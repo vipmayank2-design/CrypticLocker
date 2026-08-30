@@ -31,16 +31,16 @@ const CONSTANTS = require('../constants/cryptoConstants');
 function deriveKey(secret, salt) {
 
     return crypto.scryptSync(
-    secret,
-    salt,
-    CONSTANTS.MASTER_KEY.LENGTH,
-    {
-        N: CONSTANTS.SCRYPT.N,
-        r: CONSTANTS.SCRYPT.R,
-        p: CONSTANTS.SCRYPT.P,
-        maxmem: CONSTANTS.SCRYPT.MAX_MEMORY
-    }
-);
+        secret,
+        salt,
+        CONSTANTS.MASTER_KEY.LENGTH,
+        {
+            N: CONSTANTS.SCRYPT.N,
+            r: CONSTANTS.SCRYPT.R,
+            p: CONSTANTS.SCRYPT.P,
+            maxmem: CONSTANTS.SCRYPT.MAX_MEMORY
+        }
+    );
 
 }
 
@@ -214,22 +214,22 @@ function encryptVaultMasterKey(vaultMasterKey, unlockKey) {
     }
 
     if (
-    vaultMasterKey.length !==
-    CONSTANTS.MASTER_KEY.LENGTH
-) {
-    throw new Error(
-        'INVALID_MASTER_KEY_LENGTH'
-    );
-}
+        vaultMasterKey.length !==
+        CONSTANTS.MASTER_KEY.LENGTH
+    ) {
+        throw new Error(
+            'INVALID_MASTER_KEY_LENGTH'
+        );
+    }
 
-if (
-    unlockKey.length !==
-    CONSTANTS.AES.KEY_LENGTH
-) {
-    throw new Error(
-        'INVALID_UNLOCK_KEY_LENGTH'
-    );
-}
+    if (
+        unlockKey.length !==
+        CONSTANTS.AES.KEY_LENGTH
+    ) {
+        throw new Error(
+            'INVALID_UNLOCK_KEY_LENGTH'
+        );
+    }
 
     const iv = crypto.randomBytes(
         CONSTANTS.AES.IV_LENGTH
@@ -248,13 +248,13 @@ if (
 
     return {
 
-    iv,
+        iv,
 
-    authTag: cipher.getAuthTag(),
+        authTag: cipher.getAuthTag(),
 
-    encryptedVMK: encrypted
+        encryptedVMK: encrypted
 
-};
+    };
 
 }
 
@@ -264,26 +264,26 @@ if (
 function decryptVaultMasterKey(packageData, unlockKey) {
 
     if (
-    !packageData ||
-    !Buffer.isBuffer(packageData.iv) ||
-    !Buffer.isBuffer(packageData.authTag) ||
-    !Buffer.isBuffer(packageData.encryptedVMK)
-) {
-    throw new Error(
-        'INVALID_VMK_PACKAGE'
-    );
-}
+        !packageData ||
+        !Buffer.isBuffer(packageData.iv) ||
+        !Buffer.isBuffer(packageData.authTag) ||
+        !Buffer.isBuffer(packageData.encryptedVMK)
+    ) {
+        throw new Error(
+            'INVALID_VMK_PACKAGE'
+        );
+    }
 
-if (
-    unlockKey.length !==
-    CONSTANTS.AES.KEY_LENGTH
-) {
-    throw new Error(
-        'INVALID_UNLOCK_KEY_LENGTH'
-    );
-}
+    if (
+        unlockKey.length !==
+        CONSTANTS.AES.KEY_LENGTH
+    ) {
+        throw new Error(
+            'INVALID_UNLOCK_KEY_LENGTH'
+        );
+    }
 
-if (!Buffer.isBuffer(unlockKey)) {
+    if (!Buffer.isBuffer(unlockKey)) {
         throw new Error('INVALID_UNLOCK_KEY');
     }
 

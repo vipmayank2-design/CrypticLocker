@@ -42,7 +42,7 @@ async function collectFilesRecursively(dir, baseDir = dir) {
 async function moveDirectory(src, dest) {
     try {
         await fsp.rm(dest, { recursive: true, force: true });
-    } catch {}
+    } catch { }
 
     try {
         await fsp.rename(src, dest);
@@ -58,7 +58,7 @@ async function moveDirectory(src, dest) {
     try {
         await fsp.rename(src, dest);
         return;
-    } catch {}
+    } catch { }
 
     // Fallback to recursive copy + delete
     await fsp.cp(src, dest, { recursive: true });
@@ -366,10 +366,10 @@ async function exportVaultPackage(vaultDirectory, outputFilePath, settingsFilePa
         // All-or-Nothing Rollback: delete temp file immediately
         try {
             await fsp.unlink(tempPath);
-        } catch {}
+        } catch { }
         try {
             await fsp.unlink(outputFilePath);
-        } catch {}
+        } catch { }
         throw err;
     }
 }
@@ -865,13 +865,13 @@ async function validateAndExtractVaultPackage(packagePath, targetVaultDirectory,
             // All-or-Nothing Rollback: remove stagingDir completely
             try {
                 await fsp.rm(stagingDir, { recursive: true, force: true });
-            } catch {}
+            } catch { }
             throw innerErr;
         }
     } catch (err) {
         try {
             await fileHandle.close();
-        } catch {}
+        } catch { }
         throw err;
     }
 }

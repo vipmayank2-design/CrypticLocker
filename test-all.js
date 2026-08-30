@@ -130,7 +130,7 @@ async function main() {
 
         try {
             await fsp.mkdir(path.join(tempVault, 'files'), { recursive: true });
-            
+
             const validVaultConfig = {
                 version: 1,
                 format: 'CLV2',
@@ -202,7 +202,7 @@ async function main() {
     // -------------------------------------------------------------
     console.log('\n▶ [5/8] Testing File/Folder Restoration & Instant Cancellation...');
     runSuite('Restore overlay cleanup upon confirmation and on operation start', () => {
-        assert.ok(dashboardJs.includes('if (\n    !restoreConfirmOverlay.hidden\n) {\n\n    closeRestoreConfirm(false);\n\n}'));
+        assert.ok(dashboardJs.includes('!restoreConfirmOverlay.hidden') && dashboardJs.includes('closeRestoreConfirm(false);'));
         const closeCalls = dashboardJs.split('closeRestoreConfirm(false);').length - 1;
         assert.ok(closeCalls >= 8, 'closeRestoreConfirm must be invoked immediately after user confirm');
     });

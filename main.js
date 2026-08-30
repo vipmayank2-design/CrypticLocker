@@ -366,8 +366,8 @@ function normalizeApplicationSettings(
 
     const source =
         settings &&
-        typeof settings === 'object' &&
-        !Array.isArray(settings)
+            typeof settings === 'object' &&
+            !Array.isArray(settings)
             ? settings
             : {};
 
@@ -404,8 +404,8 @@ function normalizeApplicationSettings(
 
         theme:
             source.theme === 'light' ||
-            source.theme === 'dark' ||
-            source.theme === 'system'
+                source.theme === 'dark' ||
+                source.theme === 'system'
                 ? source.theme
                 : DEFAULT_APPLICATION_SETTINGS
                     .theme,
@@ -672,231 +672,231 @@ async function createVault(password) {
 
         const vaultDirectory = getVaultDirectory();
 
-    await fs.mkdir(vaultDirectory, {
-        recursive: true
-    });
+        await fs.mkdir(vaultDirectory, {
+            recursive: true
+        });
 
 
-    /*
-    Generate Vault Master Key.
-*/
-
-vaultMasterKey =
-    vaultCrypto.generateVaultMasterKey();
-
-/*
-    Password protection.
-*/
-
-const passwordSalt =
-    crypto.randomBytes(
-        CONSTANTS.SCRYPT.SALT_LENGTH
-    );
-
-passwordUnlockKey =
-    vaultCrypto.derivePasswordKey(
-        password,
-        passwordSalt
-    );
-
-/*
-    Encrypt VMK using password.
-*/
-
-const passwordPackage =
-    vaultCrypto.encryptVaultMasterKey(
-        vaultMasterKey,
-        passwordUnlockKey
-    );
-
-/*
-    Generate permanent recovery key.
-*/
-
-const recoveryKey =
-    vaultCrypto.generateRecoveryKey();
-
-/*
-    Protect SAME VMK using recovery key.
-*/
-
-const recoverySalt =
-    crypto.randomBytes(
-        CONSTANTS.SCRYPT.SALT_LENGTH
-    );
-
-recoveryUnlockKey =
-    vaultCrypto.deriveRecoveryKey(
-        recoveryKey,
-        recoverySalt
-    );
-
-const recoveryPackage =
-    vaultCrypto.encryptVaultMasterKey(
-        vaultMasterKey,
-        recoveryUnlockKey
-    );
-
-    /*
-    Encrypt the permanent recovery key
-    using the Vault Master Key.
-
-    The plaintext recovery key is never
-    stored inside vault.json.
-*/
-
-const encryptedRecoveryKey =
-    vaultCrypto.encryptRecoveryKey(
-        recoveryKey,
-        vaultMasterKey
-    );
-
-
-    const vaultConfig = {
-
-    version:
-    CONSTANTS.VAULT_VERSION,
-
-    format:
-    CONSTANTS.VAULT_FORMAT,
-
-    password: {
-
-        algorithm: "scrypt",
-
-        salt:
-            passwordSalt.toString("base64"),
-
-        N: CONSTANTS.SCRYPT.N,
-
-r: CONSTANTS.SCRYPT.R,
-
-p: CONSTANTS.SCRYPT.P,
-
-        vmk: {
-
-            iv:
-                passwordPackage.iv.toString("base64"),
-
-            authTag:
-                passwordPackage.authTag.toString("base64"),
-
-            encrypted:
-                passwordPackage.encryptedVMK.toString("base64")
-
-        }
-
-    },
-
-    recovery: {
-
-    algorithm: "scrypt",
-
-    salt:
-        recoverySalt.toString("base64"),
-
-    N: CONSTANTS.SCRYPT.N,
-
-    r: CONSTANTS.SCRYPT.R,
-
-    p: CONSTANTS.SCRYPT.P,
-
-    vmk: {
-
-        iv:
-            recoveryPackage.iv.toString("base64"),
-
-        authTag:
-            recoveryPackage.authTag.toString("base64"),
-
-        encrypted:
-            recoveryPackage.encryptedVMK.toString("base64")
-
-    },
-
-    key: {
-
-        iv:
-            encryptedRecoveryKey.iv.toString("base64"),
-
-        authTag:
-            encryptedRecoveryKey.authTag.toString("base64"),
-
-        encrypted:
-            encryptedRecoveryKey
-                .encryptedRecoveryKey
-                .toString("base64")
-
-    }
-
-},
-
-    createdAt:
-        new Date().toISOString()
-
-};
-
-    /*
-        Atomic-ish config creation:
-        first write temporary file,
-        then rename it.
+        /*
+        Generate Vault Master Key.
     */
 
-    const temporaryPath =
-        path.join(vaultDirectory, 'vault.tmp');
+        vaultMasterKey =
+            vaultCrypto.generateVaultMasterKey();
 
+        /*
+            Password protection.
+        */
 
-    await fs.writeFile(
-        temporaryPath,
-        JSON.stringify(vaultConfig, null, 2),
-        {
-            encoding: 'utf8',
-            flag: 'wx'
-        }
-    );
+        const passwordSalt =
+            crypto.randomBytes(
+                CONSTANTS.SCRYPT.SALT_LENGTH
+            );
 
+        passwordUnlockKey =
+            vaultCrypto.derivePasswordKey(
+                password,
+                passwordSalt
+            );
 
-    await fs.rename(
-        temporaryPath,
-        getVaultConfigPath()
-    );
+        /*
+            Encrypt VMK using password.
+        */
 
-    sessionManager.createSession();
+        const passwordPackage =
+            vaultCrypto.encryptVaultMasterKey(
+                vaultMasterKey,
+                passwordUnlockKey
+            );
 
-sessionManager.setVaultMasterKey(
-    vaultMasterKey
-);
+        /*
+            Generate permanent recovery key.
+        */
 
+        const recoveryKey =
+            vaultCrypto.generateRecoveryKey();
 
-    /*
-        Best effort:
-        remove password reference from this function.
-        JavaScript strings cannot be reliably wiped
-        from memory, so we never persist it.
+        /*
+            Protect SAME VMK using recovery key.
+        */
+
+        const recoverySalt =
+            crypto.randomBytes(
+                CONSTANTS.SCRYPT.SALT_LENGTH
+            );
+
+        recoveryUnlockKey =
+            vaultCrypto.deriveRecoveryKey(
+                recoveryKey,
+                recoverySalt
+            );
+
+        const recoveryPackage =
+            vaultCrypto.encryptVaultMasterKey(
+                vaultMasterKey,
+                recoveryUnlockKey
+            );
+
+        /*
+        Encrypt the permanent recovery key
+        using the Vault Master Key.
+    
+        The plaintext recovery key is never
+        stored inside vault.json.
     */
 
-    return {
+        const encryptedRecoveryKey =
+            vaultCrypto.encryptRecoveryKey(
+                recoveryKey,
+                vaultMasterKey
+            );
 
-    success: true,
 
-    recoveryKey
+        const vaultConfig = {
 
-};
+            version:
+                CONSTANTS.VAULT_VERSION,
 
-}
-finally {
+            format:
+                CONSTANTS.VAULT_FORMAT,
 
-    if (passwordUnlockKey) {
-        passwordUnlockKey.fill(0);
+            password: {
+
+                algorithm: "scrypt",
+
+                salt:
+                    passwordSalt.toString("base64"),
+
+                N: CONSTANTS.SCRYPT.N,
+
+                r: CONSTANTS.SCRYPT.R,
+
+                p: CONSTANTS.SCRYPT.P,
+
+                vmk: {
+
+                    iv:
+                        passwordPackage.iv.toString("base64"),
+
+                    authTag:
+                        passwordPackage.authTag.toString("base64"),
+
+                    encrypted:
+                        passwordPackage.encryptedVMK.toString("base64")
+
+                }
+
+            },
+
+            recovery: {
+
+                algorithm: "scrypt",
+
+                salt:
+                    recoverySalt.toString("base64"),
+
+                N: CONSTANTS.SCRYPT.N,
+
+                r: CONSTANTS.SCRYPT.R,
+
+                p: CONSTANTS.SCRYPT.P,
+
+                vmk: {
+
+                    iv:
+                        recoveryPackage.iv.toString("base64"),
+
+                    authTag:
+                        recoveryPackage.authTag.toString("base64"),
+
+                    encrypted:
+                        recoveryPackage.encryptedVMK.toString("base64")
+
+                },
+
+                key: {
+
+                    iv:
+                        encryptedRecoveryKey.iv.toString("base64"),
+
+                    authTag:
+                        encryptedRecoveryKey.authTag.toString("base64"),
+
+                    encrypted:
+                        encryptedRecoveryKey
+                            .encryptedRecoveryKey
+                            .toString("base64")
+
+                }
+
+            },
+
+            createdAt:
+                new Date().toISOString()
+
+        };
+
+        /*
+            Atomic-ish config creation:
+            first write temporary file,
+            then rename it.
+        */
+
+        const temporaryPath =
+            path.join(vaultDirectory, 'vault.tmp');
+
+
+        await fs.writeFile(
+            temporaryPath,
+            JSON.stringify(vaultConfig, null, 2),
+            {
+                encoding: 'utf8',
+                flag: 'wx'
+            }
+        );
+
+
+        await fs.rename(
+            temporaryPath,
+            getVaultConfigPath()
+        );
+
+        sessionManager.createSession();
+
+        sessionManager.setVaultMasterKey(
+            vaultMasterKey
+        );
+
+
+        /*
+            Best effort:
+            remove password reference from this function.
+            JavaScript strings cannot be reliably wiped
+            from memory, so we never persist it.
+        */
+
+        return {
+
+            success: true,
+
+            recoveryKey
+
+        };
+
     }
+    finally {
 
-    if (recoveryUnlockKey) { recoveryUnlockKey.fill(0); }
+        if (passwordUnlockKey) {
+            passwordUnlockKey.fill(0);
+        }
 
-    if (vaultMasterKey) {
-        vaultMasterKey.fill(0);
+        if (recoveryUnlockKey) { recoveryUnlockKey.fill(0); }
+
+        if (vaultMasterKey) {
+            vaultMasterKey.fill(0);
+        }
+
     }
-
-}
 
 }
 
@@ -1123,7 +1123,7 @@ function serializeCLV2Metadata(
     if (
         !metadata ||
         metadata.version !==
-            CLV2_VERSION
+        CLV2_VERSION
     ) {
 
         throw new Error(
@@ -1161,7 +1161,7 @@ function serializeCLV2Metadata(
     if (
         metadataBuffer.length === 0 ||
         metadataBuffer.length >
-            MAX_METADATA_SIZE
+        MAX_METADATA_SIZE
     ) {
 
         throw new Error(
@@ -1220,11 +1220,11 @@ function decodeVaultIndexContainer(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     /*
@@ -1372,8 +1372,8 @@ const vaultMasterKey =
 async function readVaultIndex() {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
 
     try {
@@ -1421,8 +1421,8 @@ async function readVaultIndex() {
 async function readVaultIndexBackup() {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
 
     const backupPath =
@@ -1853,8 +1853,8 @@ async function cleanupOldDamagedVaultIndexes(
 async function recoverVaultIndexIfNeeded() {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
 
     /*
@@ -2151,10 +2151,10 @@ async function recoverVaultIndexIfNeeded() {
 
 
         await cleanupOldDamagedVaultIndexes(
-    3
-);
+            3
+        );
 
-return {
+        return {
 
             recovered: true,
 
@@ -2212,13 +2212,13 @@ return {
 async function writeVaultIndex(indexData) {
 
     if (
-    !sessionManager.isUnlocked()
-) {
-    throw new Error('Vault is locked.');
-}
+        !sessionManager.isUnlocked()
+    ) {
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const plaintext =
@@ -2233,11 +2233,11 @@ const vaultMasterKey =
 
 
     const cipher =
-    crypto.createCipheriv(
-        'aes-256-gcm',
-        vaultMasterKey,
-        iv
-    );
+        crypto.createCipheriv(
+            'aes-256-gcm',
+            vaultMasterKey,
+            iv
+        );
 
 
     cipher.setAAD(
@@ -2277,46 +2277,46 @@ const vaultMasterKey =
         const temporaryPath =
             `${indexPath}.tmp`;
 
-            const backupPath =
-    `${indexPath}.bak`;
+        const backupPath =
+            `${indexPath}.bak`;
 
-            /*
-    Write the new encrypted index to a
-    temporary file first.
+        /*
+Write the new encrypted index to a
+temporary file first.
 
-    Do not consider the temporary index
-    durable until its contents have been
-    explicitly flushed to storage.
+Do not consider the temporary index
+durable until its contents have been
+explicitly flushed to storage.
 */
 
-const temporaryHandle =
-    await fs.open(
-        temporaryPath,
-        'w'
-    );
+        const temporaryHandle =
+            await fs.open(
+                temporaryPath,
+                'w'
+            );
 
 
-try {
+        try {
 
-    await temporaryHandle.writeFile(
-        container
-    );
-
-
-    /*
-        Force pending index data to the
-        storage device before verification
-        and before replacing index.clm.
-    */
-
-    await temporaryHandle.sync();
+            await temporaryHandle.writeFile(
+                container
+            );
 
 
-} finally {
+            /*
+                Force pending index data to the
+                storage device before verification
+                and before replacing index.clm.
+            */
 
-    await temporaryHandle.close();
+            await temporaryHandle.sync();
 
-}
+
+        } finally {
+
+            await temporaryHandle.close();
+
+        }
 
 
         /*
@@ -2395,82 +2395,82 @@ try {
     newly verified temporary index.
 */
 
-try {
+        try {
 
-    /*
-        Read the currently committed index.
-    */
+            /*
+                Read the currently committed index.
+            */
 
-    const currentIndex =
-        await fs.readFile(
-            indexPath
-        );
-
-
-    /*
-        Write the known-good previous index
-        into the backup using a writable handle.
-    */
-
-    const backupHandle =
-        await fs.open(
-            backupPath,
-            'w'
-        );
+            const currentIndex =
+                await fs.readFile(
+                    indexPath
+                );
 
 
-    try {
+            /*
+                Write the known-good previous index
+                into the backup using a writable handle.
+            */
 
-        await backupHandle.writeFile(
-            currentIndex
-        );
+            const backupHandle =
+                await fs.open(
+                    backupPath,
+                    'w'
+                );
+
+
+            try {
+
+                await backupHandle.writeFile(
+                    currentIndex
+                );
+
+
+                /*
+                    Flush backup contents before the
+                    active index is replaced.
+                */
+
+                await backupHandle.sync();
+
+
+            } finally {
+
+                await backupHandle.close();
+
+            }
+
+
+        } catch (error) {
+
+            /*
+                No existing index is normal during
+                first-time vault creation.
+            */
+
+            if (
+                error.code !==
+                'ENOENT'
+            ) {
+
+                throw error;
+
+            }
+
+        }
 
 
         /*
-            Flush backup contents before the
-            active index is replaced.
+            The new index.clm.tmp has already passed
+            cryptographic verification and fsync.
+        
+            It can now become the active index.
         */
 
-        await backupHandle.sync();
-
-
-    } finally {
-
-        await backupHandle.close();
-
-    }
-
-
-} catch (error) {
-
-    /*
-        No existing index is normal during
-        first-time vault creation.
-    */
-
-    if (
-        error.code !==
-        'ENOENT'
-    ) {
-
-        throw error;
-
-    }
-
-}
-
-
-/*
-    The new index.clm.tmp has already passed
-    cryptographic verification and fsync.
-
-    It can now become the active index.
-*/
-
-await fs.rename(
-    temporaryPath,
-    indexPath
-);
+        await fs.rename(
+            temporaryPath,
+            indexPath
+        );
 
 
     } finally {
@@ -2516,7 +2516,7 @@ function isVaultOperationCancelled(
 
     return (
         typeof operationId ===
-            'string' &&
+        'string' &&
         cancelledVaultOperations.has(
             operationId
         )
@@ -2653,7 +2653,7 @@ function sendVaultOperationFailure(
         name = null,
         error = null,
         fallbackMessage =
-            'The operation could not be completed.'
+        'The operation could not be completed.'
     } = {}
 ) {
 
@@ -2666,59 +2666,59 @@ function sendVaultOperationFailure(
 
     const errorCode =
         error &&
-        typeof error.code === 'string'
+            typeof error.code === 'string'
             ? error.code
             : 'OPERATION_FAILED';
 
 
     const cancelled =
-    errorCode ===
-    'OPERATION_CANCELLED';
+        errorCode ===
+        'OPERATION_CANCELLED';
 
 
-sendVaultProgress(
-    event,
-    {
-        operationId,
+    sendVaultProgress(
+        event,
+        {
+            operationId,
 
-        operation,
+            operation,
 
-        itemType,
+            itemType,
 
-        status:
-            cancelled
-                ? 'cancelled'
-                : 'failed',
+            status:
+                cancelled
+                    ? 'cancelled'
+                    : 'failed',
 
-        name,
+            name,
 
-        currentFile:
-            null,
+            currentFile:
+                null,
 
-        errorCode,
+            errorCode,
 
-        message:
-            cancelled
-                ? 'Operation cancelled by user.'
-                : message,
+            message:
+                cancelled
+                    ? 'Operation cancelled by user.'
+                    : message,
 
-        speedBytesPerSecond:
-            0,
+            speedBytesPerSecond:
+                0,
 
-        etaSeconds:
-            null
+            etaSeconds:
+                null
 
-    }
-);
-
-
-if (cancelled) {
-
-    clearVaultOperationCancellation(
-        operationId
+        }
     );
 
-}
+
+    if (cancelled) {
+
+        clearVaultOperationCancellation(
+            operationId
+        );
+
+    }
 
 }
 
@@ -3014,7 +3014,7 @@ async function cleanupRecoveryJournalOnStartup() {
         !journal ||
         journal.version !== 1 ||
         typeof journal.destinationPath !==
-            'string' ||
+        'string' ||
         !journal.destinationPath.trim() ||
         !path.isAbsolute(
             journal.destinationPath
@@ -3198,7 +3198,7 @@ async function detectOrphanVaultFiles(
 
             if (
                 typeof file.encryptedFile ===
-                    'string' &&
+                'string' &&
                 file.encryptedFile.length > 0
             ) {
 
@@ -3875,8 +3875,8 @@ async function deleteQuarantinedOrphan(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
 
     if (
@@ -3958,8 +3958,8 @@ async function deleteQuarantinedOrphan(
 async function deleteAllInvalidQuarantinedOrphans() {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
 
     /*
@@ -4123,11 +4123,11 @@ async function inspectCLV2OrphanMetadata(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const safeName =
@@ -4169,7 +4169,7 @@ const vaultMasterKey =
     if (
         !stat.isFile() ||
         stat.size <
-            CLV2_HEADER_LENGTH + 5 + 32
+        CLV2_HEADER_LENGTH + 5 + 32
     ) {
         throw new Error(
             'Invalid or incomplete CLV2 container.'
@@ -4273,7 +4273,7 @@ const vaultMasterKey =
     if (
         serializedMetadataLength < 5 ||
         serializedMetadataLength >
-            MAX_METADATA_SIZE + 4
+        MAX_METADATA_SIZE + 4
     ) {
         throw new Error(
             'Invalid CLV2 metadata length.'
@@ -4465,11 +4465,11 @@ const vaultMasterKey =
         if (
             !metadata ||
             metadata.version !==
-                CLV2_VERSION ||
+            CLV2_VERSION ||
             metadata.id !==
-                fileId ||
+            fileId ||
             typeof metadata.name !==
-                'string' ||
+            'string' ||
             !metadata.name.trim() ||
             !Number.isSafeInteger(
                 metadata.size
@@ -4546,8 +4546,8 @@ async function recoverQuarantinedOrphanAuto(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault must be unlocked before recovery.');
-}
+        throw new Error('Vault must be unlocked before recovery.');
+    }
 
     const safeName =
         path.basename(
@@ -4665,11 +4665,11 @@ async function recoverCLV2OrphanFile(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const safeName =
@@ -4788,7 +4788,7 @@ const vaultMasterKey =
 
     if (
         typeof result.metadata.name !==
-            'string' ||
+        'string' ||
         !result.metadata.name.trim()
     ) {
 
@@ -4827,11 +4827,11 @@ async function recoverOrphanFile(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const safeName =
@@ -4903,13 +4903,13 @@ const vaultMasterKey =
         }
 
         const totalBytes =
-    Math.max(
-        0,
-        stat.size - 32
-    );
+            Math.max(
+                0,
+                stat.size - 32
+            );
 
 
-let processedBytes = 0;
+        let processedBytes = 0;
 
 
         /*
@@ -5052,43 +5052,43 @@ let processedBytes = 0;
                 }
             );
 
-            const progressTransform =
-    new Transform({
+        const progressTransform =
+            new Transform({
 
-        transform(
-            chunk,
-            encoding,
-            callback
-        ) {
+                transform(
+                    chunk,
+                    encoding,
+                    callback
+                ) {
 
-            processedBytes +=
-                chunk.length;
-
-
-            if (
-                typeof onProgress ===
-                'function'
-            ) {
-
-                onProgress({
-
-                    processedBytes,
-
-                    totalBytes
-
-                });
-
-            }
+                    processedBytes +=
+                        chunk.length;
 
 
-            callback(
-                null,
-                chunk
-            );
+                    if (
+                        typeof onProgress ===
+                        'function'
+                    ) {
 
-        }
+                        onProgress({
 
-    });
+                            processedBytes,
+
+                            totalBytes
+
+                        });
+
+                    }
+
+
+                    callback(
+                        null,
+                        chunk
+                    );
+
+                }
+
+            });
 
 
         /*
@@ -5281,13 +5281,13 @@ async function calculateEncryptedFileHash(
 ) {
 
     if (
-    !sessionManager.isUnlocked()
-) {
-    throw new Error('Vault is locked.');
-}
+        !sessionManager.isUnlocked()
+    ) {
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const encryptedPath =
@@ -5441,13 +5441,13 @@ async function encryptFile(
 ) {
 
     if (
-    !sessionManager.isUnlocked()
-) {
-    throw new Error('Vault is locked.');
-}
+        !sessionManager.isUnlocked()
+    ) {
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const stat =
@@ -5487,11 +5487,11 @@ const vaultMasterKey =
 
 
     const cipher =
-    crypto.createCipheriv(
-        'aes-256-gcm',
-        vaultMasterKey,
-        iv
-    );
+        crypto.createCipheriv(
+            'aes-256-gcm',
+            vaultMasterKey,
+            iv
+        );
 
 
     const aad =
@@ -5513,18 +5513,18 @@ const vaultMasterKey =
     const temporaryPath =
         `${destinationPath}.tmp`;
 
-        /*
-    Calculate SHA-256 during the SAME
-    streaming pass used for encryption.
+    /*
+Calculate SHA-256 during the SAME
+streaming pass used for encryption.
 
-    This avoids reading large files once
-    for hashing and then again for encryption.
+This avoids reading large files once
+for hashing and then again for encryption.
 */
 
-const hash =
-    crypto.createHash(
-        'sha256'
-    );
+    const hash =
+        crypto.createHash(
+            'sha256'
+        );
 
     let originalHash = null;
 
@@ -5594,82 +5594,82 @@ const hash =
         */
 
         const writeStream =
-    fsSync.createWriteStream(
-        temporaryPath,
-        {
-            flags: 'r+',
-            start: 32
-        }
-    );
-
-
-/*
-    Every plaintext chunk passes through
-    this transform before encryption.
-
-    The chunk is added to SHA-256 and then
-    immediately forwarded to AES-GCM.
-*/
-
-const hashTransform =
-    new Transform({
-
-        transform(
-            chunk,
-            encoding,
-            callback
-        ) {
-
-            hash.update(
-                chunk
+            fsSync.createWriteStream(
+                temporaryPath,
+                {
+                    flags: 'r+',
+                    start: 32
+                }
             );
 
 
-            callback(
-                null,
-                chunk
+        /*
+            Every plaintext chunk passes through
+            this transform before encryption.
+        
+            The chunk is added to SHA-256 and then
+            immediately forwarded to AES-GCM.
+        */
+
+        const hashTransform =
+            new Transform({
+
+                transform(
+                    chunk,
+                    encoding,
+                    callback
+                ) {
+
+                    hash.update(
+                        chunk
+                    );
+
+
+                    callback(
+                        null,
+                        chunk
+                    );
+
+                }
+
+            });
+
+        const progressTransform =
+            createProgressTransform(
+                processedBytes => {
+
+                    if (
+                        typeof onProgress ===
+                        'function'
+                    ) {
+
+                        onProgress({
+
+                            fileId,
+
+                            name:
+                                originalName,
+
+                            processedBytes,
+
+                            totalBytes:
+                                stat.size
+
+                        });
+
+                    }
+
+                }
             );
 
-        }
 
-    });
-    
-    const progressTransform =
-    createProgressTransform(
-        processedBytes => {
-
-            if (
-                typeof onProgress ===
-                'function'
-            ) {
-
-                onProgress({
-
-                    fileId,
-
-                    name:
-                        originalName,
-
-                    processedBytes,
-
-                    totalBytes:
-                        stat.size
-
-                });
-
-            }
-
-        }
-    );
-
-
-await pipeline(
-    readStream,
-    progressTransform,
-    hashTransform,
-    cipher,
-    writeStream
-);
+        await pipeline(
+            readStream,
+            progressTransform,
+            hashTransform,
+            cipher,
+            writeStream
+        );
 
 
         /*
@@ -5677,12 +5677,12 @@ await pipeline(
     plaintext byte has now been hashed.
 */
 
-originalHash =
-    hash.digest(
-        'hex'
-    );
-    
-    const authTag =
+        originalHash =
+            hash.digest(
+                'hex'
+            );
+
+        const authTag =
             cipher.getAuthTag();
 
 
@@ -5796,42 +5796,42 @@ originalHash =
     together after every file succeeds.
 */
 
-if (saveToIndex) {
-
-    try {
-
-        const index =
-            await readVaultIndex();
-
-
-        index.files.push(
-            fileMetadata
-        );
-
-
-        await writeVaultIndex(
-            index
-        );
-
-
-    } catch (error) {
+    if (saveToIndex) {
 
         try {
 
-            await fs.unlink(
-                destinationPath
+            const index =
+                await readVaultIndex();
+
+
+            index.files.push(
+                fileMetadata
             );
 
-        } catch {
-            // Best-effort cleanup
+
+            await writeVaultIndex(
+                index
+            );
+
+
+        } catch (error) {
+
+            try {
+
+                await fs.unlink(
+                    destinationPath
+                );
+
+            } catch {
+                // Best-effort cleanup
+            }
+
+
+            throw error;
+
         }
 
-
-        throw error;
-
     }
-
-}
 
 
     /*
@@ -5905,20 +5905,20 @@ async function encryptFileV2(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const {
-    parentFolderId = null,
-    relativePath = null,
-    operationId = null,
-    onProgress = null,
-    mode = 'copy'
-} = options;
+        parentFolderId = null,
+        relativePath = null,
+        operationId = null,
+        onProgress = null,
+        mode = 'copy'
+    } = options;
 
 
     const stat =
@@ -6029,11 +6029,11 @@ const vaultMasterKey =
 
 
     const cipher =
-    crypto.createCipheriv(
-        'aes-256-gcm',
-        vaultMasterKey,
-        iv
-    );
+        crypto.createCipheriv(
+            'aes-256-gcm',
+            vaultMasterKey,
+            iv
+        );
 
 
     cipher.setAAD(
@@ -6119,240 +6119,240 @@ const vaultMasterKey =
 */
 
 
-/*
-    Start consuming encrypted output
-    immediately.
+        /*
+            Start consuming encrypted output
+            immediately.
+        
+            Do not await yet because plaintext still
+            needs to be written into the cipher.
+        */
 
-    Do not await yet because plaintext still
-    needs to be written into the cipher.
-*/
-
-const cipherPipeline =
-    pipeline(
-        cipher,
-        outputStream
-    );
+        const cipherPipeline =
+            pipeline(
+                cipher,
+                outputStream
+            );
 
 
-/*
-    Metadata is the first authenticated and
-    encrypted part of the CLV2 payload.
-*/
+        /*
+            Metadata is the first authenticated and
+            encrypted part of the CLV2 payload.
+        */
 
-if (
-    !cipher.write(
-        serializedMetadata
-    )
-) {
-
-    await new Promise(
-        resolve =>
-            cipher.once(
-                'drain',
-                resolve
+        if (
+            !cipher.write(
+                serializedMetadata
             )
-    );
-
-}
-
-
-const inputStream =
-    fsSync.createReadStream(
-        sourcePath
-    );
-
-
-let processedBytes =
-    0;
-
-
-const hashTransform =
-    new Transform({
-
-        transform(
-            chunk,
-            encoding,
-            callback
         ) {
 
-            try {
-
-                if (
-    isVaultOperationCancelled(
-        operationId
-    )
-) {
-
-    callback(
-        createVaultOperationCancelledError()
-    );
-
-    return;
-
-}
-
-hash.update(
-                    chunk
-                );
-
-                if (
-    operationId &&
-    isVaultOperationCancelled(
-        operationId
-    )
-) {
-
-    callback(
-        createVaultOperationCancelledError()
-    );
-
-    return;
-
-}
-
-                processedBytes +=
-                    chunk.length;
-
-
-                if (
-                    typeof onProgress ===
-                    'function'
-                ) {
-
-                    onProgress({
-
-                        fileId,
-
-                        name:
-                            originalName,
-
-                        processedBytes,
-
-                        totalBytes:
-                            stat.size
-
-                    });
-
-                }
-
-
-                callback(
-                    null,
-                    chunk
-                );
-
-            } catch (error) {
-
-                callback(
-                    error
-                );
-
-            }
-
-        }
-
-    });
-
-
-/*
-    Writable bridge.
-
-    It forwards plaintext file bytes into the
-    already-running AES-GCM cipher without
-    ending the cipher when the source file
-    finishes.
-
-    We still need to append SHA-256 afterward.
-*/
-
-const cipherInput =
-    new Writable({
-
-        write(
-            chunk,
-            encoding,
-            callback
-        ) {
-
-            try {
-
-                if (
-                    cipher.write(
-                        chunk
+            await new Promise(
+                resolve =>
+                    cipher.once(
+                        'drain',
+                        resolve
                     )
-                ) {
-
-                    callback();
-                    return;
-
-                }
-
-
-                cipher.once(
-                    'drain',
-                    callback
-                );
-
-            } catch (error) {
-
-                callback(
-                    error
-                );
-
-            }
+            );
 
         }
 
-    });
+
+        const inputStream =
+            fsSync.createReadStream(
+                sourcePath
+            );
 
 
-await pipeline(
-    inputStream,
-    hashTransform,
-    cipherInput
-);
+        let processedBytes =
+            0;
 
 
-/*
-    Every original file byte has now passed
-    through SHA-256 exactly once.
-*/
+        const hashTransform =
+            new Transform({
 
-const sha256Digest =
-    hash.digest();
+                transform(
+                    chunk,
+                    encoding,
+                    callback
+                ) {
+
+                    try {
+
+                        if (
+                            isVaultOperationCancelled(
+                                operationId
+                            )
+                        ) {
+
+                            callback(
+                                createVaultOperationCancelledError()
+                            );
+
+                            return;
+
+                        }
+
+                        hash.update(
+                            chunk
+                        );
+
+                        if (
+                            operationId &&
+                            isVaultOperationCancelled(
+                                operationId
+                            )
+                        ) {
+
+                            callback(
+                                createVaultOperationCancelledError()
+                            );
+
+                            return;
+
+                        }
+
+                        processedBytes +=
+                            chunk.length;
 
 
-if (
-    sha256Digest.length !==
-    sha256DigestLength
-) {
+                        if (
+                            typeof onProgress ===
+                            'function'
+                        ) {
 
-    throw new Error(
-        'Invalid SHA-256 digest.'
-    );
+                            onProgress({
 
-}
+                                fileId,
 
+                                name:
+                                    originalName,
 
-/*
-    Digest is the final encrypted part of the
-    CLV2 plaintext payload.
+                                processedBytes,
 
-    cipher.end() appends it and then finalizes
-    AES-GCM.
-*/
+                                totalBytes:
+                                    stat.size
 
-cipher.end(
-    sha256Digest
-);
+                            });
+
+                        }
 
 
-/*
-    Now wait until every encrypted byte has
-    actually reached the temporary file.
-*/
+                        callback(
+                            null,
+                            chunk
+                        );
 
-await cipherPipeline;
+                    } catch (error) {
+
+                        callback(
+                            error
+                        );
+
+                    }
+
+                }
+
+            });
+
+
+        /*
+            Writable bridge.
+        
+            It forwards plaintext file bytes into the
+            already-running AES-GCM cipher without
+            ending the cipher when the source file
+            finishes.
+        
+            We still need to append SHA-256 afterward.
+        */
+
+        const cipherInput =
+            new Writable({
+
+                write(
+                    chunk,
+                    encoding,
+                    callback
+                ) {
+
+                    try {
+
+                        if (
+                            cipher.write(
+                                chunk
+                            )
+                        ) {
+
+                            callback();
+                            return;
+
+                        }
+
+
+                        cipher.once(
+                            'drain',
+                            callback
+                        );
+
+                    } catch (error) {
+
+                        callback(
+                            error
+                        );
+
+                    }
+
+                }
+
+            });
+
+
+        await pipeline(
+            inputStream,
+            hashTransform,
+            cipherInput
+        );
+
+
+        /*
+            Every original file byte has now passed
+            through SHA-256 exactly once.
+        */
+
+        const sha256Digest =
+            hash.digest();
+
+
+        if (
+            sha256Digest.length !==
+            sha256DigestLength
+        ) {
+
+            throw new Error(
+                'Invalid SHA-256 digest.'
+            );
+
+        }
+
+
+        /*
+            Digest is the final encrypted part of the
+            CLV2 plaintext payload.
+        
+            cipher.end() appends it and then finalizes
+            AES-GCM.
+        */
+
+        cipher.end(
+            sha256Digest
+        );
+
+
+        /*
+            Now wait until every encrypted byte has
+            actually reached the temporary file.
+        */
+
+        await cipherPipeline;
 
 
         const authTag =
@@ -6680,11 +6680,11 @@ async function restoreCLV2FileStream(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const containerStat =
@@ -6696,7 +6696,7 @@ const vaultMasterKey =
     if (
         !containerStat.isFile() ||
         containerStat.size <
-            CLV2_HEADER_LENGTH + 4 + 1 + 32
+        CLV2_HEADER_LENGTH + 4 + 1 + 32
     ) {
         throw new Error(
             'Invalid or incomplete CLV2 container.'
@@ -6803,7 +6803,7 @@ const vaultMasterKey =
     if (
         serializedMetadataLength < 5 ||
         serializedMetadataLength >
-            MAX_METADATA_SIZE + 4
+        MAX_METADATA_SIZE + 4
     ) {
         throw new Error(
             'Invalid CLV2 metadata length.'
@@ -7117,11 +7117,11 @@ const vaultMasterKey =
                                 if (
                                     !metadata ||
                                     metadata.version !==
-                                        CLV2_VERSION ||
+                                    CLV2_VERSION ||
                                     metadata.id !==
-                                        fileId ||
+                                    fileId ||
                                     typeof metadata.name !==
-                                        'string' ||
+                                    'string' ||
                                     !Number.isSafeInteger(
                                         metadata.size
                                     ) ||
@@ -7504,7 +7504,7 @@ const vaultMasterKey =
     }
 
 }
-    
+
 /* =========================================
    VERIFY CLV2 FILE - STREAMING
 ========================================= */
@@ -7514,19 +7514,19 @@ async function verifyCLV2FileStream(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     if (
         !fileMetadata ||
         typeof fileMetadata.id !==
-            'string' ||
+        'string' ||
         typeof fileMetadata.encryptedFile !==
-            'string'
+        'string'
     ) {
         throw new Error(
             'Invalid file metadata.'
@@ -7550,10 +7550,10 @@ const vaultMasterKey =
     if (
         !containerStat.isFile() ||
         containerStat.size <
-            CLV2_HEADER_LENGTH +
-            4 +
-            1 +
-            32
+        CLV2_HEADER_LENGTH +
+        4 +
+        1 +
+        32
     ) {
         throw new Error(
             'Invalid or incomplete CLV2 container.'
@@ -7660,7 +7660,7 @@ const vaultMasterKey =
     if (
         serializedMetadataLength < 5 ||
         serializedMetadataLength >
-            MAX_METADATA_SIZE + 4
+        MAX_METADATA_SIZE + 4
     ) {
         throw new Error(
             'Invalid CLV2 metadata length.'
@@ -7785,7 +7785,7 @@ const vaultMasterKey =
                                 Math.min(
                                     remaining,
                                     chunk.length -
-                                        offset
+                                    offset
                                 );
 
 
@@ -7855,11 +7855,11 @@ const vaultMasterKey =
                                 if (
                                     !metadata ||
                                     metadata.version !==
-                                        CLV2_VERSION ||
+                                    CLV2_VERSION ||
                                     metadata.id !==
-                                        fileMetadata.id ||
+                                    fileMetadata.id ||
                                     typeof metadata.name !==
-                                        'string' ||
+                                    'string' ||
                                     !Number.isSafeInteger(
                                         metadata.size
                                     ) ||
@@ -7919,7 +7919,7 @@ const vaultMasterKey =
                                 Math.min(
                                     remaining,
                                     chunk.length -
-                                        offset
+                                    offset
                                 );
 
 
@@ -7973,7 +7973,7 @@ const vaultMasterKey =
                             Math.min(
                                 remainingDigest,
                                 chunk.length -
-                                    offset
+                                offset
                             );
 
 
@@ -8105,9 +8105,9 @@ const vaultMasterKey =
 
         if (
             typeof fileMetadata.size ===
-                'number' &&
+            'number' &&
             metadata.size !==
-                fileMetadata.size
+            fileMetadata.size
         ) {
             throw new Error(
                 'CLV2 file size does not match vault index.'
@@ -8123,9 +8123,9 @@ const vaultMasterKey =
 
         if (
             typeof fileMetadata.sha256 ===
-                'string' &&
+            'string' &&
             calculatedHash !==
-                fileMetadata.sha256
+            fileMetadata.sha256
         ) {
             throw new Error(
                 'CLV2 SHA-256 does not match vault index.'
@@ -8185,8 +8185,8 @@ async function restoreVaultFileAuto(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
 
     if (
@@ -8242,11 +8242,11 @@ async function restoreVaultFileAuto(
 
 
         await restoreVaultFileStream(
-    fileMetadata,
-    destinationPath,
-    operationId,
-    onProgress
-);
+            fileMetadata,
+            destinationPath,
+            operationId,
+            onProgress
+        );
 
 
         return {
@@ -8304,9 +8304,9 @@ async function restoreVaultFileAuto(
 
         if (
             typeof fileMetadata.size ===
-                'number' &&
+            'number' &&
             restored.metadata.size !==
-                fileMetadata.size
+            fileMetadata.size
         ) {
             throw new Error(
                 'CLV2 file size does not match vault index.'
@@ -8316,9 +8316,9 @@ async function restoreVaultFileAuto(
 
         if (
             typeof fileMetadata.sha256 ===
-                'string' &&
+            'string' &&
             restored.sha256 !==
-                fileMetadata.sha256
+            fileMetadata.sha256
         ) {
             throw new Error(
                 'CLV2 SHA-256 does not match vault index.'
@@ -8348,12 +8348,12 @@ async function encryptFolder(
     operationId = null,
     onProgress = null
 ) {
-if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+    if (!sessionManager.isUnlocked()) {
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     const stat =
@@ -8393,81 +8393,81 @@ const vaultMasterKey =
 
 
     const totalSize =
-    scan.files.reduce(
-        (sum, file) =>
-            sum + file.size,
-        0
-    );
-
-
-const storageCheck =
-    await ensureVaultStorageAvailable(
-        totalSize
-    );
-
-
-if (!storageCheck.enough) {
-
-    const error =
-        new Error(
-            'Not enough storage space.'
+        scan.files.reduce(
+            (sum, file) =>
+                sum + file.size,
+            0
         );
 
 
-    error.code =
-        'INSUFFICIENT_STORAGE';
+    const storageCheck =
+        await ensureVaultStorageAvailable(
+            totalSize
+        );
 
 
-    error.requiredBytes =
-        storageCheck.requiredWithBuffer;
+    if (!storageCheck.enough) {
+
+        const error =
+            new Error(
+                'Not enough storage space.'
+            );
 
 
-    error.folderSize =
-        totalSize;
+        error.code =
+            'INSUFFICIENT_STORAGE';
 
 
-    error.availableBytes =
-        storageCheck.availableBytes;
+        error.requiredBytes =
+            storageCheck.requiredWithBuffer;
 
 
-    throw error;
-
-}
-
-const totalFiles =
-    scan.files.length;
+        error.folderSize =
+            totalSize;
 
 
-let completedFiles = 0;
-
-let completedBytes = 0;
-
-
-const encryptedFiles = [];
+        error.availableBytes =
+            storageCheck.availableBytes;
 
 
-/*
-    Tracks whether index.clm has already
-    been replaced with this transaction.
+        throw error;
 
-    This is intentionally separate from
-    transactionCommitted.
+    }
 
-    indexWritten:
-        index.clm may already reference
-        these encrypted files.
+    const totalFiles =
+        scan.files.length;
 
-    transactionCommitted:
-        the newly written index has also
-        passed read-back verification.
-*/
 
-let indexWritten =
-    false;
+    let completedFiles = 0;
 
-let transactionCommitted =
-    false;
+    let completedBytes = 0;
+
+
+    const encryptedFiles = [];
+
+
+    /*
+        Tracks whether index.clm has already
+        been replaced with this transaction.
     
+        This is intentionally separate from
+        transactionCommitted.
+    
+        indexWritten:
+            index.clm may already reference
+            these encrypted files.
+    
+        transactionCommitted:
+            the newly written index has also
+            passed read-back verification.
+    */
+
+    let indexWritten =
+        false;
+
+    let transactionCommitted =
+        false;
+
     /*
     Transaction state.
 
@@ -8481,7 +8481,7 @@ let transactionCommitted =
 */
 
 
-try {
+    try {
 
         /*
             PHASE 1 — PREPARE
@@ -8491,190 +8491,190 @@ try {
         */
 
         for (
-    const sourceFile
-    of scan.files
-) {
+            const sourceFile
+            of scan.files
+        ) {
 
-    const currentFileName =
-        path.basename(
-            sourceFile.sourcePath
-        );
+            const currentFileName =
+                path.basename(
+                    sourceFile.sourcePath
+                );
 
-
-    /*
-        Tell renderer which file is about
-        to start processing.
-
-        Example:
-        file1.pdf
-            ↓
-        file2.jpg
-            ↓
-        file3.mp4
-    */
-
-    if (
-        typeof onProgress ===
-        'function'
-    ) {
-
-        onProgress({
-
-            status:
-                'file-started',
-
-            name:
-                folderName,
-
-            currentFile:
-                currentFileName,
-
-            processedBytes:
-                completedBytes,
-
-            totalBytes:
-                totalSize,
-
-            completedFiles,
-
-            totalFiles
-
-        });
-
-    }
-
-const encrypted =
-    await encryptFileV2(
-        sourceFile.sourcePath,
-        {
 
             /*
-                Folder relationship is written
-                INSIDE the authenticated CLV2
-                recovery metadata itself.
-
-                This means a CLV2 container can
-                later tell us which folder it
-                belonged to even if index.clm
-                needs recovery.
+                Tell renderer which file is about
+                to start processing.
+        
+                Example:
+                file1.pdf
+                    ↓
+                file2.jpg
+                    ↓
+                file3.mp4
             */
 
-            parentFolderId:
-                folderId,
+            if (
+                typeof onProgress ===
+                'function'
+            ) {
 
-            relativePath:
-                sourceFile.relativePath,
+                onProgress({
 
-            operationId:
-                operationId,
+                    status:
+                        'file-started',
 
-            mode:
-                removeOriginal ? 'move' : 'copy',
+                    name:
+                        folderName,
 
-            onProgress:
-                fileProgress => {
+                    currentFile:
+                        currentFileName,
 
-                    /*
-                        encryptFileV2 reports
-                        progress for CURRENT file.
+                    processedBytes:
+                        completedBytes,
 
-                        Convert it into progress
-                        for the COMPLETE folder.
-                    */
+                    totalBytes:
+                        totalSize,
 
-                    const folderProcessedBytes =
-                        completedBytes +
-                        fileProgress.processedBytes;
+                    completedFiles,
+
+                    totalFiles
+
+                });
+
+            }
+
+            const encrypted =
+                await encryptFileV2(
+                    sourceFile.sourcePath,
+                    {
+
+                        /*
+                            Folder relationship is written
+                            INSIDE the authenticated CLV2
+                            recovery metadata itself.
+            
+                            This means a CLV2 container can
+                            later tell us which folder it
+                            belonged to even if index.clm
+                            needs recovery.
+                        */
+
+                        parentFolderId:
+                            folderId,
+
+                        relativePath:
+                            sourceFile.relativePath,
+
+                        operationId:
+                            operationId,
+
+                        mode:
+                            removeOriginal ? 'move' : 'copy',
+
+                        onProgress:
+                            fileProgress => {
+
+                                /*
+                                    encryptFileV2 reports
+                                    progress for CURRENT file.
+            
+                                    Convert it into progress
+                                    for the COMPLETE folder.
+                                */
+
+                                const folderProcessedBytes =
+                                    completedBytes +
+                                    fileProgress.processedBytes;
 
 
-                    if (
-                        typeof onProgress ===
-                        'function'
-                    ) {
+                                if (
+                                    typeof onProgress ===
+                                    'function'
+                                ) {
 
-                        onProgress({
+                                    onProgress({
 
-                            status:
-                                'progress',
+                                        status:
+                                            'progress',
 
-                            name:
-                                folderName,
+                                        name:
+                                            folderName,
 
-                            currentFile:
-                                currentFileName,
+                                        currentFile:
+                                            currentFileName,
 
-                            processedBytes:
-                                folderProcessedBytes,
+                                        processedBytes:
+                                            folderProcessedBytes,
 
-                            totalBytes:
-                                totalSize,
+                                        totalBytes:
+                                            totalSize,
 
-                            currentFileProcessedBytes:
-                                fileProgress.processedBytes,
+                                        currentFileProcessedBytes:
+                                            fileProgress.processedBytes,
 
-                            currentFileTotalBytes:
-                                fileProgress.totalBytes,
+                                        currentFileTotalBytes:
+                                            fileProgress.totalBytes,
 
-                            completedFiles,
+                                        completedFiles,
 
-                            totalFiles
+                                        totalFiles
 
-                        });
+                                    });
+
+                                }
+
+                            }
 
                     }
+                );
 
-                }
+
+            encryptedFiles.push(
+                encrypted
+            );
+
+
+            /*
+                This file is now fully encrypted.
+            */
+
+            completedFiles++;
+
+            completedBytes +=
+                sourceFile.size;
+
+
+            if (
+                typeof onProgress ===
+                'function'
+            ) {
+
+                onProgress({
+
+                    status:
+                        'file-completed',
+
+                    name:
+                        folderName,
+
+                    currentFile:
+                        currentFileName,
+
+                    processedBytes:
+                        completedBytes,
+
+                    totalBytes:
+                        totalSize,
+
+                    completedFiles,
+
+                    totalFiles
+
+                });
+
+            }
 
         }
-    );
-
-
-    encryptedFiles.push(
-        encrypted
-    );
-
-
-    /*
-        This file is now fully encrypted.
-    */
-
-    completedFiles++;
-
-    completedBytes +=
-        sourceFile.size;
-
-
-    if (
-        typeof onProgress ===
-        'function'
-    ) {
-
-        onProgress({
-
-            status:
-                'file-completed',
-
-            name:
-                folderName,
-
-            currentFile:
-                currentFileName,
-
-            processedBytes:
-                completedBytes,
-
-            totalBytes:
-                totalSize,
-
-            completedFiles,
-
-            totalFiles
-
-        });
-
-    }
-
-}
 
 
         /*
@@ -8701,65 +8701,65 @@ const encrypted =
     file passes this phase.
 */
 
-for (
-    const encrypted
-    of encryptedFiles
-) {
+        for (
+            const encrypted
+            of encryptedFiles
+        ) {
 
-const verification =
-    await verifyCLV2FileStream(
-        encrypted
-    );
-
-
-    if (
-        !verification ||
-        verification.success !== true
-    ) {
-
-        throw new Error(
-            `Vault verification failed for "${encrypted.name}". Original folder was not removed.`
-        );
-
-    }
+            const verification =
+                await verifyCLV2FileStream(
+                    encrypted
+                );
 
 
-    /*
-        Folder relationship is part of the
-        authenticated CLV2 recovery metadata.
+            if (
+                !verification ||
+                verification.success !== true
+            ) {
 
-        Verify it independently as well.
-    */
+                throw new Error(
+                    `Vault verification failed for "${encrypted.name}". Original folder was not removed.`
+                );
 
-    if (
-        verification.metadata.parentFolderId !==
-        folderId
-    ) {
-
-        throw new Error(
-            `Folder verification failed for "${encrypted.name}".`
-        );
-
-    }
+            }
 
 
-    if (
-        verification.metadata.relativePath !==
-        encrypted.relativePath
-    ) {
+            /*
+                Folder relationship is part of the
+                authenticated CLV2 recovery metadata.
+        
+                Verify it independently as well.
+            */
 
-        throw new Error(
-            `Folder path verification failed for "${encrypted.name}".`
-        );
+            if (
+                verification.metadata.parentFolderId !==
+                folderId
+            ) {
 
-    }
+                throw new Error(
+                    `Folder verification failed for "${encrypted.name}".`
+                );
 
-}
+            }
 
-/*
-            Folder metadata is created only
-            after every file was encrypted.
-        */
+
+            if (
+                verification.metadata.relativePath !==
+                encrypted.relativePath
+            ) {
+
+                throw new Error(
+                    `Folder path verification failed for "${encrypted.name}".`
+                );
+
+            }
+
+        }
+
+        /*
+                    Folder metadata is created only
+                    after every file was encrypted.
+                */
 
         const folderMetadata = {
 
@@ -8832,209 +8832,209 @@ const verification =
 
         try {
 
-    await writeVaultIndex(
-        index
-    );
-
-    indexWritten =
-    true;
-
-    /*
-        From this exact point onward the folder
-        transaction is part of index.clm.
-
-        The outer rollback must never delete
-        these encrypted containers.
-    */
-
-    /*
-    =============================
-    COMMIT READ-BACK VERIFICATION
-    =============================
-
-    Do not trust only the successful return
-    from writeVaultIndex().
-
-    Read index.clm back from disk, decrypt it,
-    and confirm that the complete folder
-    transaction is actually recoverable.
-*/
-
-const committedIndex =
-    await readVaultIndex();
-
-
-/*
-    Verify folder metadata exists.
-*/
-
-const committedFolder =
-    committedIndex.folders.find(
-        folder =>
-            folder.id ===
-            folderId
-    );
-
-
-if (!committedFolder) {
-
-    throw new Error(
-        'Committed folder metadata could not be read back from vault index.'
-    );
-
-}
-
-
-/*
-    Verify every encrypted file belonging to
-    this transaction exists in the committed
-    index with the expected folder relationship.
-*/
-
-for (
-    const encryptedFile
-    of encryptedFiles
-) {
-
-    const committedFile =
-        committedIndex.files.find(
-            file =>
-                file.id ===
-                encryptedFile.id
-        );
-
-
-    if (!committedFile) {
-
-        throw new Error(
-            `Committed file "${encryptedFile.name}" could not be read back from vault index.`
-        );
-
-    }
-
-
-    if (
-        committedFile.encryptedFile !==
-        encryptedFile.encryptedFile
-    ) {
-
-        throw new Error(
-            `Committed container reference mismatch for "${encryptedFile.name}".`
-        );
-
-    }
-
-
-    if (
-        committedFile.parentFolderId !==
-        folderId
-    ) {
-
-        throw new Error(
-            `Committed folder relationship mismatch for "${encryptedFile.name}".`
-        );
-
-    }
-
-
-    if (
-        committedFile.relativePath !==
-        encryptedFile.relativePath
-    ) {
-
-        throw new Error(
-            `Committed relative path mismatch for "${encryptedFile.name}".`
-        );
-
-    }
-
-}
-
-
-/*
-    The transaction has now been:
-
-    1. written to index.clm
-    2. read back from index.clm
-    3. decrypted/authenticated
-    4. folder metadata confirmed
-    5. every file reference confirmed
-
-    Only NOW may rollback protection switch
-    to committed state.
-*/
-
-transactionCommitted =
-    true;
-
-
-} catch (error) {
-
-    /*
-        There are two fundamentally different
-        failure states here.
-
-        1. indexWritten === false
-
-           writeVaultIndex() did not complete.
-           The transaction is not known to have
-           reached index.clm.
-
-           Normal rollback is allowed.
-
-        2. indexWritten === true
-
-           index.clm was already replaced, but
-           read-back verification failed.
-
-           We MUST treat this as an uncertain
-           commit. The encrypted containers may
-           already be referenced by index.clm,
-           so they must not be deleted.
-    */
-
-    if (indexWritten) {
-
-        const uncertainError =
-            new Error(
-                `Vault folder commit could not be verified: ${error.message}`
+            await writeVaultIndex(
+                index
             );
 
+            indexWritten =
+                true;
 
-        uncertainError.code =
-            'VAULT_COMMIT_UNCERTAIN';
+            /*
+                From this exact point onward the folder
+                transaction is part of index.clm.
+        
+                The outer rollback must never delete
+                these encrypted containers.
+            */
+
+            /*
+            =============================
+            COMMIT READ-BACK VERIFICATION
+            =============================
+        
+            Do not trust only the successful return
+            from writeVaultIndex().
+        
+            Read index.clm back from disk, decrypt it,
+            and confirm that the complete folder
+            transaction is actually recoverable.
+        */
+
+            const committedIndex =
+                await readVaultIndex();
 
 
-        uncertainError.folderId =
-            folderId;
+            /*
+                Verify folder metadata exists.
+            */
+
+            const committedFolder =
+                committedIndex.folders.find(
+                    folder =>
+                        folder.id ===
+                        folderId
+                );
 
 
-        uncertainError.folderName =
-            folderName;
+            if (!committedFolder) {
+
+                throw new Error(
+                    'Committed folder metadata could not be read back from vault index.'
+                );
+
+            }
 
 
-        uncertainError.encryptedFiles =
-            encryptedFiles.map(
-                file => ({
-                    id:
-                        file.id,
+            /*
+                Verify every encrypted file belonging to
+                this transaction exists in the committed
+                index with the expected folder relationship.
+            */
 
-                    encryptedFile:
-                        file.encryptedFile
-                })
+            for (
+                const encryptedFile
+                of encryptedFiles
+            ) {
+
+                const committedFile =
+                    committedIndex.files.find(
+                        file =>
+                            file.id ===
+                            encryptedFile.id
+                    );
+
+
+                if (!committedFile) {
+
+                    throw new Error(
+                        `Committed file "${encryptedFile.name}" could not be read back from vault index.`
+                    );
+
+                }
+
+
+                if (
+                    committedFile.encryptedFile !==
+                    encryptedFile.encryptedFile
+                ) {
+
+                    throw new Error(
+                        `Committed container reference mismatch for "${encryptedFile.name}".`
+                    );
+
+                }
+
+
+                if (
+                    committedFile.parentFolderId !==
+                    folderId
+                ) {
+
+                    throw new Error(
+                        `Committed folder relationship mismatch for "${encryptedFile.name}".`
+                    );
+
+                }
+
+
+                if (
+                    committedFile.relativePath !==
+                    encryptedFile.relativePath
+                ) {
+
+                    throw new Error(
+                        `Committed relative path mismatch for "${encryptedFile.name}".`
+                    );
+
+                }
+
+            }
+
+
+            /*
+                The transaction has now been:
+            
+                1. written to index.clm
+                2. read back from index.clm
+                3. decrypted/authenticated
+                4. folder metadata confirmed
+                5. every file reference confirmed
+            
+                Only NOW may rollback protection switch
+                to committed state.
+            */
+
+            transactionCommitted =
+                true;
+
+
+        } catch (error) {
+
+            /*
+                There are two fundamentally different
+                failure states here.
+        
+                1. indexWritten === false
+        
+                   writeVaultIndex() did not complete.
+                   The transaction is not known to have
+                   reached index.clm.
+        
+                   Normal rollback is allowed.
+        
+                2. indexWritten === true
+        
+                   index.clm was already replaced, but
+                   read-back verification failed.
+        
+                   We MUST treat this as an uncertain
+                   commit. The encrypted containers may
+                   already be referenced by index.clm,
+                   so they must not be deleted.
+            */
+
+            if (indexWritten) {
+
+                const uncertainError =
+                    new Error(
+                        `Vault folder commit could not be verified: ${error.message}`
+                    );
+
+
+                uncertainError.code =
+                    'VAULT_COMMIT_UNCERTAIN';
+
+
+                uncertainError.folderId =
+                    folderId;
+
+
+                uncertainError.folderName =
+                    folderName;
+
+
+                uncertainError.encryptedFiles =
+                    encryptedFiles.map(
+                        file => ({
+                            id:
+                                file.id,
+
+                            encryptedFile:
+                                file.encryptedFile
+                        })
+                    );
+
+
+                throw uncertainError;
+
+            }
+
+
+            throw new Error(
+                `Unable to commit folder to vault: ${error.message}`
             );
 
-
-        throw uncertainError;
-
-    }
-
-
-    throw new Error(
-        `Unable to commit folder to vault: ${error.message}`
-    );
-
-}
+        }
 
 
         /*
@@ -9097,68 +9097,68 @@ transactionCommitted =
 
     } catch (error) {
 
-    /*
-        =============================
-        ROLLBACK
-        =============================
+        /*
+            =============================
+            ROLLBACK
+            =============================
+    
+            Rollback is allowed ONLY before
+            index.clm has successfully committed
+            this folder transaction.
+    
+            Once committed, encrypted CLV2 files
+            must never be deleted here.
+        */
 
-        Rollback is allowed ONLY before
-        index.clm has successfully committed
-        this folder transaction.
+        if (
+            !indexWritten &&
+            !transactionCommitted
+        ) {
 
-        Once committed, encrypted CLV2 files
-        must never be deleted here.
-    */
-
-    if (
-    !indexWritten &&
-    !transactionCommitted
-) {
-
-    for (
-        const encryptedFile
-        of encryptedFiles
-    ) {
-
-        try {
-
-            const encryptedPath =
-                path.join(
-                    getVaultFilesDirectory(),
-                    encryptedFile.encryptedFile
-                );
-
-
-            await fs.unlink(
-                encryptedPath
-            );
-
-
-        } catch (cleanupError) {
-
-            if (
-                cleanupError.code !==
-                'ENOENT'
+            for (
+                const encryptedFile
+                of encryptedFiles
             ) {
 
-                console.error(
-                    'Unable to rollback encrypted folder file:',
-                    encryptedFile.encryptedFile,
-                    cleanupError
-                );
+                try {
+
+                    const encryptedPath =
+                        path.join(
+                            getVaultFilesDirectory(),
+                            encryptedFile.encryptedFile
+                        );
+
+
+                    await fs.unlink(
+                        encryptedPath
+                    );
+
+
+                } catch (cleanupError) {
+
+                    if (
+                        cleanupError.code !==
+                        'ENOENT'
+                    ) {
+
+                        console.error(
+                            'Unable to rollback encrypted folder file:',
+                            encryptedFile.encryptedFile,
+                            cleanupError
+                        );
+
+                    }
+
+                }
 
             }
 
         }
 
+
+        throw error;
+
     }
-
-}
-
-
-    throw error;
-
-}
 
 }
 
@@ -9171,11 +9171,11 @@ async function deleteVaultFolder(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     if (
@@ -9248,7 +9248,7 @@ const vaultMasterKey =
             .filter(
                 file =>
                     typeof file.encryptedFile ===
-                        'string' &&
+                    'string' &&
                     file.encryptedFile.length > 0
             )
             .map(
@@ -9285,14 +9285,14 @@ const vaultMasterKey =
             index.files.filter(
                 file =>
                     file.parentFolderId !==
-                        folderId
+                    folderId
             ),
 
         folders:
             index.folders.filter(
                 item =>
                     item.id !==
-                        folderId
+                    folderId
             )
 
     };
@@ -9348,7 +9348,7 @@ const vaultMasterKey =
             committedIndex.folders.some(
                 item =>
                     item.id ===
-                        folderId
+                    folderId
             );
 
 
@@ -9490,7 +9490,7 @@ const vaultMasterKey =
 
         if (
             safeName !==
-                file.encryptedFile ||
+            file.encryptedFile ||
             !safeName.endsWith(
                 '.clv'
             )
@@ -9660,11 +9660,11 @@ async function deleteVaultFile(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     if (
@@ -9726,7 +9726,7 @@ const vaultMasterKey =
 
     if (
         typeof file.encryptedFile !==
-            'string' ||
+        'string' ||
         !file.encryptedFile
     ) {
 
@@ -9910,11 +9910,11 @@ async function restoreVaultFileStream(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     if (
@@ -10106,35 +10106,35 @@ const vaultMasterKey =
 
 
     const progressTransform =
-    createProgressTransform(
-        processedBytes => {
+        createProgressTransform(
+            processedBytes => {
 
-            if (
-                typeof onProgress ===
-                'function'
-            ) {
+                if (
+                    typeof onProgress ===
+                    'function'
+                ) {
 
-                onProgress({
+                    onProgress({
 
-                    fileId:
-                        fileMetadata.id,
+                        fileId:
+                            fileMetadata.id,
 
-                    name:
-                        fileMetadata.name,
+                        name:
+                            fileMetadata.name,
 
-                    processedBytes,
+                        processedBytes,
 
-                    totalBytes:
-                        fileMetadata.size
+                        totalBytes:
+                            fileMetadata.size
 
-                });
+                    });
 
-            }
+                }
 
-        },
-        operationId
-    );
-    
+            },
+            operationId
+        );
+
     try {
 
         const encryptedReadStream =
@@ -10166,12 +10166,12 @@ const vaultMasterKey =
         */
 
         await pipeline(
-    encryptedReadStream,
-    decipher,
-    progressTransform,
-    hashTransform,
-    restoredWriteStream
-);
+            encryptedReadStream,
+            decipher,
+            progressTransform,
+            hashTransform,
+            restoredWriteStream
+        );
 
 
         /*
@@ -10275,11 +10275,11 @@ async function restoreVaultFolder(
 ) {
 
     if (!sessionManager.isUnlocked()) {
-    throw new Error('Vault is locked.');
-}
+        throw new Error('Vault is locked.');
+    }
 
-const vaultMasterKey =
-    sessionManager.getVaultMasterKey();
+    const vaultMasterKey =
+        sessionManager.getVaultMasterKey();
 
 
     if (
@@ -10334,26 +10334,26 @@ const vaultMasterKey =
 
 
     const totalFiles =
-    folderFiles.length;
+        folderFiles.length;
 
 
-const totalBytes =
-    folderFiles.reduce(
-        (sum, file) =>
-            sum + (
-                typeof file.size === 'number'
-                    ? file.size
-                    : 0
-            ),
-        0
-    );
+    const totalBytes =
+        folderFiles.reduce(
+            (sum, file) =>
+                sum + (
+                    typeof file.size === 'number'
+                        ? file.size
+                        : 0
+                ),
+            0
+        );
 
 
-let completedFiles = 0;
+    let completedFiles = 0;
 
-let completedBytes = 0;
+    let completedBytes = 0;
 
-let destinationCreated =
+    let destinationCreated =
         false;
 
 
@@ -10516,127 +10516,127 @@ let destinationCreated =
 
 
             if (
-    typeof onProgress ===
-    'function'
-) {
+                typeof onProgress ===
+                'function'
+            ) {
 
-    onProgress({
+                onProgress({
 
-        status:
-            'file-started',
+                    status:
+                        'file-started',
 
-        name:
-            folderMetadata.name,
+                    name:
+                        folderMetadata.name,
 
-        currentFile:
-            file.name,
+                    currentFile:
+                        file.name,
 
-        processedBytes:
-            completedBytes,
+                    processedBytes:
+                        completedBytes,
 
-        totalBytes,
+                    totalBytes,
 
-        completedFiles,
+                    completedFiles,
 
-        totalFiles
+                    totalFiles
 
-    });
+                });
 
-}
+            }
 
-if (
-    operationId &&
-    isVaultOperationCancelled(operationId)
-) {
-    throw createVaultOperationCancelledError();
-}
+            if (
+                operationId &&
+                isVaultOperationCancelled(operationId)
+            ) {
+                throw createVaultOperationCancelledError();
+            }
 
-await restoreVaultFileAuto(
-    file,
-    destinationPath,
-    operationId,
-    fileProgress => {
+            await restoreVaultFileAuto(
+                file,
+                destinationPath,
+                operationId,
+                fileProgress => {
 
-        const folderProcessedBytes =
-            completedBytes +
-            fileProgress.processedBytes;
-
-
-        if (
-            typeof onProgress ===
-            'function'
-        ) {
-
-            onProgress({
-
-                status:
-                    'progress',
-
-                name:
-                    folderMetadata.name,
-
-                currentFile:
-                    file.name,
-
-                processedBytes:
-                    folderProcessedBytes,
-
-                totalBytes,
-
-                currentFileProcessedBytes:
-                    fileProgress.processedBytes,
-
-                currentFileTotalBytes:
-                    fileProgress.totalBytes,
-
-                completedFiles,
-
-                totalFiles
-
-            });
-
-        }
-
-    }
-);
+                    const folderProcessedBytes =
+                        completedBytes +
+                        fileProgress.processedBytes;
 
 
-completedFiles++;
+                    if (
+                        typeof onProgress ===
+                        'function'
+                    ) {
 
-completedBytes +=
-    typeof file.size === 'number'
-        ? file.size
-        : 0;
+                        onProgress({
+
+                            status:
+                                'progress',
+
+                            name:
+                                folderMetadata.name,
+
+                            currentFile:
+                                file.name,
+
+                            processedBytes:
+                                folderProcessedBytes,
+
+                            totalBytes,
+
+                            currentFileProcessedBytes:
+                                fileProgress.processedBytes,
+
+                            currentFileTotalBytes:
+                                fileProgress.totalBytes,
+
+                            completedFiles,
+
+                            totalFiles
+
+                        });
+
+                    }
+
+                }
+            );
 
 
-if (
-    typeof onProgress ===
-    'function'
-) {
+            completedFiles++;
 
-    onProgress({
+            completedBytes +=
+                typeof file.size === 'number'
+                    ? file.size
+                    : 0;
 
-        status:
-            'file-completed',
 
-        name:
-            folderMetadata.name,
+            if (
+                typeof onProgress ===
+                'function'
+            ) {
 
-        currentFile:
-            file.name,
+                onProgress({
 
-        processedBytes:
-            completedBytes,
+                    status:
+                        'file-completed',
 
-        totalBytes,
+                    name:
+                        folderMetadata.name,
 
-        completedFiles,
+                    currentFile:
+                        file.name,
 
-        totalFiles
+                    processedBytes:
+                        completedBytes,
 
-    });
+                    totalBytes,
 
-}
+                    completedFiles,
+
+                    totalFiles
+
+                });
+
+            }
 
         }
 
@@ -10942,8 +10942,8 @@ ipcMain.handle(
 
 
             const addedFiles = [];
-const addedSourcePaths = [];
-const failures = [];
+            const addedSourcePaths = [];
+            const failures = [];
 
 
             for (
@@ -10967,133 +10967,133 @@ const failures = [];
                             {
                                 mode: mode === 'move' ? 'move' : 'copy',
                                 operationId:
-    operationId,
-    onProgress:
+                                    operationId,
+                                onProgress:
                                     progress => {
 
-                    const now =
-                        Date.now();
+                                        const now =
+                                            Date.now();
 
 
-                    const elapsedSeconds =
-                        (
-                            now -
-                            lastProgressTime
-                        ) / 1000;
+                                        const elapsedSeconds =
+                                            (
+                                                now -
+                                                lastProgressTime
+                                            ) / 1000;
 
 
-                    if (
-                        elapsedSeconds >= 0.25
-                    ) {
+                                        if (
+                                            elapsedSeconds >= 0.25
+                                        ) {
 
-                        const currentGlobalBytes =
-                            processedBytesTotal +
-                            progress.processedBytes;
-
-
-                        const bytesDifference =
-                            currentGlobalBytes -
-                            lastProgressBytes;
+                                            const currentGlobalBytes =
+                                                processedBytesTotal +
+                                                progress.processedBytes;
 
 
-                        const instantSpeed =
-                            bytesDifference /
-                            elapsedSeconds;
+                                            const bytesDifference =
+                                                currentGlobalBytes -
+                                                lastProgressBytes;
 
 
-                        if (
-                            smoothedSpeed === 0
-                        ) {
-
-                            smoothedSpeed =
-                                instantSpeed;
-
-                        } else {
-
-                            smoothedSpeed =
-                                (
-                                    smoothedSpeed * 0.7
-                                ) +
-                                (
-                                    instantSpeed * 0.3
-                                );
-
-                        }
+                                            const instantSpeed =
+                                                bytesDifference /
+                                                elapsedSeconds;
 
 
-                        lastProgressTime =
-                            now;
+                                            if (
+                                                smoothedSpeed === 0
+                                            ) {
 
-                        lastProgressBytes =
-                            currentGlobalBytes;
+                                                smoothedSpeed =
+                                                    instantSpeed;
 
-                    }
+                                            } else {
 
+                                                smoothedSpeed =
+                                                    (
+                                                        smoothedSpeed * 0.7
+                                                    ) +
+                                                    (
+                                                        instantSpeed * 0.3
+                                                    );
 
-                    const globalProcessedBytes =
-                        processedBytesTotal +
-                        progress.processedBytes;
-
-
-                    const remainingBytes =
-                        Math.max(
-                            0,
-                            totalBytes -
-                            globalProcessedBytes
-                        );
+                                            }
 
 
-                    const etaSeconds =
-                        smoothedSpeed > 0
-                            ? remainingBytes /
-                                smoothedSpeed
-                            : null;
+                                            lastProgressTime =
+                                                now;
+
+                                            lastProgressBytes =
+                                                currentGlobalBytes;
+
+                                        }
 
 
-                    sendVaultProgress(
-                        event,
-                        {
-                            operationId,
+                                        const globalProcessedBytes =
+                                            processedBytesTotal +
+                                            progress.processedBytes;
 
-                            operation:
-                                'encrypt',
 
-                            itemType:
-                                'file',
+                                        const remainingBytes =
+                                            Math.max(
+                                                0,
+                                                totalBytes -
+                                                globalProcessedBytes
+                                            );
 
-                            status:
-                                'progress',
 
-                            name:
-                                fileName,
+                                        const etaSeconds =
+                                            smoothedSpeed > 0
+                                                ? remainingBytes /
+                                                smoothedSpeed
+                                                : null;
 
-                            currentFile:
-                                fileName,
 
-                            processedBytes:
-                                globalProcessedBytes,
+                                        sendVaultProgress(
+                                            event,
+                                            {
+                                                operationId,
 
-                            totalBytes,
+                                                operation:
+                                                    'encrypt',
 
-                            totalFiles:
-                                sourceStats.length,
+                                                itemType:
+                                                    'file',
 
-                            completedFiles,
+                                                status:
+                                                    'progress',
 
-                            speedBytesPerSecond:
-                                smoothedSpeed,
+                                                name:
+                                                    fileName,
 
-                            etaSeconds
-                        }
-                    );
+                                                currentFile:
+                                                    fileName,
 
-                                }
+                                                processedBytes:
+                                                    globalProcessedBytes,
+
+                                                totalBytes,
+
+                                                totalFiles:
+                                                    sourceStats.length,
+
+                                                completedFiles,
+
+                                                speedBytesPerSecond:
+                                                    smoothedSpeed,
+
+                                                etaSeconds
+                                            }
+                                        );
+
+                                    }
                             }
                         );
 
 
                     file.sourceRemoved =
-    false;
+                        false;
 
 
                     addedFiles.push(
@@ -11101,8 +11101,8 @@ const failures = [];
                     );
 
                     addedSourcePaths.push(
-    sourcePath
-);
+                        sourcePath
+                    );
 
                     completedFiles += 1;
 
@@ -11153,13 +11153,13 @@ const failures = [];
                 } catch (error) {
 
                     if (
-    error.code ===
-    'OPERATION_CANCELLED'
-) {
+                        error.code ===
+                        'OPERATION_CANCELLED'
+                    ) {
 
-break;
+                        break;
 
-}
+                    }
 
                     console.error(
                         `Add file failed for "${fileName}":`,
@@ -11181,52 +11181,52 @@ break;
 
 
             if (
-    isVaultOperationCancelled(
-        operationId
-    )
-) {
-
-    for (
-        const file of addedFiles
-    ) {
-
-        try {
-
-            await fs.unlink(
-                path.join(
-                    getVaultFilesDirectory(),
-                    file.encryptedFile
+                isVaultOperationCancelled(
+                    operationId
                 )
-            );
-
-        } catch (cleanupError) {
-
-            if (
-                cleanupError.code !==
-                'ENOENT'
             ) {
 
-                console.error(
-                    'Unable to rollback cancelled encrypted file:',
-                    file.encryptedFile,
-                    cleanupError
-                );
+                for (
+                    const file of addedFiles
+                ) {
+
+                    try {
+
+                        await fs.unlink(
+                            path.join(
+                                getVaultFilesDirectory(),
+                                file.encryptedFile
+                            )
+                        );
+
+                    } catch (cleanupError) {
+
+                        if (
+                            cleanupError.code !==
+                            'ENOENT'
+                        ) {
+
+                            console.error(
+                                'Unable to rollback cancelled encrypted file:',
+                                file.encryptedFile,
+                                cleanupError
+                            );
+
+                        }
+
+                    }
+
+                }
+
+
+                const cancelError =
+                    createVaultOperationCancelledError();
+
+                throw cancelError;
 
             }
 
-        }
-
-    }
-
-
-    const cancelError =
-        createVaultOperationCancelledError();
-
-    throw cancelError;
-
-}
-
-if (addedFiles.length === 0) {
+            if (addedFiles.length === 0) {
 
                 const failureError =
                     new Error(
@@ -11267,141 +11267,141 @@ if (addedFiles.length === 0) {
             }
 
             if (
-    isVaultOperationCancelled(
-        operationId
-    )
-) {
-
-    const cancelError =
-        createVaultOperationCancelledError();
-
-    throw cancelError;
-
-}
-
-
-const index =
-    await readVaultIndex();
-
-
-index.files.push(
-    ...addedFiles
-);
-
-
-await writeVaultIndex(
-    index
-);
-
-if (removeOriginal) {
-
-    for (
-        let i = 0;
-        i < addedFiles.length;
-        i++
-    ) {
-
-        const file =
-            addedFiles[i];
-
-        const sourcePath =
-    addedSourcePaths[i];
-
-
-        try {
-
-            await verifyCLV2FileStream(
-                file
-            );
-
-
-            await fs.unlink(
-                sourcePath
-            );
-
-
-            file.sourceRemoved =
-                true;
-
-
-        } catch (error) {
-
-            file.sourceRemoved =
-                false;
-
-            file.sourceRemoveError =
-                error.message ||
-                'Unable to remove original file.';
-
-            console.error(
-                'Unable to remove original file after batch commit:',
-                sourcePath,
-                error
-            );
-
-        }
-
-    }
-
-}
-
-if (removeOriginal) {
-
-    const updatedIndex =
-        await readVaultIndex();
-
-
-    const addedFileIds =
-        new Set(
-            addedFiles.map(
-                file => file.id
-            )
-        );
-
-
-    for (
-        const indexedFile
-        of updatedIndex.files
-    ) {
-
-        if (
-            addedFileIds.has(
-                indexedFile.id
-            )
-        ) {
-
-            const processedFile =
-                addedFiles.find(
-                    file =>
-                        file.id ===
-                        indexedFile.id
-                );
-
-
-            indexedFile.sourceRemoved =
-                processedFile.sourceRemoved;
-
-
-            if (
-                processedFile.sourceRemoveError
+                isVaultOperationCancelled(
+                    operationId
+                )
             ) {
 
-                indexedFile.sourceRemoveError =
-                    processedFile
-                        .sourceRemoveError;
+                const cancelError =
+                    createVaultOperationCancelledError();
+
+                throw cancelError;
 
             }
 
-        }
 
-    }
+            const index =
+                await readVaultIndex();
 
 
-    await writeVaultIndex(
-        updatedIndex
-    );
+            index.files.push(
+                ...addedFiles
+            );
 
-}
+
+            await writeVaultIndex(
+                index
+            );
+
+            if (removeOriginal) {
+
+                for (
+                    let i = 0;
+                    i < addedFiles.length;
+                    i++
+                ) {
+
+                    const file =
+                        addedFiles[i];
+
+                    const sourcePath =
+                        addedSourcePaths[i];
+
+
+                    try {
+
+                        await verifyCLV2FileStream(
+                            file
+                        );
+
+
+                        await fs.unlink(
+                            sourcePath
+                        );
+
+
+                        file.sourceRemoved =
+                            true;
+
+
+                    } catch (error) {
+
+                        file.sourceRemoved =
+                            false;
+
+                        file.sourceRemoveError =
+                            error.message ||
+                            'Unable to remove original file.';
+
+                        console.error(
+                            'Unable to remove original file after batch commit:',
+                            sourcePath,
+                            error
+                        );
+
+                    }
+
+                }
+
+            }
+
+            if (removeOriginal) {
+
+                const updatedIndex =
+                    await readVaultIndex();
+
+
+                const addedFileIds =
+                    new Set(
+                        addedFiles.map(
+                            file => file.id
+                        )
+                    );
+
+
+                for (
+                    const indexedFile
+                    of updatedIndex.files
+                ) {
+
+                    if (
+                        addedFileIds.has(
+                            indexedFile.id
+                        )
+                    ) {
+
+                        const processedFile =
+                            addedFiles.find(
+                                file =>
+                                    file.id ===
+                                    indexedFile.id
+                            );
+
+
+                        indexedFile.sourceRemoved =
+                            processedFile.sourceRemoved;
+
+
+                        if (
+                            processedFile.sourceRemoveError
+                        ) {
+
+                            indexedFile.sourceRemoveError =
+                                processedFile
+                                    .sourceRemoveError;
+
+                        }
+
+                    }
+
+                }
+
+
+                await writeVaultIndex(
+                    updatedIndex
+                );
+
+            }
 
             sendVaultProgress(
                 event,
@@ -11449,57 +11449,57 @@ if (removeOriginal) {
 
         } catch (error) {
 
-    console.error(
-        'Add file failed:',
-        error
-    );
+            console.error(
+                'Add file failed:',
+                error
+            );
 
 
-    if (operationId) {
+            if (operationId) {
 
-        sendVaultOperationFailure(
-            event,
-            {
-                operationId,
+                sendVaultOperationFailure(
+                    event,
+                    {
+                        operationId,
 
-                operation:
-                    'encrypt',
+                        operation:
+                            'encrypt',
 
-                itemType:
-                    'file',
+                        itemType:
+                            'file',
 
-                name:
-                    operationName,
+                        name:
+                            operationName,
 
-                error,
+                        error,
 
-                fallbackMessage:
-                    'Unable to add file.'
+                        fallbackMessage:
+                            'Unable to add file.'
+                    }
+                );
+
             }
-        );
-
-    }
 
 
-    return {
+            return {
 
-    success: false,
+                success: false,
 
-    operationFailed:
-        Boolean(operationId),
+                operationFailed:
+                    Boolean(operationId),
 
-    errorCode:
-        typeof error.code === 'string'
-            ? error.code
-            : 'OPERATION_FAILED',
+                errorCode:
+                    typeof error.code === 'string'
+                        ? error.code
+                        : 'OPERATION_FAILED',
 
-    message:
-        error.message ||
-        'Unable to add file.'
+                message:
+                    error.message ||
+                    'Unable to add file.'
 
-};
+            };
 
-}
+        }
 
     }
 );
@@ -11620,7 +11620,7 @@ async function unlockVault(password) {
 
     let passwordUnlockKey = null;
 
-let vaultMasterKey = null;
+    let vaultMasterKey = null;
 
 
     try {
@@ -11644,44 +11644,44 @@ let vaultMasterKey = null;
 
 
         passwordUnlockKey =
-    vaultCrypto.derivePasswordKey(
-        password,
-        salt
-    );
+            vaultCrypto.derivePasswordKey(
+                password,
+                salt
+            );
 
-    const iv =
-    Buffer.from(
-        config.password.vmk.iv,
-        'base64'
-    );
+        const iv =
+            Buffer.from(
+                config.password.vmk.iv,
+                'base64'
+            );
 
-const authTag =
-    Buffer.from(
-        config.password.vmk.authTag,
-        'base64'
-    );
+        const authTag =
+            Buffer.from(
+                config.password.vmk.authTag,
+                'base64'
+            );
 
-const ciphertext =
-    Buffer.from(
-        config.password.vmk.encrypted,
-        'base64'
-    );
-    
-    const passwordPackage = {
+        const ciphertext =
+            Buffer.from(
+                config.password.vmk.encrypted,
+                'base64'
+            );
 
-    iv,
+        const passwordPackage = {
 
-    authTag,
+            iv,
 
-    encryptedVMK: ciphertext
+            authTag,
 
-};
+            encryptedVMK: ciphertext
 
-vaultMasterKey =
-    vaultCrypto.decryptVaultMasterKey(
-        passwordPackage,
-        passwordUnlockKey
-    );
+        };
+
+        vaultMasterKey =
+            vaultCrypto.decryptVaultMasterKey(
+                passwordPackage,
+                passwordUnlockKey
+            );
 
 
         /*
@@ -11690,7 +11690,7 @@ vaultMasterKey =
 
         sessionManager.destroySession();
 
-sessionManager.createSession();
+        sessionManager.createSession();
 
 
         /*
@@ -11699,8 +11699,8 @@ sessionManager.createSession();
         */
 
         sessionManager.setVaultMasterKey(
-    vaultMasterKey
-);
+            vaultMasterKey
+        );
 
 
         /*
@@ -11713,19 +11713,19 @@ sessionManager.createSession();
 
     } catch {
 
-    return false;
+        return false;
 
-} finally {
+    } finally {
 
-    if (passwordUnlockKey) {
-        passwordUnlockKey.fill(0);
+        if (passwordUnlockKey) {
+            passwordUnlockKey.fill(0);
+        }
+
+        if (vaultMasterKey) {
+            vaultMasterKey.fill(0);
+        }
+
     }
-
-    if (vaultMasterKey) {
-        vaultMasterKey.fill(0);
-    }
-
-}
 
 }
 
@@ -12017,90 +12017,90 @@ function buildIntegritySummary(
 
 async function checkVaultIntegrity() {
 
-const report = {
+    const report = {
 
-    structure: {
+        structure: {
 
-        vaultConfig: false,
+            vaultConfig: false,
 
-        vaultIndex: false,
+            vaultIndex: false,
 
-        indexBackup: false,
+            indexBackup: false,
 
-        filesFolder: false
+            filesFolder: false
 
-    },
+        },
 
-    configuration: {
+        configuration: {
 
-    validJson: false,
+            validJson: false,
 
-    passwordSection: false,
+            passwordSection: false,
 
-    recoverySection: false,
+            recoverySection: false,
 
-    versionField: false
+            versionField: false
 
-},
+        },
 
-index: {
+        index: {
 
-    readable: false,
+            readable: false,
 
-    filesArray: false,
+            filesArray: false,
 
-    foldersArray: false
+            foldersArray: false
 
-},
+        },
 
-containers: {
+        containers: {
 
-    allPresent: false,
+            allPresent: false,
 
-    missing: []
+            missing: []
 
-}
+        }
 
-};
+    };
 
-await checkVaultStructure(report);
-await checkVaultConfiguration(report);
-await checkVaultIndex(report);
-await checkVaultContainers(report);
+    await checkVaultStructure(report);
+    await checkVaultConfiguration(report);
+    await checkVaultIndex(report);
+    await checkVaultContainers(report);
 
     const passed =
-    report.structure.vaultConfig &&
-    report.structure.vaultIndex &&
-    report.structure.indexBackup && 
-    report.structure.filesFolder &&
-    report.configuration.validJson &&
-    report.configuration.passwordSection &&
-    report.configuration.recoverySection &&
-    report.index.readable &&
-    report.index.filesArray &&
-    report.index.foldersArray &&
-    report.containers.allPresent &&
-    report.configuration.versionField;
+        report.structure.vaultConfig &&
+        report.structure.vaultIndex &&
+        report.structure.indexBackup &&
+        report.structure.filesFolder &&
+        report.configuration.validJson &&
+        report.configuration.passwordSection &&
+        report.configuration.recoverySection &&
+        report.index.readable &&
+        report.index.filesArray &&
+        report.index.foldersArray &&
+        report.containers.allPresent &&
+        report.configuration.versionField;
 
     const summary =
-    buildIntegritySummary(
+        buildIntegritySummary(
+            report
+        );
+
+    return {
+
+        success: true,
+
+        passed,
+
+        summary,
+
         report
-    );
 
-return {
-
-    success: true,
-
-    passed,
-
-    summary,
-
-    report
-
-};
+    };
 
 }
-    
+
 async function changeMasterPassword(
     currentPassword,
     newPassword
@@ -12186,178 +12186,178 @@ async function changeMasterPassword(
             Derive key from
             CURRENT password.
         */
-       const passwordSalt =
-    Buffer.from(
-        config.password.salt,
-        'base64'
-    );
+        const passwordSalt =
+            Buffer.from(
+                config.password.salt,
+                'base64'
+            );
 
-currentPasswordUnlockKey =
-    vaultCrypto.derivePasswordKey(
-        currentPassword,
-        passwordSalt
-    );
+        currentPasswordUnlockKey =
+            vaultCrypto.derivePasswordKey(
+                currentPassword,
+                passwordSalt
+            );
 
         /*
             Decrypt SAME VMK.
         */
-       const passwordPackage = {
+        const passwordPackage = {
 
-    iv:
-        Buffer.from(
-            config.password.vmk.iv,
-            'base64'
-        ),
+            iv:
+                Buffer.from(
+                    config.password.vmk.iv,
+                    'base64'
+                ),
 
-    authTag:
-        Buffer.from(
-            config.password.vmk.authTag,
-            'base64'
-        ),
+            authTag:
+                Buffer.from(
+                    config.password.vmk.authTag,
+                    'base64'
+                ),
 
-    encryptedVMK:
-        Buffer.from(
-            config.password.vmk.encrypted,
-            'base64'
-        )
+            encryptedVMK:
+                Buffer.from(
+                    config.password.vmk.encrypted,
+                    'base64'
+                )
 
-};
+        };
 
-try {
+        try {
 
-    vaultMasterKey =
-        vaultCrypto.decryptVaultMasterKey(
-            passwordPackage,
-            currentPasswordUnlockKey
-        );
+            vaultMasterKey =
+                vaultCrypto.decryptVaultMasterKey(
+                    passwordPackage,
+                    currentPasswordUnlockKey
+                );
 
-} catch {
+        } catch {
 
-    return {
+            return {
 
-        success: false,
+                success: false,
 
-        message:
-            'Incorrect current password.'
+                message:
+                    'Incorrect current password.'
 
-    };
+            };
 
-}
+        }
 
         /*
             Generate NEW salt.
         */
-       const newPasswordSalt =
-    crypto.randomBytes(
-        CONSTANTS.SCRYPT.SALT_LENGTH
-    );
+        const newPasswordSalt =
+            crypto.randomBytes(
+                CONSTANTS.SCRYPT.SALT_LENGTH
+            );
 
         /*
             Derive NEW password key.
         */
-       newPasswordUnlockKey =
-    vaultCrypto.derivePasswordKey(
-        newPassword,
-        newPasswordSalt
-    );
+        newPasswordUnlockKey =
+            vaultCrypto.derivePasswordKey(
+                newPassword,
+                newPasswordSalt
+            );
 
         /*
             Encrypt SAME VMK
             using NEW password.
         */
-       const newPasswordPackage =
-    vaultCrypto.encryptVaultMasterKey(
-        vaultMasterKey,
-        newPasswordUnlockKey
-    );
+        const newPasswordPackage =
+            vaultCrypto.encryptVaultMasterKey(
+                vaultMasterKey,
+                newPasswordUnlockKey
+            );
 
         /*
             Replace ONLY the
             password section.
         */
-       config.password = {
+        config.password = {
 
-    algorithm: "scrypt",
+            algorithm: "scrypt",
 
-    salt:
-        newPasswordSalt.toString(
-            'base64'
-        ),
-
-    N:
-        CONSTANTS.SCRYPT.N,
-
-    r:
-        CONSTANTS.SCRYPT.R,
-
-    p:
-        CONSTANTS.SCRYPT.P,
-
-    vmk: {
-
-        iv:
-            newPasswordPackage
-                .iv
-                .toString(
+            salt:
+                newPasswordSalt.toString(
                     'base64'
                 ),
 
-        authTag:
-            newPasswordPackage
-                .authTag
-                .toString(
-                    'base64'
-                ),
+            N:
+                CONSTANTS.SCRYPT.N,
 
-        encrypted:
-            newPasswordPackage
-                .encryptedVMK
-                .toString(
-                    'base64'
-                )
+            r:
+                CONSTANTS.SCRYPT.R,
 
-    }
+            p:
+                CONSTANTS.SCRYPT.P,
 
-};
+            vmk: {
+
+                iv:
+                    newPasswordPackage
+                        .iv
+                        .toString(
+                            'base64'
+                        ),
+
+                authTag:
+                    newPasswordPackage
+                        .authTag
+                        .toString(
+                            'base64'
+                        ),
+
+                encrypted:
+                    newPasswordPackage
+                        .encryptedVMK
+                        .toString(
+                            'base64'
+                        )
+
+            }
+
+        };
 
         /*
             Save vault.json.
         */
-       const temporaryPath =
-    path.join(
-        getVaultDirectory(),
-        'vault.tmp'
-    );
+        const temporaryPath =
+            path.join(
+                getVaultDirectory(),
+                'vault.tmp'
+            );
 
-await fs.writeFile(
+        await fs.writeFile(
 
-    temporaryPath,
+            temporaryPath,
 
-    JSON.stringify(
-        config,
-        null,
-        2
-    ),
+            JSON.stringify(
+                config,
+                null,
+                2
+            ),
 
-    {
+            {
 
-        encoding:
-            'utf8',
+                encoding:
+                    'utf8',
 
-        flag:
-            'w'
+                flag:
+                    'w'
 
-    }
+            }
 
-);
+        );
 
-await fs.rename(
+        await fs.rename(
 
-    temporaryPath,
+            temporaryPath,
 
-    getVaultConfigPath()
+            getVaultConfigPath()
 
-);
+        );
 
         /*
             Destroy session.
@@ -12368,13 +12368,13 @@ await fs.rename(
 
         sessionManager.destroySession();
 
-setPendingLoginSuccessMessage(
-    'Password changed successfully. Log in using your new password.'
-);
+        setPendingLoginSuccessMessage(
+            'Password changed successfully. Log in using your new password.'
+        );
 
-mainWindow.webContents.send(
-    'vault:session-locked'
-);
+        mainWindow.webContents.send(
+            'vault:session-locked'
+        );
 
         return {
 
@@ -12419,9 +12419,9 @@ mainWindow.webContents.send(
     }
 
 }
-    
-    /* =========================================
-   VERIFY MASTER PASSWORD
+
+/* =========================================
+VERIFY MASTER PASSWORD
 ========================================= */
 
 ipcMain.handle(
@@ -12525,8 +12525,8 @@ ipcMain.handle(
     }
 );
 
-    /* =========================================
-   DELETE VAULT
+/* =========================================
+DELETE VAULT
 ========================================= */
 
 ipcMain.handle(
@@ -12730,8 +12730,8 @@ ipcMain.handle(
     }
 );
 
-    /* =========================================
-   EXPORT VAULT
+/* =========================================
+EXPORT VAULT
 ========================================= */
 
 ipcMain.handle(
@@ -12800,7 +12800,7 @@ ipcMain.handle(
                 try {
                     const s = await fs.stat(f.fullPath);
                     totalVaultBytes += s.size;
-                } catch {}
+                } catch { }
             }
 
             const destinationDir = path.dirname(saveResult.filePath);
@@ -12863,8 +12863,8 @@ ipcMain.handle(
     }
 );
 
-    /* =========================================
-   IMPORT VAULT
+/* =========================================
+IMPORT VAULT
 ========================================= */
 
 ipcMain.handle(
@@ -12926,7 +12926,7 @@ ipcMain.handle(
                 } finally {
                     await fd.close();
                 }
-            } catch {}
+            } catch { }
 
             if (manifestTotalBytes > 0) {
                 const storageCheck = await ensureStorageAvailable(path.dirname(targetVaultDir), manifestTotalBytes);
@@ -12998,8 +12998,8 @@ ipcMain.handle(
     }
 );
 
-    /* =========================================
-   LOCK VAULT
+/* =========================================
+LOCK VAULT
 ========================================= */
 
 function lockVault() {
@@ -13098,15 +13098,15 @@ ipcMain.handle(
             Validate active vault session
             before attempting deletion.
         */
- 
-            if (!sessionManager.isUnlocked()) {
 
-    return {
-        success: false,
-        message: 'Vault is locked.'
-    };
+        if (!sessionManager.isUnlocked()) {
 
-}
+            return {
+                success: false,
+                message: 'Vault is locked.'
+            };
+
+        }
 
 
         try {
@@ -13336,35 +13336,35 @@ ipcMain.handle(
                 }
             );
 
-        return {
+            return {
 
-    success: false,
+                success: false,
 
-    /*
-        True only when the actual delete
-        operation had already started.
+                /*
+                    True only when the actual delete
+                    operation had already started.
+            
+                    Renderer then knows that
+                    status: 'failed' was already sent
+                    to the centralized operation panel.
+                */
 
-        Renderer then knows that
-        status: 'failed' was already sent
-        to the centralized operation panel.
-    */
+                operationFailed:
+                    Boolean(operationId),
 
-    operationFailed:
-        Boolean(operationId),
+                operationId,
 
-    operationId,
+                errorCode:
+                    typeof error.code ===
+                        'string'
+                        ? error.code
+                        : 'DELETE_FAILED',
 
-    errorCode:
-        typeof error.code ===
-            'string'
-            ? error.code
-            : 'DELETE_FAILED',
+                message:
+                    error.message ||
+                    'The file could not be deleted.'
 
-    message:
-        error.message ||
-        'The file could not be deleted.'
-
-};
+            };
 
         }
 
@@ -13399,7 +13399,7 @@ ipcMain.handle(
         try {
 
             const settings =
-    await synchronizeApplicationSettings();
+                await synchronizeApplicationSettings();
 
 
             return {
@@ -13559,12 +13559,12 @@ ipcMain.handle(
 
         if (!sessionManager.isUnlocked()) {
 
-    return {
-        success: false,
-        message: 'Vault is locked.'
-    };
+            return {
+                success: false,
+                message: 'Vault is locked.'
+            };
 
-}
+        }
 
 
         try {
@@ -13874,10 +13874,10 @@ ipcMain.handle(
     to the centralized operation panel.
 */
 
-operationFailed:
-    Boolean(operationId),
-    
-    operationId,
+                operationFailed:
+                    Boolean(operationId),
+
+                operationId,
 
                 errorCode:
                     typeof error.code ===
@@ -14145,13 +14145,13 @@ ipcMain.handle(
 
                         totalBytes +=
                             typeof folderMeta.totalSize ===
-                            'number'
+                                'number'
                                 ? folderMeta.totalSize
                                 : 0;
 
                         totalFileCount +=
                             typeof folderMeta.fileCount ===
-                            'number'
+                                'number'
                                 ? folderMeta.fileCount
                                 : 1;
 
@@ -14172,7 +14172,7 @@ ipcMain.handle(
 
                         totalBytes +=
                             typeof fileMeta.size ===
-                            'number'
+                                'number'
                                 ? fileMeta.size
                                 : 0;
 
@@ -14421,7 +14421,7 @@ ipcMain.handle(
                                 const etaSeconds =
                                     smoothedSpeed > 0
                                         ? remainingBytes /
-                                            smoothedSpeed
+                                        smoothedSpeed
                                         : null;
 
 
@@ -14473,13 +14473,13 @@ ipcMain.handle(
 
                         const folderSize =
                             typeof folderMetadata.totalSize ===
-                            'number'
+                                'number'
                                 ? folderMetadata.totalSize
                                 : 0;
 
                         const folderFileCount =
                             typeof folderMetadata.fileCount ===
-                            'number'
+                                'number'
                                 ? folderMetadata.fileCount
                                 : 0;
 
@@ -14578,10 +14578,10 @@ ipcMain.handle(
                                                 smoothedSpeed *
                                                 0.7
                                             ) +
-                                                (
-                                                    instantSpeed *
-                                                    0.3
-                                                );
+                                            (
+                                                instantSpeed *
+                                                0.3
+                                            );
 
                                     }
 
@@ -14611,7 +14611,7 @@ ipcMain.handle(
                                 const etaSeconds =
                                     smoothedSpeed > 0
                                         ? remainingBytes /
-                                            smoothedSpeed
+                                        smoothedSpeed
                                         : null;
 
 
@@ -14661,7 +14661,7 @@ ipcMain.handle(
 
                         const fileSize =
                             typeof fileMetadata.size ===
-                            'number'
+                                'number'
                                 ? fileMetadata.size
                                 : 0;
 
@@ -15313,359 +15313,100 @@ ipcMain.handle(
 
         if (!sessionManager.isUnlocked()) {
 
-    return {
-        success: false,
-        message: 'Vault is locked.'
-    };
+            return {
+                success: false,
+                message: 'Vault is locked.'
+            };
 
-}
+        }
 
         let operationId = null;
-let operationName = null;
-
-try {
-
-    /*
-        Ask user to select one or more
-        folders to add to CrypticLocker.
-    */
-
-    const result =
-        await dialog.showOpenDialog(
-            mainWindow,
-            {
-                title:
-                    'Add Folders to CrypticLocker',
-
-                properties: [
-                    'openDirectory',
-                    'multiSelections'
-                ]
-            }
-        );
-
-
-    /*
-        User closed/cancelled the folder picker.
-    */
-
-    if (
-        result.canceled ||
-        result.filePaths.length === 0
-    ) {
-
-        return {
-            success: false,
-            canceled: true
-        };
-
-    }
-
-
-    const sourceFolders =
-        result.filePaths;
-
-
-    operationName =
-        sourceFolders.length === 1
-            ? path.basename(
-                sourceFolders[0]
-            )
-            : `${sourceFolders.length} folders`;
-
-
-    const removeOriginal =
-        mode === 'move';
-
-
-    operationId =
-        crypto.randomUUID();
-
-
-let lastProgressTime =
-    Date.now();
-
-
-let lastProgressBytes =
-    0;
-
-
-let smoothedSpeed =
-    0;
-
-
-/*
-    Running totals from folders that have
-    already fully completed. Combined with
-    the current folder's own progress, this
-    gives an accurate combined total across
-    the whole batch even though each folder's
-    own size is only discovered once its
-    scan finishes.
-*/
-
-let bytesOffset = 0;
-let filesOffset = 0;
-let completedFolders = 0;
-
-
-sendVaultProgress(
-    event,
-    {
-
-        operationId,
-
-        operation:
-            'encrypt',
-
-        itemType:
-            'folder',
-
-        status:
-            'started',
-
-        name:
-            operationName,
-
-        currentFile:
-            null,
-
-        processedBytes:
-            0,
-
-        totalBytes:
-            0,
-
-        completedFiles:
-            0,
-
-        totalFiles:
-            0,
-
-        speedBytesPerSecond:
-            0,
-
-        etaSeconds:
-            null
-
-    }
-);
-
-
-const addedFolders = [];
-const failures = [];
-
-
-for (
-    const sourceFolder
-    of sourceFolders
-) {
-
-    const folderLabel =
-        path.basename(
-            sourceFolder
-        );
-
-
-    try {
-
-        const folder =
-    await encryptFolder(
-        sourceFolder,
-        removeOriginal,
-
-        operationId,
-
-        progress => {
-
-                    const now =
-                        Date.now();
-
-
-                    if (
-                        progress.status ===
-                        'progress'
-                    ) {
-
-                        const elapsedSeconds =
-                            (
-                                now -
-                                lastProgressTime
-                            ) / 1000;
-
-
-                        if (
-                            elapsedSeconds >= 0.25
-                        ) {
-
-                            const currentGlobalBytes =
-                                bytesOffset +
-                                progress.processedBytes;
-
-
-                            const bytesDifference =
-                                currentGlobalBytes -
-                                lastProgressBytes;
-
-
-                            const instantSpeed =
-                                bytesDifference /
-                                elapsedSeconds;
-
-
-                            if (
-                                smoothedSpeed === 0
-                            ) {
-
-                                smoothedSpeed =
-                                    instantSpeed;
-
-                            } else {
-
-                                smoothedSpeed =
-                                    (
-                                        smoothedSpeed *
-                                        0.7
-                                    ) +
-                                    (
-                                        instantSpeed *
-                                        0.3
-                                    );
-
-                            }
-
-
-                            lastProgressTime =
-                                now;
-
-
-                            lastProgressBytes =
-                                currentGlobalBytes;
-
-                        }
-
+        let operationName = null;
+
+        try {
+
+            /*
+                Ask user to select one or more
+                folders to add to CrypticLocker.
+            */
+
+            const result =
+                await dialog.showOpenDialog(
+                    mainWindow,
+                    {
+                        title:
+                            'Add Folders to CrypticLocker',
+
+                        properties: [
+                            'openDirectory',
+                            'multiSelections'
+                        ]
                     }
+                );
 
 
-                    const globalProcessedBytes =
-                        bytesOffset +
-                        progress.processedBytes;
+            /*
+                User closed/cancelled the folder picker.
+            */
 
-                    const globalTotalBytes =
-                        bytesOffset +
-                        progress.totalBytes;
+            if (
+                result.canceled ||
+                result.filePaths.length === 0
+            ) {
 
-                    const globalCompletedFiles =
-                        filesOffset +
-                        progress.completedFiles;
+                return {
+                    success: false,
+                    canceled: true
+                };
 
-                    const globalTotalFiles =
-                        filesOffset +
-                        progress.totalFiles;
-
-
-                    const remainingBytes =
-                        Math.max(
-                            0,
-                            globalTotalBytes -
-                            globalProcessedBytes
-                        );
+            }
 
 
-                    const etaSeconds =
-                        smoothedSpeed > 0
-                            ? remainingBytes /
-                                smoothedSpeed
-                            : null;
+            const sourceFolders =
+                result.filePaths;
 
 
-                    sendVaultProgress(
-                        event,
-                        {
-
-                            operationId,
-
-                            operation:
-                                'encrypt',
-
-                            itemType:
-                                'folder',
-
-                            status:
-                                progress.status,
-
-                            name:
-                                sourceFolders.length === 1
-                                    ? progress.name
-                                    : folderLabel,
-
-                            currentFile:
-                                progress.currentFile,
-
-                            processedBytes:
-                                globalProcessedBytes,
-
-                            totalBytes:
-                                globalTotalBytes,
-
-                            completedFiles:
-                                globalCompletedFiles,
-
-                            totalFiles:
-                                globalTotalFiles,
-
-                            speedBytesPerSecond:
-                                smoothedSpeed,
-
-                            etaSeconds
-
-                        }
-                    );
-
-                }
-            );
+            operationName =
+                sourceFolders.length === 1
+                    ? path.basename(
+                        sourceFolders[0]
+                    )
+                    : `${sourceFolders.length} folders`;
 
 
-        addedFolders.push(
-            folder
-        );
-
-        bytesOffset +=
-            folder.totalSize;
-
-        filesOffset +=
-            folder.fileCount;
-
-        completedFolders += 1;
+            const removeOriginal =
+                mode === 'move';
 
 
-    } catch (error) {
+            operationId =
+                crypto.randomUUID();
 
-        /*
-            Special case:
 
-            index.clm may already contain the
-            transaction, but read-back verification
-            could not confirm it.
+            let lastProgressTime =
+                Date.now();
 
-            This is NOT a normal encryption failure.
 
-            Stop the whole batch immediately so the
-            user sees this before any further folders
-            are touched — any remaining, not-yet-started
-            folders in this selection are simply left
-            untouched and can be re-added afterwards.
-        */
+            let lastProgressBytes =
+                0;
 
-        if (
-            error.code ===
-            'VAULT_COMMIT_UNCERTAIN'
-        ) {
 
-            console.error(
-                'Vault folder commit is uncertain:',
-                error
-            );
+            let smoothedSpeed =
+                0;
+
+
+            /*
+                Running totals from folders that have
+                already fully completed. Combined with
+                the current folder's own progress, this
+                gives an accurate combined total across
+                the whole batch even though each folder's
+                own size is only discovered once its
+                scan finishes.
+            */
+
+            let bytesOffset = 0;
+            let filesOffset = 0;
+            let completedFolders = 0;
 
 
             sendVaultProgress(
@@ -15681,19 +15422,25 @@ for (
                         'folder',
 
                     status:
-                        'attention',
+                        'started',
 
                     name:
-                        folderLabel,
+                        operationName,
 
                     currentFile:
                         null,
 
-                    errorCode:
-                        'VAULT_COMMIT_UNCERTAIN',
+                    processedBytes:
+                        0,
 
-                    message:
-                        'The folder was encrypted, but CrypticLocker could not verify the final vault commit. Your original folder has not been removed.',
+                    totalBytes:
+                        0,
+
+                    completedFiles:
+                        0,
+
+                    totalFiles:
+                        0,
 
                     speedBytesPerSecond:
                         0,
@@ -15705,261 +15452,450 @@ for (
             );
 
 
-            return {
+            const addedFolders = [];
+            const failures = [];
 
-                success:
-                    addedFolders.length > 0,
 
-                folders:
-                    addedFolders,
+            for (
+                const sourceFolder
+                of sourceFolders
+            ) {
 
-                failures,
+                const folderLabel =
+                    path.basename(
+                        sourceFolder
+                    );
 
-                errorCode:
-                    'VAULT_COMMIT_UNCERTAIN',
 
-                uncertainCommit:
-                    true,
+                try {
 
-                message:
-                    'The folder was encrypted, but CrypticLocker could not verify the final vault commit. Your original folder has not been removed.',
+                    const folder =
+                        await encryptFolder(
+                            sourceFolder,
+                            removeOriginal,
 
-                folderId:
-                    error.folderId || null,
+                            operationId,
 
-                folderName:
-                    error.folderName || null,
+                            progress => {
 
-                encryptedFiles:
-                    Array.isArray(
-                        error.encryptedFiles
-                    )
-                        ? error.encryptedFiles
-                        : []
+                                const now =
+                                    Date.now();
 
-            };
 
-        }
+                                if (
+                                    progress.status ===
+                                    'progress'
+                                ) {
 
+                                    const elapsedSeconds =
+                                        (
+                                            now -
+                                            lastProgressTime
+                                        ) / 1000;
 
-        /*
-            User-initiated cancellation.
 
-            Stop the batch immediately and let
-            the post-loop cancellation handler
-            send the correct 'cancelled' status
-            to the renderer.
-        */
+                                    if (
+                                        elapsedSeconds >= 0.25
+                                    ) {
 
-        if (
-            error.code ===
-            'OPERATION_CANCELLED'
-        ) {
+                                        const currentGlobalBytes =
+                                            bytesOffset +
+                                            progress.processedBytes;
 
-            break;
 
-        }
+                                        const bytesDifference =
+                                            currentGlobalBytes -
+                                            lastProgressBytes;
 
 
-        console.error(
-            `Add folder failed for "${folderLabel}":`,
-            error
-        );
+                                        const instantSpeed =
+                                            bytesDifference /
+                                            elapsedSeconds;
 
 
-        failures.push({
+                                        if (
+                                            smoothedSpeed === 0
+                                        ) {
 
-            name:
-                folderLabel,
+                                            smoothedSpeed =
+                                                instantSpeed;
 
-            message:
-                error.code ===
-                'INSUFFICIENT_STORAGE'
-                    ? 'Not enough storage space.'
-                    : (
-                        error.message ||
-                        'Unable to add folder.'
-                    )
+                                        } else {
 
-        });
+                                            smoothedSpeed =
+                                                (
+                                                    smoothedSpeed *
+                                                    0.7
+                                                ) +
+                                                (
+                                                    instantSpeed *
+                                                    0.3
+                                                );
 
-    }
+                                        }
 
-}
 
+                                        lastProgressTime =
+                                            now;
 
-/*
-    The user cancelled the batch.
 
-    Send a proper 'cancelled' terminal event so the
-    renderer shows "Operation cancelled" instead of
-    "Folder could not be secured".
+                                        lastProgressBytes =
+                                            currentGlobalBytes;
 
-    This mirrors the vault:add-file cancellation
-    handler.
-*/
+                                    }
 
-if (
-    isVaultOperationCancelled(
-        operationId
-    )
-) {
+                                }
 
-    const cancelError =
-        createVaultOperationCancelledError();
 
-    sendVaultOperationFailure(
-        event,
-        {
-            operationId,
+                                const globalProcessedBytes =
+                                    bytesOffset +
+                                    progress.processedBytes;
 
-            operation:
-                'encrypt',
+                                const globalTotalBytes =
+                                    bytesOffset +
+                                    progress.totalBytes;
 
-            itemType:
-                'folder',
+                                const globalCompletedFiles =
+                                    filesOffset +
+                                    progress.completedFiles;
 
-            name:
-                operationName,
+                                const globalTotalFiles =
+                                    filesOffset +
+                                    progress.totalFiles;
 
-            error:
-                cancelError,
 
-            fallbackMessage:
-                'Unable to add folders.'
-        }
-    );
+                                const remainingBytes =
+                                    Math.max(
+                                        0,
+                                        globalTotalBytes -
+                                        globalProcessedBytes
+                                    );
 
-    return {
 
-        success: false,
+                                const etaSeconds =
+                                    smoothedSpeed > 0
+                                        ? remainingBytes /
+                                        smoothedSpeed
+                                        : null;
 
-        operationFailed: true,
 
-        message:
-            cancelError.message,
+                                sendVaultProgress(
+                                    event,
+                                    {
 
-        failures
+                                        operationId,
 
-    };
+                                        operation:
+                                            'encrypt',
 
-}
+                                        itemType:
+                                            'folder',
 
+                                        status:
+                                            progress.status,
 
-if (addedFolders.length === 0) {
+                                        name:
+                                            sourceFolders.length === 1
+                                                ? progress.name
+                                                : folderLabel,
 
-    const failureError =
-        new Error(
-            failures[0]?.message ||
-            'Unable to add folders.'
-        );
+                                        currentFile:
+                                            progress.currentFile,
 
-    sendVaultOperationFailure(
-        event,
-        {
-            operationId,
+                                        processedBytes:
+                                            globalProcessedBytes,
 
-            operation:
-                'encrypt',
+                                        totalBytes:
+                                            globalTotalBytes,
 
-            itemType:
-                'folder',
+                                        completedFiles:
+                                            globalCompletedFiles,
 
-            name:
-                operationName,
+                                        totalFiles:
+                                            globalTotalFiles,
 
-            error:
-                failureError,
+                                        speedBytesPerSecond:
+                                            smoothedSpeed,
 
-            fallbackMessage:
-                'Unable to add folders.'
-        }
-    );
+                                        etaSeconds
 
-    return {
+                                    }
+                                );
 
-        success: false,
+                            }
+                        );
 
-        operationFailed: true,
 
-        message:
-            failureError.message,
+                    addedFolders.push(
+                        folder
+                    );
 
-        failures
+                    bytesOffset +=
+                        folder.totalSize;
 
-    };
+                    filesOffset +=
+                        folder.fileCount;
 
-}
+                    completedFolders += 1;
 
 
-sendVaultProgress(
-    event,
-    {
+                } catch (error) {
 
-        operationId,
+                    /*
+                        Special case:
+            
+                        index.clm may already contain the
+                        transaction, but read-back verification
+                        could not confirm it.
+            
+                        This is NOT a normal encryption failure.
+            
+                        Stop the whole batch immediately so the
+                        user sees this before any further folders
+                        are touched — any remaining, not-yet-started
+                        folders in this selection are simply left
+                        untouched and can be re-added afterwards.
+                    */
 
-        operation:
-            'encrypt',
+                    if (
+                        error.code ===
+                        'VAULT_COMMIT_UNCERTAIN'
+                    ) {
 
-        itemType:
-            'folder',
+                        console.error(
+                            'Vault folder commit is uncertain:',
+                            error
+                        );
 
-        status:
-            'completed',
 
-        name:
-            operationName,
+                        sendVaultProgress(
+                            event,
+                            {
 
-        currentFile:
-            null,
+                                operationId,
 
-        processedBytes:
-            bytesOffset,
+                                operation:
+                                    'encrypt',
 
-        totalBytes:
-            bytesOffset,
+                                itemType:
+                                    'folder',
 
-        completedFiles:
-            filesOffset,
+                                status:
+                                    'attention',
 
-        totalFiles:
-            filesOffset,
+                                name:
+                                    folderLabel,
 
-        speedBytesPerSecond:
-            0,
+                                currentFile:
+                                    null,
 
-        etaSeconds:
-            0
+                                errorCode:
+                                    'VAULT_COMMIT_UNCERTAIN',
 
-    }
-);
+                                message:
+                                    'The folder was encrypted, but CrypticLocker could not verify the final vault commit. Your original folder has not been removed.',
 
+                                speedBytesPerSecond:
+                                    0,
 
-return {
-    success: true,
-    folders: addedFolders,
-    failures
-};
+                                etaSeconds:
+                                    null
 
+                            }
+                        );
 
-        } catch (error) {
 
-    /*
-        Preserve storage information because
-        renderer may use these values for the
-        dedicated insufficient-storage UI.
-    */
+                        return {
 
-    if (
-        error.code ===
-        'INSUFFICIENT_STORAGE'
-    ) {
+                            success:
+                                addedFolders.length > 0,
 
-        if (operationId) {
+                            folders:
+                                addedFolders,
 
-            sendVaultOperationFailure(
+                            failures,
+
+                            errorCode:
+                                'VAULT_COMMIT_UNCERTAIN',
+
+                            uncertainCommit:
+                                true,
+
+                            message:
+                                'The folder was encrypted, but CrypticLocker could not verify the final vault commit. Your original folder has not been removed.',
+
+                            folderId:
+                                error.folderId || null,
+
+                            folderName:
+                                error.folderName || null,
+
+                            encryptedFiles:
+                                Array.isArray(
+                                    error.encryptedFiles
+                                )
+                                    ? error.encryptedFiles
+                                    : []
+
+                        };
+
+                    }
+
+
+                    /*
+                        User-initiated cancellation.
+            
+                        Stop the batch immediately and let
+                        the post-loop cancellation handler
+                        send the correct 'cancelled' status
+                        to the renderer.
+                    */
+
+                    if (
+                        error.code ===
+                        'OPERATION_CANCELLED'
+                    ) {
+
+                        break;
+
+                    }
+
+
+                    console.error(
+                        `Add folder failed for "${folderLabel}":`,
+                        error
+                    );
+
+
+                    failures.push({
+
+                        name:
+                            folderLabel,
+
+                        message:
+                            error.code ===
+                                'INSUFFICIENT_STORAGE'
+                                ? 'Not enough storage space.'
+                                : (
+                                    error.message ||
+                                    'Unable to add folder.'
+                                )
+
+                    });
+
+                }
+
+            }
+
+
+            /*
+                The user cancelled the batch.
+            
+                Send a proper 'cancelled' terminal event so the
+                renderer shows "Operation cancelled" instead of
+                "Folder could not be secured".
+            
+                This mirrors the vault:add-file cancellation
+                handler.
+            */
+
+            if (
+                isVaultOperationCancelled(
+                    operationId
+                )
+            ) {
+
+                const cancelError =
+                    createVaultOperationCancelledError();
+
+                sendVaultOperationFailure(
+                    event,
+                    {
+                        operationId,
+
+                        operation:
+                            'encrypt',
+
+                        itemType:
+                            'folder',
+
+                        name:
+                            operationName,
+
+                        error:
+                            cancelError,
+
+                        fallbackMessage:
+                            'Unable to add folders.'
+                    }
+                );
+
+                return {
+
+                    success: false,
+
+                    operationFailed: true,
+
+                    message:
+                        cancelError.message,
+
+                    failures
+
+                };
+
+            }
+
+
+            if (addedFolders.length === 0) {
+
+                const failureError =
+                    new Error(
+                        failures[0]?.message ||
+                        'Unable to add folders.'
+                    );
+
+                sendVaultOperationFailure(
+                    event,
+                    {
+                        operationId,
+
+                        operation:
+                            'encrypt',
+
+                        itemType:
+                            'folder',
+
+                        name:
+                            operationName,
+
+                        error:
+                            failureError,
+
+                        fallbackMessage:
+                            'Unable to add folders.'
+                    }
+                );
+
+                return {
+
+                    success: false,
+
+                    operationFailed: true,
+
+                    message:
+                        failureError.message,
+
+                    failures
+
+                };
+
+            }
+
+
+            sendVaultProgress(
                 event,
                 {
+
                     operationId,
 
                     operation:
@@ -15968,95 +15904,159 @@ return {
                     itemType:
                         'folder',
 
+                    status:
+                        'completed',
+
                     name:
                         operationName,
 
-                    error,
+                    currentFile:
+                        null,
 
-                    fallbackMessage:
-                        'Unable to add folder.'
+                    processedBytes:
+                        bytesOffset,
+
+                    totalBytes:
+                        bytesOffset,
+
+                    completedFiles:
+                        filesOffset,
+
+                    totalFiles:
+                        filesOffset,
+
+                    speedBytesPerSecond:
+                        0,
+
+                    etaSeconds:
+                        0
+
                 }
             );
 
+
+            return {
+                success: true,
+                folders: addedFolders,
+                failures
+            };
+
+
+        } catch (error) {
+
+            /*
+                Preserve storage information because
+                renderer may use these values for the
+                dedicated insufficient-storage UI.
+            */
+
+            if (
+                error.code ===
+                'INSUFFICIENT_STORAGE'
+            ) {
+
+                if (operationId) {
+
+                    sendVaultOperationFailure(
+                        event,
+                        {
+                            operationId,
+
+                            operation:
+                                'encrypt',
+
+                            itemType:
+                                'folder',
+
+                            name:
+                                operationName,
+
+                            error,
+
+                            fallbackMessage:
+                                'Unable to add folder.'
+                        }
+                    );
+
+                }
+
+                return {
+
+                    success: false,
+
+                    operationFailed:
+                        Boolean(operationId),
+
+                    errorCode:
+                        'INSUFFICIENT_STORAGE',
+
+                    message:
+                        'Not enough storage space.',
+
+                    requiredBytes:
+                        error.requiredBytes,
+
+                    folderSize:
+                        error.folderSize,
+
+                    availableBytes:
+                        error.availableBytes
+
+                };
+
+            }
+
+
+            console.error(
+                'Add folder failed:',
+                error
+            );
+
+            if (operationId) {
+
+                sendVaultOperationFailure(
+                    event,
+                    {
+                        operationId,
+
+                        operation:
+                            'encrypt',
+
+                        itemType:
+                            'folder',
+
+                        name:
+                            operationName,
+
+                        error,
+
+                        fallbackMessage:
+                            'Unable to add folder.'
+                    }
+                );
+
+            }
+
+
+            return {
+
+                success: false,
+
+                operationFailed:
+                    Boolean(operationId),
+
+                errorCode:
+                    typeof error.code === 'string'
+                        ? error.code
+                        : 'OPERATION_FAILED',
+
+                message:
+                    error.message ||
+                    'Unable to add folder.'
+
+            };
+
         }
-
-        return {
-
-            success: false,
-
-            operationFailed:
-    Boolean(operationId),
-    
-    errorCode:
-            'INSUFFICIENT_STORAGE',
-
-        message:
-            'Not enough storage space.',
-
-        requiredBytes:
-            error.requiredBytes,
-
-        folderSize:
-            error.folderSize,
-
-        availableBytes:
-            error.availableBytes
-
-    };
-
-}
-
-
-console.error(
-    'Add folder failed:',
-    error
-);
-
-if (operationId) {
-
-    sendVaultOperationFailure(
-        event,
-        {
-            operationId,
-
-            operation:
-                'encrypt',
-
-            itemType:
-                'folder',
-
-            name:
-                operationName,
-
-            error,
-
-            fallbackMessage:
-                'Unable to add folder.'
-        }
-    );
-
-}
-
-
-return {
-
-    success: false,
-
-    operationFailed:
-        Boolean(operationId),
-
-    errorCode:
-        typeof error.code === 'string'
-            ? error.code
-            : 'OPERATION_FAILED',
-
-    message:
-        error.message ||
-        'Unable to add folder.'
-
-};
-
-}
 
     }
 );
@@ -16069,9 +16069,9 @@ ipcMain.handle(
         try {
 
             const result =
-    await createVault(password);
+                await createVault(password);
 
-return result;
+            return result;
 
         } catch (error) {
 
@@ -16234,12 +16234,12 @@ ipcMain.handle(
 
             if (!sessionManager.isUnlocked()) {
 
-    return {
-        success: false,
-        message: 'Vault is locked.'
-    };
+                return {
+                    success: false,
+                    message: 'Vault is locked.'
+                };
 
-}
+            }
 
             safeName =
                 path.basename(
@@ -16431,73 +16431,73 @@ ipcMain.handle(
     touched here.
 */
 
-await cleanupStaleRecoveryTempFile(
-    saveResult.filePath
-);
+            await cleanupStaleRecoveryTempFile(
+                saveResult.filePath
+            );
 
-operationId =
-    crypto.randomUUID();
-
-
-sendVaultProgress(
-    event,
-    {
-        operationId,
-
-        operation:
-            'recover',
-
-        itemType:
-            'file',
-
-        status:
-            'started',
-
-        name:
-            defaultName,
-
-        currentFile:
-            null,
-
-        processedBytes:
-            0,
-
-        totalBytes:
-            0,
-
-        completedFiles:
-            0,
-
-        totalFiles:
-            1,
-
-        speedBytesPerSecond:
-            0,
-
-        etaSeconds:
-            null,
-
-        containerVersion
-    }
-);
+            operationId =
+                crypto.randomUUID();
 
 
-let lastProgressTime =
-    Date.now();
+            sendVaultProgress(
+                event,
+                {
+                    operationId,
+
+                    operation:
+                        'recover',
+
+                    itemType:
+                        'file',
+
+                    status:
+                        'started',
+
+                    name:
+                        defaultName,
+
+                    currentFile:
+                        null,
+
+                    processedBytes:
+                        0,
+
+                    totalBytes:
+                        0,
+
+                    completedFiles:
+                        0,
+
+                    totalFiles:
+                        1,
+
+                    speedBytesPerSecond:
+                        0,
+
+                    etaSeconds:
+                        null,
+
+                    containerVersion
+                }
+            );
 
 
-let lastProgressBytes =
-    0;
+            let lastProgressTime =
+                Date.now();
 
 
-let smoothedSpeed =
-    0;
+            let lastProgressBytes =
+                0;
 
 
-/*
-    One progress callback works for
-    both CLV1 and CLV2 recovery.
-*/
+            let smoothedSpeed =
+                0;
+
+
+            /*
+                One progress callback works for
+                both CLV1 and CLV2 recovery.
+            */
 
             const handleProgress =
                 progress => {
@@ -16542,7 +16542,7 @@ let smoothedSpeed =
                         const instantSpeed =
                             elapsedSeconds > 0
                                 ? bytesDifference /
-                                    elapsedSeconds
+                                elapsedSeconds
                                 : 0;
 
 
@@ -16612,7 +16612,7 @@ let smoothedSpeed =
                     const etaSeconds =
                         smoothedSpeed > 0
                             ? remainingBytes /
-                                smoothedSpeed
+                            smoothedSpeed
                             : null;
 
 
@@ -16644,12 +16644,12 @@ let smoothedSpeed =
                             totalBytes,
 
                             completedFiles:
-    0,
+                                0,
 
-totalFiles:
-    1,
-    
-    speedBytesPerSecond:
+                            totalFiles:
+                                1,
+
+                            speedBytesPerSecond:
                                 smoothedSpeed,
 
                             etaSeconds,
@@ -16661,40 +16661,40 @@ totalFiles:
 
                 };
 
-                /*
-    Persist the destination BEFORE recovery
-    starts.
+            /*
+Persist the destination BEFORE recovery
+starts.
 
-    If the application crashes during recovery,
-    the next launch can find and remove the
-    incomplete plaintext temporary file.
+If the application crashes during recovery,
+the next launch can find and remove the
+incomplete plaintext temporary file.
 */
 
-await writeRecoveryJournal(
-    saveResult.filePath
-);
+            await writeRecoveryJournal(
+                saveResult.filePath
+            );
 
 
-/*
-    IMPORTANT:
+            /*
+                IMPORTANT:
+            
+                Auto router now chooses:
+            
+                CLV1 → recoverOrphanFile()
+            
+                CLV2 → recoverCLV2OrphanFile()
+            */
 
-    Auto router now chooses:
+            const result =
+                await recoverQuarantinedOrphanAuto(
 
-    CLV1 → recoverOrphanFile()
+                    safeName,
 
-    CLV2 → recoverCLV2OrphanFile()
-*/
+                    saveResult.filePath,
 
-const result =
-    await recoverQuarantinedOrphanAuto(
+                    handleProgress
 
-        safeName,
-
-        saveResult.filePath,
-
-        handleProgress
-
-    );
+                );
 
 
             /*
@@ -16709,9 +16709,9 @@ const result =
     required.
 */
 
-await clearRecoveryJournal();
+            await clearRecoveryJournal();
 
-sendVaultProgress(
+            sendVaultProgress(
                 event,
                 {
 
@@ -16735,27 +16735,27 @@ sendVaultProgress(
 
                     processedBytes:
                         result.metadata &&
-                        Number.isSafeInteger(
-                            result.metadata.size
-                        )
+                            Number.isSafeInteger(
+                                result.metadata.size
+                            )
                             ? result.metadata.size
                             : null,
 
                     totalBytes:
                         result.metadata &&
-                        Number.isSafeInteger(
-                            result.metadata.size
-                        )
+                            Number.isSafeInteger(
+                                result.metadata.size
+                            )
                             ? result.metadata.size
                             : null,
 
                     completedFiles:
-    1,
+                        1,
 
-totalFiles:
-    1,
-    
-    speedBytesPerSecond:
+                    totalFiles:
+                        1,
+
+                    speedBytesPerSecond:
                         0,
 
                     etaSeconds:
@@ -16925,219 +16925,219 @@ async function resetPasswordUsingRecoveryKey(
     }
 
     const vaultConfigPath =
-    getVaultConfigPath();
+        getVaultConfigPath();
 
-const raw =
-    await fs.readFile(
-        vaultConfigPath,
-        'utf8'
-    );
+    const raw =
+        await fs.readFile(
+            vaultConfigPath,
+            'utf8'
+        );
 
-const vaultConfig =
-    JSON.parse(raw);
+    const vaultConfig =
+        JSON.parse(raw);
 
     let recoveryUnlockKey;
 
-let vaultMasterKey;
-let newPasswordUnlockKey;
+    let vaultMasterKey;
+    let newPasswordUnlockKey;
 
-try {
+    try {
 
-if (
-    !vaultConfig.recovery ||
-    !vaultConfig.recovery.salt ||
-    !vaultConfig.recovery.vmk
-) {
+        if (
+            !vaultConfig.recovery ||
+            !vaultConfig.recovery.salt ||
+            !vaultConfig.recovery.vmk
+        ) {
 
-    return {
+            return {
 
-        success: false,
+                success: false,
 
-        message:
-            'Recovery information is missing.'
+                message:
+                    'Recovery information is missing.'
 
-    };
+            };
 
-}
+        }
 
-const recoverySalt =
-    Buffer.from(
-        vaultConfig.recovery.salt,
-        'base64'
-    );
+        const recoverySalt =
+            Buffer.from(
+                vaultConfig.recovery.salt,
+                'base64'
+            );
 
-recoveryUnlockKey =
-    vaultCrypto.deriveRecoveryKey(
-        recoveryKey,
-        recoverySalt
-    );
+        recoveryUnlockKey =
+            vaultCrypto.deriveRecoveryKey(
+                recoveryKey,
+                recoverySalt
+            );
 
-    const recoveryIV =
-    Buffer.from(
-        vaultConfig.recovery.vmk.iv,
-        'base64'
-    );
+        const recoveryIV =
+            Buffer.from(
+                vaultConfig.recovery.vmk.iv,
+                'base64'
+            );
 
-const recoveryAuthTag =
-    Buffer.from(
-        vaultConfig.recovery.vmk.authTag,
-        'base64'
-    );
+        const recoveryAuthTag =
+            Buffer.from(
+                vaultConfig.recovery.vmk.authTag,
+                'base64'
+            );
 
-const encryptedVaultMasterKey =
-    Buffer.from(
-        vaultConfig.recovery.vmk.encrypted,
-        'base64'
-    );
+        const encryptedVaultMasterKey =
+            Buffer.from(
+                vaultConfig.recovery.vmk.encrypted,
+                'base64'
+            );
 
-try {
+        try {
 
-    const recoveryPackage = {
+            const recoveryPackage = {
 
-    iv: recoveryIV,
+                iv: recoveryIV,
 
-    authTag: recoveryAuthTag,
+                authTag: recoveryAuthTag,
 
-    encryptedVMK: encryptedVaultMasterKey
+                encryptedVMK: encryptedVaultMasterKey
 
-};
+            };
 
-vaultMasterKey =
-    vaultCrypto.decryptVaultMasterKey(
-        recoveryPackage,
-        recoveryUnlockKey
-    );
+            vaultMasterKey =
+                vaultCrypto.decryptVaultMasterKey(
+                    recoveryPackage,
+                    recoveryUnlockKey
+                );
 
-} catch {
+        } catch {
 
-    recoveryUnlockKey.fill(0);
+            recoveryUnlockKey.fill(0);
 
-    return {
+            return {
 
-        success: false,
+                success: false,
 
-        message:
-            'Invalid recovery key.'
+                message:
+                    'Invalid recovery key.'
 
-    };
+            };
 
-}
+        }
 
-/*
-    Generate NEW password salt.
-*/
+        /*
+            Generate NEW password salt.
+        */
 
-const newPasswordSalt =
-    crypto.randomBytes(
-        CONSTANTS.SCRYPT.SALT_LENGTH
-    );
+        const newPasswordSalt =
+            crypto.randomBytes(
+                CONSTANTS.SCRYPT.SALT_LENGTH
+            );
 
-/*
-    Derive NEW password key.
-*/
+        /*
+            Derive NEW password key.
+        */
 
-newPasswordUnlockKey =
-    vaultCrypto.derivePasswordKey(
-        newPassword,
-        newPasswordSalt
-    );
+        newPasswordUnlockKey =
+            vaultCrypto.derivePasswordKey(
+                newPassword,
+                newPasswordSalt
+            );
 
-/*
-    Encrypt SAME VMK using NEW password.
-*/
+        /*
+            Encrypt SAME VMK using NEW password.
+        */
 
-const newPasswordPackage =
-    vaultCrypto.encryptVaultMasterKey(
-        vaultMasterKey,
-        newPasswordUnlockKey
-    );
+        const newPasswordPackage =
+            vaultCrypto.encryptVaultMasterKey(
+                vaultMasterKey,
+                newPasswordUnlockKey
+            );
 
-    /*
-    Replace password protection
-    with the NEW password.
-*/
+        /*
+        Replace password protection
+        with the NEW password.
+    */
 
-vaultConfig.password = {
+        vaultConfig.password = {
 
-    algorithm: "scrypt",
+            algorithm: "scrypt",
 
-    salt:
-        newPasswordSalt.toString(
-            "base64"
-        ),
+            salt:
+                newPasswordSalt.toString(
+                    "base64"
+                ),
 
-    N: CONSTANTS.SCRYPT.N,
+            N: CONSTANTS.SCRYPT.N,
 
-    r: CONSTANTS.SCRYPT.R,
+            r: CONSTANTS.SCRYPT.R,
 
-    p: CONSTANTS.SCRYPT.P,
+            p: CONSTANTS.SCRYPT.P,
 
-    vmk: {
+            vmk: {
 
-        iv:
-            newPasswordPackage.iv.toString(
-                "base64"
+                iv:
+                    newPasswordPackage.iv.toString(
+                        "base64"
+                    ),
+
+                authTag:
+                    newPasswordPackage.authTag.toString(
+                        "base64"
+                    ),
+
+                encrypted:
+                    newPasswordPackage.encryptedVMK.toString(
+                        "base64"
+                    )
+
+            }
+
+        };
+
+        await fs.writeFile(
+
+            vaultConfigPath,
+
+            JSON.stringify(
+                vaultConfig,
+                null,
+                2
             ),
 
-        authTag:
-            newPasswordPackage.authTag.toString(
-                "base64"
-            ),
+            "utf8"
 
-        encrypted:
-            newPasswordPackage.encryptedVMK.toString(
-                "base64"
-            )
+        );
+
+        setPendingLoginSuccessMessage(
+            'Password reset successfully. Log in using your new password.'
+        );
+
+        await resetLockoutState();
+
+        return {
+
+            success: true
+
+        };
 
     }
 
-};
+    finally {
 
-await fs.writeFile(
+        if (recoveryUnlockKey) {
+            recoveryUnlockKey.fill(0);
+        }
 
-    vaultConfigPath,
+        if (newPasswordUnlockKey) {
+            newPasswordUnlockKey.fill(0);
+        }
 
-    JSON.stringify(
-        vaultConfig,
-        null,
-        2
-    ),
+        if (vaultMasterKey) {
+            vaultMasterKey.fill(0);
+        }
 
-    "utf8"
-
-);
-
-setPendingLoginSuccessMessage(
-    'Password reset successfully. Log in using your new password.'
-);
-
-await resetLockoutState();
-
-return {
-
-    success: true
-
-};
-
+    }
 }
-
-finally {
-
-    if (recoveryUnlockKey) {
-        recoveryUnlockKey.fill(0);
-    }
-
-    if (newPasswordUnlockKey) {
-        newPasswordUnlockKey.fill(0);
-    }
-
-    if (vaultMasterKey) {
-        vaultMasterKey.fill(0);
-    }
-
-}
-}
-    ipcMain.handle(
+ipcMain.handle(
     'vault:reset-password',
     async (
         event,
@@ -17216,140 +17216,140 @@ ipcMain.handle(
             await resetLockoutState();
 
 
-/*
-    Vault is now successfully unlocked.
+            /*
+                Vault is now successfully unlocked.
+            
+                We can safely decrypt index.clm and
+                compare its references with the actual
+                encrypted .clv files on disk.
+            */
 
-    We can safely decrypt index.clm and
-    compare its references with the actual
-    encrypted .clv files on disk.
-*/
+            /*
+                Before orphan detection, make sure the
+                active metadata index is trustworthy.
+            
+                If index.clm is damaged or missing while
+                encrypted vault data exists, the recovery
+                engine will attempt to restore it from the
+                authenticated backup.
+            */
 
-/*
-    Before orphan detection, make sure the
-    active metadata index is trustworthy.
-
-    If index.clm is damaged or missing while
-    encrypted vault data exists, the recovery
-    engine will attempt to restore it from the
-    authenticated backup.
-*/
-
-const indexRecovery =
-    await recoverVaultIndexIfNeeded();
-
-
-const index =
-    indexRecovery.index;
+            const indexRecovery =
+                await recoverVaultIndexIfNeeded();
 
 
-console.log(
-    'INDEX RECOVERY STATUS:',
-    {
-        recovered:
-            indexRecovery.recovered,
-
-        source:
-            indexRecovery.source,
-
-        files:
-            index.files.length,
-
-        folders:
-            index.folders.length
-    }
-);
-
-const orphanFiles =
-    await detectOrphanVaultFiles(
-        index
-    );
+            const index =
+                indexRecovery.index;
 
 
-if (orphanFiles.length > 0) {
+            console.log(
+                'INDEX RECOVERY STATUS:',
+                {
+                    recovered:
+                        indexRecovery.recovered,
 
-    console.warn(
-        `CrypticLocker detected ${orphanFiles.length} orphan encrypted file(s).`
-    );
+                    source:
+                        indexRecovery.source,
 
+                    files:
+                        index.files.length,
 
-    for (const orphan of orphanFiles) {
-
-        console.warn(
-            'Orphan:',
-            orphan.name,
-            '-',
-            orphan.size,
-            'bytes'
-        );
-
-    }
-
-}
-
-if (orphanFiles.length > 0) {
-
-    const quarantined =
-        await quarantineOrphanVaultFiles(
-            orphanFiles
-        );
-
-
-    if (quarantined.length > 0) {
-
-        console.warn(
-            `CrypticLocker quarantined ${quarantined.length} orphan encrypted file(s).`
-        );
-
-    }
-
-}
-
-const quarantinedOrphans =
-    await scanQuarantinedOrphans();
-
-
-if (quarantinedOrphans.length > 0) {
-
-    console.warn(
-        `CrypticLocker found ${quarantinedOrphans.length} quarantined orphan(s).`
-    );
-
-
-    for (
-        const orphan
-        of quarantinedOrphans
-    ) {
-
-        if (orphan.valid) {
-
-            console.warn(
-                'Quarantined orphan:',
-                orphan.name,
-                '→ POSSIBLE VALID CONTAINER',
-                '-',
-                orphan.size,
-                'bytes'
+                    folders:
+                        index.folders.length
+                }
             );
 
-        } else {
+            const orphanFiles =
+                await detectOrphanVaultFiles(
+                    index
+                );
 
-            console.warn(
-                'Quarantined orphan:',
-                orphan.name,
-                '→ INVALID',
-                '-',
-                orphan.reason
-            );
 
-        }
+            if (orphanFiles.length > 0) {
 
-    }
+                console.warn(
+                    `CrypticLocker detected ${orphanFiles.length} orphan encrypted file(s).`
+                );
 
-}
-    
-return {
-    success: true
-};
+
+                for (const orphan of orphanFiles) {
+
+                    console.warn(
+                        'Orphan:',
+                        orphan.name,
+                        '-',
+                        orphan.size,
+                        'bytes'
+                    );
+
+                }
+
+            }
+
+            if (orphanFiles.length > 0) {
+
+                const quarantined =
+                    await quarantineOrphanVaultFiles(
+                        orphanFiles
+                    );
+
+
+                if (quarantined.length > 0) {
+
+                    console.warn(
+                        `CrypticLocker quarantined ${quarantined.length} orphan encrypted file(s).`
+                    );
+
+                }
+
+            }
+
+            const quarantinedOrphans =
+                await scanQuarantinedOrphans();
+
+
+            if (quarantinedOrphans.length > 0) {
+
+                console.warn(
+                    `CrypticLocker found ${quarantinedOrphans.length} quarantined orphan(s).`
+                );
+
+
+                for (
+                    const orphan
+                    of quarantinedOrphans
+                ) {
+
+                    if (orphan.valid) {
+
+                        console.warn(
+                            'Quarantined orphan:',
+                            orphan.name,
+                            '→ POSSIBLE VALID CONTAINER',
+                            '-',
+                            orphan.size,
+                            'bytes'
+                        );
+
+                    } else {
+
+                        console.warn(
+                            'Quarantined orphan:',
+                            orphan.name,
+                            '→ INVALID',
+                            '-',
+                            orphan.reason
+                        );
+
+                    }
+
+                }
+
+            }
+
+            return {
+                success: true
+            };
 
 
         } catch (error) {
@@ -17439,9 +17439,9 @@ ipcMain.handle(
     async () => {
 
         return {
-    unlocked:
-        sessionManager.isUnlocked()
-};
+            unlocked:
+                sessionManager.isUnlocked()
+        };
 
     }
 );
@@ -17682,53 +17682,53 @@ ipcMain.handle(
         }
 
         try {
-         
-         const config =
-    JSON.parse(
-        await fs.readFile(
-            getVaultConfigPath(),
-            'utf8'
-        )
-    );
 
-const packageData = {
+            const config =
+                JSON.parse(
+                    await fs.readFile(
+                        getVaultConfigPath(),
+                        'utf8'
+                    )
+                );
 
-    iv:
-        Buffer.from(
-            config.recovery.key.iv,
-            'base64'
-        ),
+            const packageData = {
 
-    authTag:
-        Buffer.from(
-            config.recovery.key.authTag,
-            'base64'
-        ),
+                iv:
+                    Buffer.from(
+                        config.recovery.key.iv,
+                        'base64'
+                    ),
 
-    encryptedRecoveryKey:
-        Buffer.from(
-            config.recovery.key.encrypted,
-            'base64'
-        )
+                authTag:
+                    Buffer.from(
+                        config.recovery.key.authTag,
+                        'base64'
+                    ),
 
-};
+                encryptedRecoveryKey:
+                    Buffer.from(
+                        config.recovery.key.encrypted,
+                        'base64'
+                    )
 
-const recoveryKey =
-    vaultCrypto.decryptRecoveryKey(
+            };
 
-        packageData,
+            const recoveryKey =
+                vaultCrypto.decryptRecoveryKey(
 
-        sessionManager.getVaultMasterKey()
+                    packageData,
 
-    );
+                    sessionManager.getVaultMasterKey()
 
-return {
+                );
 
-    success: true,
+            return {
 
-    recoveryKey
+                success: true,
 
-};
+                recoveryKey
+
+            };
 
         } catch (error) {
 
@@ -17762,16 +17762,14 @@ ipcMain.handle(
         orphanFileName
     ) => {
 
-        if (!sessionManager.isUnlocked())
+        if (!sessionManager.isUnlocked()) {
 
-            {
+            return {
+                success: false,
+                message: 'Vault is locked.'
+            };
 
-    return {
-        success: false,
-        message: 'Vault is locked.'
-    };
-
-}
+        }
 
         try {
 
@@ -17814,16 +17812,14 @@ ipcMain.handle(
     'vault:delete-all-invalid-quarantined-orphans',
     async () => {
 
-        if (!sessionManager.isUnlocked())
+        if (!sessionManager.isUnlocked()) {
 
-            {
+            return {
+                success: false,
+                message: 'Vault is locked.'
+            };
 
-    return {
-        success: false,
-        message: 'Vault is locked.'
-    };
-
-}
+        }
 
         try {
 
@@ -17855,7 +17851,7 @@ ipcMain.handle(
 
                 errorCode:
                     typeof error.code ===
-                    'string'
+                        'string'
                         ? error.code
                         : null,
 
@@ -18001,278 +17997,278 @@ ipcMain.handle(
     Check free space on D:\Restored
 */
 
-const destinationDirectory =
-    path.dirname(
-        saveResult.filePath
-    );
+            const destinationDirectory =
+                path.dirname(
+                    saveResult.filePath
+                );
 
 
-const storageCheck =
-    await ensureStorageAvailable(
-        destinationDirectory,
-        file.size
-    );
+            const storageCheck =
+                await ensureStorageAvailable(
+                    destinationDirectory,
+                    file.size
+                );
 
 
-if (!storageCheck.enough) {
+            if (!storageCheck.enough) {
 
-    return {
+                return {
 
-        success: false,
+                    success: false,
 
-        errorCode:
-            'INSUFFICIENT_STORAGE',
+                    errorCode:
+                        'INSUFFICIENT_STORAGE',
 
-        message:
-            'Not enough storage space.',
+                    message:
+                        'Not enough storage space.',
 
-        requiredBytes:
-            storageCheck.requiredWithBuffer,
+                    requiredBytes:
+                        storageCheck.requiredWithBuffer,
 
-        fileSize:
-            file.size,
+                    fileSize:
+                        file.size,
 
-        availableBytes:
-            storageCheck.availableBytes
+                    availableBytes:
+                        storageCheck.availableBytes
 
-    };
-
-}
-
-
-            operationName =
-    file.name;
-
-operationId =
-    crypto.randomUUID();
-
-
-let lastProgressTime =
-    Date.now();
-
-let lastProgressBytes =
-    0;
-
-let smoothedSpeed =
-    0;
-
-
-sendVaultProgress(
-    event,
-    {
-
-        operationId,
-
-        operation:
-            'restore',
-
-        itemType:
-            'file',
-
-        status:
-            'started',
-
-        name:
-            file.name,
-
-        currentFile:
-            file.name,
-
-        processedBytes:
-            0,
-
-        totalBytes:
-            file.size,
-
-        completedFiles:
-            0,
-
-        totalFiles:
-            1,
-
-        speedBytesPerSecond:
-            0,
-
-        etaSeconds:
-            null
-
-    }
-);
-
-
-const restored =
-    await restoreVaultFileAuto(
-        file,
-        saveResult.filePath,
-
-        operationId,
-
-        progress => {
-
-        const now =
-            Date.now();
-
-
-        const elapsedSeconds =
-            (
-                now -
-                lastProgressTime
-            ) / 1000;
-
-
-        if (
-            elapsedSeconds >= 0.25
-        ) {
-
-            const bytesDifference =
-                progress.processedBytes -
-                lastProgressBytes;
-
-
-            const instantSpeed =
-                bytesDifference /
-                elapsedSeconds;
-
-
-            if (
-                smoothedSpeed === 0
-            ) {
-
-                smoothedSpeed =
-                    instantSpeed;
-
-            } else {
-
-                smoothedSpeed =
-                    (
-                        smoothedSpeed * 0.7
-                    ) +
-                    (
-                        instantSpeed * 0.3
-                    );
+                };
 
             }
 
 
-            lastProgressTime =
-                now;
+            operationName =
+                file.name;
 
-            lastProgressBytes =
-                progress.processedBytes;
-
-        }
+            operationId =
+                crypto.randomUUID();
 
 
-        const remainingBytes =
-            Math.max(
-                0,
-                progress.totalBytes -
-                progress.processedBytes
+            let lastProgressTime =
+                Date.now();
+
+            let lastProgressBytes =
+                0;
+
+            let smoothedSpeed =
+                0;
+
+
+            sendVaultProgress(
+                event,
+                {
+
+                    operationId,
+
+                    operation:
+                        'restore',
+
+                    itemType:
+                        'file',
+
+                    status:
+                        'started',
+
+                    name:
+                        file.name,
+
+                    currentFile:
+                        file.name,
+
+                    processedBytes:
+                        0,
+
+                    totalBytes:
+                        file.size,
+
+                    completedFiles:
+                        0,
+
+                    totalFiles:
+                        1,
+
+                    speedBytesPerSecond:
+                        0,
+
+                    etaSeconds:
+                        null
+
+                }
             );
 
 
-        const etaSeconds =
-            smoothedSpeed > 0
-                ? remainingBytes /
-                    smoothedSpeed
-                : null;
+            const restored =
+                await restoreVaultFileAuto(
+                    file,
+                    saveResult.filePath,
+
+                    operationId,
+
+                    progress => {
+
+                        const now =
+                            Date.now();
 
 
-        sendVaultProgress(
-    event,
-    {
-        operationId,
-
-        operation:
-            'restore',
-
-        itemType:
-            'file',
-
-        status:
-            'progress',
-
-        name:
-            file.name,
-
-        currentFile:
-            file.name,
-
-        processedBytes:
-            progress.processedBytes,
-
-        totalBytes:
-            progress.totalBytes,
-
-        completedFiles:
-            0,
-
-        totalFiles:
-            1,
-
-        speedBytesPerSecond:
-            smoothedSpeed,
-
-        etaSeconds
-    }
-);
-
-        }
-    );
+                        const elapsedSeconds =
+                            (
+                                now -
+                                lastProgressTime
+                            ) / 1000;
 
 
-console.log(
-    `Normal restore completed using CLV${restored.containerVersion}.`
-);
+                        if (
+                            elapsedSeconds >= 0.25
+                        ) {
+
+                            const bytesDifference =
+                                progress.processedBytes -
+                                lastProgressBytes;
 
 
-/*
-    restoreVaultFileStream() returns only
-    after authentication, hash and size
-    verification have succeeded.
-*/
+                            const instantSpeed =
+                                bytesDifference /
+                                elapsedSeconds;
 
-sendVaultProgress(
-    event,
-    {
 
-        operationId,
+                            if (
+                                smoothedSpeed === 0
+                            ) {
 
-        operation:
-            'restore',
+                                smoothedSpeed =
+                                    instantSpeed;
 
-        itemType:
-            'file',
+                            } else {
 
-        status:
-            'completed',
+                                smoothedSpeed =
+                                    (
+                                        smoothedSpeed * 0.7
+                                    ) +
+                                    (
+                                        instantSpeed * 0.3
+                                    );
 
-        name:
-            file.name,
+                            }
 
-        currentFile:
-            null,
 
-        processedBytes:
-            file.size,
+                            lastProgressTime =
+                                now;
 
-        totalBytes:
-            file.size,
+                            lastProgressBytes =
+                                progress.processedBytes;
 
-        completedFiles:
-            1,
+                        }
 
-        totalFiles:
-            1,
 
-        speedBytesPerSecond:
-            0,
+                        const remainingBytes =
+                            Math.max(
+                                0,
+                                progress.totalBytes -
+                                progress.processedBytes
+                            );
 
-        etaSeconds:
-            0
 
-    }
-);
+                        const etaSeconds =
+                            smoothedSpeed > 0
+                                ? remainingBytes /
+                                smoothedSpeed
+                                : null;
+
+
+                        sendVaultProgress(
+                            event,
+                            {
+                                operationId,
+
+                                operation:
+                                    'restore',
+
+                                itemType:
+                                    'file',
+
+                                status:
+                                    'progress',
+
+                                name:
+                                    file.name,
+
+                                currentFile:
+                                    file.name,
+
+                                processedBytes:
+                                    progress.processedBytes,
+
+                                totalBytes:
+                                    progress.totalBytes,
+
+                                completedFiles:
+                                    0,
+
+                                totalFiles:
+                                    1,
+
+                                speedBytesPerSecond:
+                                    smoothedSpeed,
+
+                                etaSeconds
+                            }
+                        );
+
+                    }
+                );
+
+
+            console.log(
+                `Normal restore completed using CLV${restored.containerVersion}.`
+            );
+
+
+            /*
+                restoreVaultFileStream() returns only
+                after authentication, hash and size
+                verification have succeeded.
+            */
+
+            sendVaultProgress(
+                event,
+                {
+
+                    operationId,
+
+                    operation:
+                        'restore',
+
+                    itemType:
+                        'file',
+
+                    status:
+                        'completed',
+
+                    name:
+                        file.name,
+
+                    currentFile:
+                        null,
+
+                    processedBytes:
+                        file.size,
+
+                    totalBytes:
+                        file.size,
+
+                    completedFiles:
+                        1,
+
+                    totalFiles:
+                        1,
+
+                    speedBytesPerSecond:
+                        0,
+
+                    etaSeconds:
+                        0
+
+                }
+            );
 
 
             let removedFromVault = false;
@@ -18312,7 +18308,7 @@ sendVaultProgress(
             };
 
 
-                } catch (error) {
+        } catch (error) {
 
             console.error(
                 'Streaming restore failed:',
@@ -18388,19 +18384,17 @@ ipcMain.handle(
         removeFromVault = false
     ) => {
 
-                let operationId = null;
+        let operationId = null;
         let operationName = null;
-        
-        if (!sessionManager.isUnlocked())
 
-            {
+        if (!sessionManager.isUnlocked()) {
 
-    return {
-        success: false,
-        message: 'Vault is locked.'
-    };
+            return {
+                success: false,
+                message: 'Vault is locked.'
+            };
 
-}
+        }
 
 
         try {
@@ -18466,237 +18460,104 @@ ipcMain.handle(
     should be sent.
 */
 
-if (
-    result.canceled ||
-    result.filePaths.length === 0
-) {
-
-    return {
-        success: false,
-        canceled: true
-    };
-
-}
-
-/*
-    Check destination storage BEFORE
-    creating/restoring the folder.
-*/
-
-const destinationParent =
-    result.filePaths[0];
-
-
-const folderFiles =
-    index.files.filter(
-        file =>
-            file.parentFolderId ===
-            folder.id
-    );
-
-
-const requiredFolderBytes =
-    folderFiles.reduce(
-        (total, file) =>
-            total +
-            (
-                typeof file.size === 'number'
-                    ? file.size
-                    : 0
-            ),
-        0
-    );
-
-
-const storageCheck =
-    await ensureStorageAvailable(
-        destinationParent,
-        requiredFolderBytes
-    );
-
-
-if (!storageCheck.enough) {
-
-    return {
-
-        success: false,
-
-        errorCode:
-            'INSUFFICIENT_STORAGE',
-
-        message:
-            'Not enough storage space.',
-
-        requiredBytes:
-            storageCheck.requiredWithBuffer,
-
-        folderSize:
-            requiredFolderBytes,
-
-        availableBytes:
-            storageCheck.availableBytes
-
-    };
-
-}
-
-
-           operationName =
-    folder.name;
-
-operationId =
-    crypto.randomUUID();
-
-
-let lastProgressTime =
-    Date.now();
-
-let lastProgressBytes =
-    0;
-
-let smoothedSpeed =
-    0;
-
-
-/*
-    Folder restore is starting.
-
-    Total bytes/files will become available
-    when restoreVaultFolder begins processing.
-*/
-
-sendVaultProgress(
-    event,
-    {
-
-        operationId,
-
-        operation:
-            'restore',
-
-        itemType:
-            'folder',
-
-        status:
-            'started',
-
-        name:
-            folder.name,
-
-        currentFile:
-            null,
-
-        processedBytes:
-            0,
-
-        totalBytes:
-            folder.totalSize || 0,
-
-        completedFiles:
-            0,
-
-        totalFiles:
-            folder.fileCount || 0,
-
-        speedBytesPerSecond:
-            0,
-
-        etaSeconds:
-            null
-
-    }
-);
-
-
-const restored =
-    await restoreVaultFolder(
-        folder,
-        index,
-        result.filePaths[0],
-
-        progress => {
-
-            const now =
-                Date.now();
-
-
-            /*
-                Calculate actual restore speed.
-            */
-
             if (
-                progress.status ===
-                'progress'
+                result.canceled ||
+                result.filePaths.length === 0
             ) {
 
-                const elapsedSeconds =
-                    (
-                        now -
-                        lastProgressTime
-                    ) / 1000;
+                return {
+                    success: false,
+                    canceled: true
+                };
+
+            }
+
+            /*
+                Check destination storage BEFORE
+                creating/restoring the folder.
+            */
+
+            const destinationParent =
+                result.filePaths[0];
 
 
-                if (
-                    elapsedSeconds >= 0.25
-                ) {
-
-                    const bytesDifference =
-                        progress.processedBytes -
-                        lastProgressBytes;
-
-
-                    const instantSpeed =
-                        bytesDifference /
-                        elapsedSeconds;
+            const folderFiles =
+                index.files.filter(
+                    file =>
+                        file.parentFolderId ===
+                        folder.id
+                );
 
 
-                    if (
-                        smoothedSpeed === 0
-                    ) {
-
-                        smoothedSpeed =
-                            instantSpeed;
-
-                    } else {
-
-                        smoothedSpeed =
-                            (
-                                smoothedSpeed *
-                                0.7
-                            ) +
-                            (
-                                instantSpeed *
-                                0.3
-                            );
-
-                    }
+            const requiredFolderBytes =
+                folderFiles.reduce(
+                    (total, file) =>
+                        total +
+                        (
+                            typeof file.size === 'number'
+                                ? file.size
+                                : 0
+                        ),
+                    0
+                );
 
 
-                    lastProgressTime =
-                        now;
+            const storageCheck =
+                await ensureStorageAvailable(
+                    destinationParent,
+                    requiredFolderBytes
+                );
 
-                    lastProgressBytes =
-                        progress.processedBytes;
 
-                }
+            if (!storageCheck.enough) {
+
+                return {
+
+                    success: false,
+
+                    errorCode:
+                        'INSUFFICIENT_STORAGE',
+
+                    message:
+                        'Not enough storage space.',
+
+                    requiredBytes:
+                        storageCheck.requiredWithBuffer,
+
+                    folderSize:
+                        requiredFolderBytes,
+
+                    availableBytes:
+                        storageCheck.availableBytes
+
+                };
 
             }
 
 
-            const remainingBytes =
-                Math.max(
-                    0,
-                    progress.totalBytes -
-                    progress.processedBytes
-                );
+            operationName =
+                folder.name;
+
+            operationId =
+                crypto.randomUUID();
 
 
-            const etaSeconds =
-                smoothedSpeed > 0
-                    ? remainingBytes /
-                        smoothedSpeed
-                    : null;
+            let lastProgressTime =
+                Date.now();
 
+            let lastProgressBytes =
+                0;
+
+            let smoothedSpeed =
+                0;
+
+
+            /*
+                Folder restore is starting.
+            
+                Total bytes/files will become available
+                when restoreVaultFolder begins processing.
+            */
 
             sendVaultProgress(
                 event,
@@ -18711,85 +18572,218 @@ const restored =
                         'folder',
 
                     status:
-                        progress.status,
+                        'started',
 
                     name:
-                        progress.name,
+                        folder.name,
 
                     currentFile:
-                        progress.currentFile,
+                        null,
 
                     processedBytes:
-                        progress.processedBytes,
+                        0,
 
                     totalBytes:
-                        progress.totalBytes,
+                        folder.totalSize || 0,
 
                     completedFiles:
-                        progress.completedFiles,
+                        0,
 
                     totalFiles:
-                        progress.totalFiles,
+                        folder.fileCount || 0,
 
                     speedBytesPerSecond:
-                        smoothedSpeed,
+                        0,
 
-                    etaSeconds
+                    etaSeconds:
+                        null
 
                 }
             );
 
-        },
-        operationId
-    );
+
+            const restored =
+                await restoreVaultFolder(
+                    folder,
+                    index,
+                    result.filePaths[0],
+
+                    progress => {
+
+                        const now =
+                            Date.now();
 
 
-/*
-    We reach this point only after every file
-    has been decrypted and integrity verified.
-*/
+                        /*
+                            Calculate actual restore speed.
+                        */
 
-sendVaultProgress(
-    event,
-    {
+                        if (
+                            progress.status ===
+                            'progress'
+                        ) {
 
-        operationId,
+                            const elapsedSeconds =
+                                (
+                                    now -
+                                    lastProgressTime
+                                ) / 1000;
 
-        operation:
-            'restore',
 
-        itemType:
-            'folder',
+                            if (
+                                elapsedSeconds >= 0.25
+                            ) {
 
-        status:
-            'completed',
+                                const bytesDifference =
+                                    progress.processedBytes -
+                                    lastProgressBytes;
 
-        name:
-            restored.name,
 
-        currentFile:
-            null,
+                                const instantSpeed =
+                                    bytesDifference /
+                                    elapsedSeconds;
 
-        processedBytes:
-            folder.totalSize || 0,
 
-        totalBytes:
-            folder.totalSize || 0,
+                                if (
+                                    smoothedSpeed === 0
+                                ) {
 
-        completedFiles:
-            restored.fileCount,
+                                    smoothedSpeed =
+                                        instantSpeed;
 
-        totalFiles:
-            restored.fileCount,
+                                } else {
 
-        speedBytesPerSecond:
-            0,
+                                    smoothedSpeed =
+                                        (
+                                            smoothedSpeed *
+                                            0.7
+                                        ) +
+                                        (
+                                            instantSpeed *
+                                            0.3
+                                        );
 
-        etaSeconds:
-            0
+                                }
 
-    }
-);
+
+                                lastProgressTime =
+                                    now;
+
+                                lastProgressBytes =
+                                    progress.processedBytes;
+
+                            }
+
+                        }
+
+
+                        const remainingBytes =
+                            Math.max(
+                                0,
+                                progress.totalBytes -
+                                progress.processedBytes
+                            );
+
+
+                        const etaSeconds =
+                            smoothedSpeed > 0
+                                ? remainingBytes /
+                                smoothedSpeed
+                                : null;
+
+
+                        sendVaultProgress(
+                            event,
+                            {
+
+                                operationId,
+
+                                operation:
+                                    'restore',
+
+                                itemType:
+                                    'folder',
+
+                                status:
+                                    progress.status,
+
+                                name:
+                                    progress.name,
+
+                                currentFile:
+                                    progress.currentFile,
+
+                                processedBytes:
+                                    progress.processedBytes,
+
+                                totalBytes:
+                                    progress.totalBytes,
+
+                                completedFiles:
+                                    progress.completedFiles,
+
+                                totalFiles:
+                                    progress.totalFiles,
+
+                                speedBytesPerSecond:
+                                    smoothedSpeed,
+
+                                etaSeconds
+
+                            }
+                        );
+
+                    },
+                    operationId
+                );
+
+
+            /*
+                We reach this point only after every file
+                has been decrypted and integrity verified.
+            */
+
+            sendVaultProgress(
+                event,
+                {
+
+                    operationId,
+
+                    operation:
+                        'restore',
+
+                    itemType:
+                        'folder',
+
+                    status:
+                        'completed',
+
+                    name:
+                        restored.name,
+
+                    currentFile:
+                        null,
+
+                    processedBytes:
+                        folder.totalSize || 0,
+
+                    totalBytes:
+                        folder.totalSize || 0,
+
+                    completedFiles:
+                        restored.fileCount,
+
+                    totalFiles:
+                        restored.fileCount,
+
+                    speedBytesPerSecond:
+                        0,
+
+                    etaSeconds:
+                        0
+
+                }
+            );
 
 
             let removedFromVault = false;
@@ -18828,7 +18822,7 @@ sendVaultProgress(
             };
 
 
-                } catch (error) {
+        } catch (error) {
 
             console.error(
                 'Folder restore failed:',
@@ -18906,39 +18900,39 @@ app.whenReady().then(
         await cleanupStaleVaultTempFiles();
         await synchronizeApplicationSettings();
 
-/*
-    Recover from an application/process crash
-    that happened during orphan recovery.
+        /*
+            Recover from an application/process crash
+            that happened during orphan recovery.
+        
+            This runs before the UI opens so an
+            incomplete plaintext recovery file is not
+            left behind unnoticed.
+        */
 
-    This runs before the UI opens so an
-    incomplete plaintext recovery file is not
-    left behind unnoticed.
-*/
+        try {
 
-try {
+            await cleanupRecoveryJournalOnStartup();
 
-    await cleanupRecoveryJournalOnStartup();
+        } catch (error) {
 
-} catch (error) {
+            /*
+                Do not delete the journal when cleanup
+                fails.
+        
+                Keeping it allows CrypticLocker to try
+                again on the next launch instead of
+                forgetting about an incomplete recovery.
+            */
 
-    /*
-        Do not delete the journal when cleanup
-        fails.
+            console.error(
+                'Startup recovery cleanup failed:',
+                error
+            );
 
-        Keeping it allows CrypticLocker to try
-        again on the next launch instead of
-        forgetting about an incomplete recovery.
-    */
-
-    console.error(
-        'Startup recovery cleanup failed:',
-        error
-    );
-
-}
+        }
 
 
-createWindow();
+        createWindow();
 
         /*
     Electron emits "suspend" when the
@@ -18948,34 +18942,34 @@ createWindow();
     Electron's app is ready.
 */
 
-powerMonitor.on(
-    'suspend',
-    () => {
+        powerMonitor.on(
+            'suspend',
+            () => {
 
-        void lockVaultForSystemSleep();
+                void lockVaultForSystemSleep();
 
-    }
-);
+            }
+        );
 
-powerMonitor.on(
-    'lock-screen',
-    () => {
+        powerMonitor.on(
+            'lock-screen',
+            () => {
 
-        void lockVaultForSystemSleep();
+                void lockVaultForSystemSleep();
 
-    }
-);
+            }
+        );
 
-powerMonitor.on(
-    'resume',
-    () => {
+        powerMonitor.on(
+            'resume',
+            () => {
 
-        void lockVaultForSystemSleep();
+                void lockVaultForSystemSleep();
 
-    }
-);
+            }
+        );
 
-app.on(
+        app.on(
             'activate',
             () => {
 

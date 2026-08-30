@@ -1465,7 +1465,7 @@ if (importVaultButton) {
                         document.documentElement.dataset.theme = themeToApply;
                         try {
                             window.localStorage.setItem('cl-theme', result.theme);
-                        } catch {}
+                        } catch { }
                     }
 
                     setImportInProgress(false);

@@ -70,17 +70,17 @@ const CRYPTO_CONSTANTS = Object.freeze({
 
     RECOVERY: Object.freeze({
 
-    BYTE_LENGTH: 32,
+        BYTE_LENGTH: 32,
 
-    GROUP_SIZE: 4,
+        GROUP_SIZE: 4,
 
-    SEPARATOR: '-',
+        SEPARATOR: '-',
 
-    ALPHABET: 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+        ALPHABET: 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
 
-    PREFIX: 'CKRV'
+        PREFIX: 'CKRV'
 
-}),
+    }),
 
     // ========================================================
     // Metadata

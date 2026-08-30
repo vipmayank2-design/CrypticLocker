@@ -21,30 +21,30 @@ contextBridge.exposeInMainWorld(
 
         getLoginSuccessMessage: () => {
 
-    return ipcRenderer.invoke(
-        'auth:get-success-message'
-    );
+            return ipcRenderer.invoke(
+                'auth:get-success-message'
+            );
 
-},
+        },
 
         checkVaultIntegrity: () => {
 
-    return ipcRenderer.invoke(
-        'vault:integrity-check'
-    );
+            return ipcRenderer.invoke(
+                'vault:integrity-check'
+            );
 
-},
+        },
 
-getSettings: () =>
-    ipcRenderer.invoke(
-        'settings:get'
-    ),
+        getSettings: () =>
+            ipcRenderer.invoke(
+                'settings:get'
+            ),
 
-updateSettings: updates =>
-    ipcRenderer.invoke(
-        'settings:update',
-        updates
-    ),
+        updateSettings: updates =>
+            ipcRenderer.invoke(
+                'settings:update',
+                updates
+            ),
 
 
         createVault: (password) => {
@@ -77,34 +77,34 @@ updateSettings: updates =>
 
 
         changePassword: (
-    currentPassword,
-    newPassword
-) => {
+            currentPassword,
+            newPassword
+        ) => {
 
-    return ipcRenderer.invoke(
+            return ipcRenderer.invoke(
 
-        'vault:change-password',
+                'vault:change-password',
 
-        currentPassword,
+                currentPassword,
 
-        newPassword
+                newPassword
 
-    );
+            );
 
-},
+        },
 
-resetPassword: (
-    recoveryKey,
-    newPassword
-) => {
+        resetPassword: (
+            recoveryKey,
+            newPassword
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:reset-password',
-        recoveryKey,
-        newPassword
-    );
+            return ipcRenderer.invoke(
+                'vault:reset-password',
+                recoveryKey,
+                newPassword
+            );
 
-},
+        },
 
         getSessionStatus: () => {
 
@@ -117,321 +117,321 @@ resetPassword: (
 
         lockVault: () => {
 
-    return ipcRenderer.invoke(
-        'vault:lock'
-    );
+            return ipcRenderer.invoke(
+                'vault:lock'
+            );
 
-},
+        },
 
-verifyPassword: (password) => {
+        verifyPassword: (password) => {
 
-    return ipcRenderer.invoke(
-        'vault:verify-password',
-        password
-    );
+            return ipcRenderer.invoke(
+                'vault:verify-password',
+                password
+            );
 
-},
+        },
 
-deleteVault: (password) => {
+        deleteVault: (password) => {
 
-    return ipcRenderer.invoke(
-        'vault:delete-vault',
-        password
-    );
+            return ipcRenderer.invoke(
+                'vault:delete-vault',
+                password
+            );
 
-},
+        },
 
-exportVault: () => {
+        exportVault: () => {
 
-    return ipcRenderer.invoke(
-        'vault:export-vault'
-    );
+            return ipcRenderer.invoke(
+                'vault:export-vault'
+            );
 
-},
+        },
 
-importVault: () => {
+        importVault: () => {
 
-    return ipcRenderer.invoke(
-        'vault:import-vault'
-    );
+            return ipcRenderer.invoke(
+                'vault:import-vault'
+            );
 
-},
+        },
 
 
-addFile: (mode = 'copy') => {
+        addFile: (mode = 'copy') => {
 
-    return ipcRenderer.invoke(
-        'vault:add-file',
-        mode
-    );
+            return ipcRenderer.invoke(
+                'vault:add-file',
+                mode
+            );
 
-},
+        },
 
 
-getFiles: () => {
+        getFiles: () => {
 
-    return ipcRenderer.invoke(
-        'vault:get-files'
-    );
+            return ipcRenderer.invoke(
+                'vault:get-files'
+            );
 
-},
+        },
 
-getVaultSettingsInfo: () => {
+        getVaultSettingsInfo: () => {
 
-    return ipcRenderer.invoke(
-        'vault:get-settings-info'
-    );
+            return ipcRenderer.invoke(
+                'vault:get-settings-info'
+            );
 
-},
+        },
 
-openVaultStorageLocation: () => {
+        openVaultStorageLocation: () => {
 
-    return ipcRenderer.invoke(
-        'vault:open-storage-location'
-    );
+            return ipcRenderer.invoke(
+                'vault:open-storage-location'
+            );
 
-},
+        },
 
-getRecoveryKey: () => {
+        getRecoveryKey: () => {
 
-    return ipcRenderer.invoke(
-        'vault:get-recovery-key'
-    );
+            return ipcRenderer.invoke(
+                'vault:get-recovery-key'
+            );
 
-},
+        },
 
-copyText: (text) => {
+        copyText: (text) => {
 
-    return ipcRenderer.invoke(
-        'clipboard:copy',
-        text
-    );
+            return ipcRenderer.invoke(
+                'clipboard:copy',
+                text
+            );
 
-},
+        },
 
-addFolder: (mode = 'copy') => {
+        addFolder: (mode = 'copy') => {
 
-    return ipcRenderer.invoke(
-        'vault:add-folder',
-        mode
-    );
+            return ipcRenderer.invoke(
+                'vault:add-folder',
+                mode
+            );
 
-},
+        },
 
-restoreFile: (
-    fileId,
-    removeFromVault = false
-) => {
+        restoreFile: (
+            fileId,
+            removeFromVault = false
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:restore-file',
-        fileId,
-        removeFromVault
-    );
+            return ipcRenderer.invoke(
+                'vault:restore-file',
+                fileId,
+                removeFromVault
+            );
 
-},
+        },
 
 
-deleteFile: (fileId) => {
+        deleteFile: (fileId) => {
 
-    return ipcRenderer.invoke(
-        'vault:delete-file',
-        fileId
-    );
+            return ipcRenderer.invoke(
+                'vault:delete-file',
+                fileId
+            );
 
-},
+        },
 
 
-restoreFolder: (
-    folderId,
-    removeFromVault = false
-) => {
+        restoreFolder: (
+            folderId,
+            removeFromVault = false
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:restore-folder',
-        folderId,
-        removeFromVault
-    );
+            return ipcRenderer.invoke(
+                'vault:restore-folder',
+                folderId,
+                removeFromVault
+            );
 
-},
+        },
 
-bulkDeleteItems: (
-    items
-) => {
+        bulkDeleteItems: (
+            items
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:bulk-delete',
-        items
-    );
+            return ipcRenderer.invoke(
+                'vault:bulk-delete',
+                items
+            );
 
-},
+        },
 
-bulkRestoreItems: (
-    items,
-    removeFromVault = false
-) => {
+        bulkRestoreItems: (
+            items,
+            removeFromVault = false
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:bulk-restore',
-        items,
-        removeFromVault
-    );
+            return ipcRenderer.invoke(
+                'vault:bulk-restore',
+                items,
+                removeFromVault
+            );
 
-},
+        },
 
-checkItemsStatus: (
-    items
-) => {
+        checkItemsStatus: (
+            items
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:check-items-status',
-        items
-    );
+            return ipcRenderer.invoke(
+                'vault:check-items-status',
+                items
+            );
 
-},
+        },
 
 
-deleteFolder: (folderId) => {
+        deleteFolder: (folderId) => {
 
-    return ipcRenderer.invoke(
-        'vault:delete-folder',
-        folderId
-    );
+            return ipcRenderer.invoke(
+                'vault:delete-folder',
+                folderId
+            );
 
-},
+        },
 
 
-getQuarantinedOrphans: () => {
+        getQuarantinedOrphans: () => {
 
-    return ipcRenderer.invoke(
-        'vault:get-quarantined-orphans'
-    );
+            return ipcRenderer.invoke(
+                'vault:get-quarantined-orphans'
+            );
 
-},
+        },
 
-checkQuarantineOrphan: (orphanFileName) => {
+        checkQuarantineOrphan: (orphanFileName) => {
 
-    return ipcRenderer.invoke(
-        'vault:check-orphan-recovery',
-        orphanFileName
-    );
+            return ipcRenderer.invoke(
+                'vault:check-orphan-recovery',
+                orphanFileName
+            );
 
-},
+        },
 
-recoverOrphan: (
-    orphanFileName,
-    removeFromQuarantine = false
-) => {
+        recoverOrphan: (
+            orphanFileName,
+            removeFromQuarantine = false
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:recover-orphan',
-        orphanFileName,
-        removeFromQuarantine
-    );
+            return ipcRenderer.invoke(
+                'vault:recover-orphan',
+                orphanFileName,
+                removeFromQuarantine
+            );
 
-},
+        },
 
-deleteQuarantinedOrphan: (
-    orphanFileName
-) => {
+        deleteQuarantinedOrphan: (
+            orphanFileName
+        ) => {
 
-    return ipcRenderer.invoke(
-        'vault:delete-quarantined-orphan',
-        orphanFileName
-    );
+            return ipcRenderer.invoke(
+                'vault:delete-quarantined-orphan',
+                orphanFileName
+            );
 
-},
+        },
 
-deleteAllInvalidQuarantinedOrphans: () =>
+        deleteAllInvalidQuarantinedOrphans: () =>
 
-    ipcRenderer.invoke(
-        'vault:delete-all-invalid-quarantined-orphans'
-    ),
-    
-    onOperationProgress: (callback) => {
+            ipcRenderer.invoke(
+                'vault:delete-all-invalid-quarantined-orphans'
+            ),
 
-    const listener =
-        (event, data) => {
+        onOperationProgress: (callback) => {
 
-            callback(data);
+            const listener =
+                (event, data) => {
 
-        };
+                    callback(data);
 
+                };
 
-    ipcRenderer.on(
-        'vault:operation-progress',
-        listener
-    );
 
+            ipcRenderer.on(
+                'vault:operation-progress',
+                listener
+            );
 
-    /*
-        Return cleanup function so renderer
-        can remove this listener if required.
-    */
 
-    return () => {
+            /*
+                Return cleanup function so renderer
+                can remove this listener if required.
+            */
 
-        ipcRenderer.removeListener(
-            'vault:operation-progress',
-            listener
-        );
+            return () => {
 
-    };
+                ipcRenderer.removeListener(
+                    'vault:operation-progress',
+                    listener
+                );
 
-},
+            };
 
-cancelOperation: (
-    operationId
-) => {
+        },
 
-    return ipcRenderer.invoke(
-        'vault:cancel-operation',
-        operationId
-    );
+        cancelOperation: (
+            operationId
+        ) => {
 
-},
+            return ipcRenderer.invoke(
+                'vault:cancel-operation',
+                operationId
+            );
 
-onSessionLocked: (callback) => {
+        },
 
-    if (
-        typeof callback !== 'function'
-    ) {
+        onSessionLocked: (callback) => {
 
-        return () => {};
+            if (
+                typeof callback !== 'function'
+            ) {
 
-    }
+                return () => { };
 
+            }
 
-    const listener =
-        (event, data) => {
 
-            callback(data);
+            const listener =
+                (event, data) => {
 
-        };
+                    callback(data);
 
+                };
 
-    ipcRenderer.on(
-        'vault:session-locked',
-        listener
-    );
 
+            ipcRenderer.on(
+                'vault:session-locked',
+                listener
+            );
 
-    /*
-        Return cleanup function so the
-        renderer can safely remove this
-        listener when required.
-    */
 
-    return () => {
+            /*
+                Return cleanup function so the
+                renderer can safely remove this
+                listener when required.
+            */
 
-        ipcRenderer.removeListener(
-            'vault:session-locked',
-            listener
-        );
+            return () => {
 
-    };
+                ipcRenderer.removeListener(
+                    'vault:session-locked',
+                    listener
+                );
 
-}
+            };
+
+        }
 
     }
 );

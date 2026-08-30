@@ -1,100 +1,97 @@
 @font-face {
-    font-family: 'League Spartan';
-    src: url('../fonts/LeagueSpartan-VariableFont_wght.ttf') format('truetype');
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
+  font-family: "League Spartan";
+  src: url("../fonts/LeagueSpartan-VariableFont_wght.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
-    font-family: 'League Spartan', sans-serif;
-    background:
-        radial-gradient(
-            circle at 50% -30%,
-            color-mix(in srgb, var(--primary) 12%, transparent),
-            transparent 42%
-        ),
-        var(--bg);
+  font-family: "League Spartan", sans-serif;
+  background:
+    radial-gradient(
+      circle at 50% -30%,
+      color-mix(in srgb, var(--primary) 12%, transparent),
+      transparent 42%
+    ),
+    var(--bg);
 
-    color: var(--text);
+  color: var(--text);
 
-    user-select: none;
+  user-select: none;
 }
-
 
 /* =========================
    APP PAGE
 ========================= */
 
 .auth-page {
-    width: 100%;
-    height: 100vh;
+  width: 100%;
+  height: 100vh;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    padding: 20px 30px;
+  padding: 20px 30px;
 }
-
 
 /* =========================
    MAIN CONTENT
 ========================= */
 
 .vault-card {
-    width: 100%;
-    max-width: 550px;
+  width: 100%;
+  max-width: 550px;
 
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 
-    padding: 0;
+  padding: 0;
 }
-
 
 /* =========================
    LOGO
 ========================= */
 
 .logo {
-    width: 52px;
-    height: 52px;
+  width: 52px;
+  height: 52px;
 
-    margin: 0 auto 12px;
+  margin: 0 auto 12px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    border-radius: 14px;
-    border: none;
+  border-radius: 14px;
+  border: none;
 }
 
 .logo img {
-    width: 72px;
-    height: 72px;
+  width: 72px;
+  height: 72px;
 
-    display: block;
-    object-fit: contain;
+  display: block;
+  object-fit: contain;
 
-    user-select: none;
-    -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* =========================
@@ -102,93 +99,89 @@ body {
 ========================= */
 
 .brand {
-    text-align: center;
+  text-align: center;
 }
 
 .brand h1 {
-    font-size: 26px;
-    font-weight: 700;
+  font-size: 26px;
+  font-weight: 700;
 
-    letter-spacing: -0.4px;
+  letter-spacing: -0.4px;
 }
 
 .brand p {
-    margin-top: 4px;
+  margin-top: 4px;
 
-    color: var(--muted);
+  color: var(--muted);
 
-    font-size: 13px;
+  font-size: 13px;
 }
-
 
 .divider {
-    display: none;
+  display: none;
 }
-
 
 /* =========================
    FORM HEADING
 ========================= */
 
 .form-heading {
-    text-align: center;
+  text-align: center;
 
-    margin-top: 24px;
-    margin-bottom: 18px;
+  margin-top: 24px;
+  margin-bottom: 18px;
 }
 
 .form-heading h2 {
-    font-size: 20px;
-    font-weight: 600;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .form-heading p {
-    margin-top: 5px;
+  margin-top: 5px;
 
-    color: var(--muted);
+  color: var(--muted);
 
-    font-size: 13px;
-    line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.5;
 }
-
 
 /* =========================
    FORM
 ========================= */
 
 .form-group {
-    margin-bottom: 14px;
+  margin-bottom: 14px;
 }
 
 .form-group label {
-    display: block;
+  display: block;
 
-    margin-bottom: 7px;
+  margin-bottom: 7px;
 
-    color: var(--text-secondary);
+  color: var(--text-secondary);
 
-    font-size: 13px;
-    font-weight: 500;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-
 .password-label {
-    display: flex !important;
-    align-items: center;
-    gap: 6px;
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
 }
 
 .label-lock-icon {
-    width: 14px;
-    height: 14px;
+  width: 14px;
+  height: 14px;
 
-    flex-shrink: 0;
+  flex-shrink: 0;
 
-    fill: none;
-    stroke: var(--text-secondary);
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* =========================
@@ -196,409 +189,400 @@ body {
 ========================= */
 
 .password-field {
-    position: relative;
+  position: relative;
 }
 
 .password-field input {
-    width: 100%;
-    height: 48px;
-    padding: 0 46px 0 14px;
+  width: 100%;
+  height: 48px;
+  padding: 0 46px 0 14px;
 
-    border: 1px solid var(--border);
-    border-radius: 9px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
 
-    outline: none;
+  outline: none;
 
-    background: var(--surface);
+  background: var(--surface);
 
-    color: var(--text);
+  color: var(--text);
 
-    font-family: inherit;
-    font-size: 14px;
+  font-family: inherit;
+  font-size: 14px;
 
-    user-select: text;
+  user-select: text;
 
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .password-field input:hover {
-    border-color: var(--border-hover);
+  border-color: var(--border-hover);
 }
 
 .password-field input:focus {
-    border-color: var(--primary);
+  border-color: var(--primary);
 
-    box-shadow:
-        0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .password-field input::placeholder {
-    color: var(--text-subtle);
-    font-size: 14px;
+  color: var(--text-subtle);
+  font-size: 14px;
 }
 
 .password-field input:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-    background: rgba(255, 255, 255, 0.03);
+  opacity: 0.65;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.03);
 }
-
 
 /* =========================
    EYE BUTTON
 ========================= */
 
 .toggle-password {
-    position: absolute;
+  position: absolute;
 
-    right: 13px;
-    top: 50%;
+  right: 13px;
+  top: 50%;
 
-    transform: translateY(-50%);
+  transform: translateY(-50%);
 
-    width: 24px;
-    height: 24px;
+  width: 24px;
+  height: 24px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    border: none;
-    outline: none;
+  border: none;
+  outline: none;
 
-    background: transparent;
+  background: transparent;
 
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .eye-icon {
-    position: relative;
+  position: relative;
 
-    display: block;
+  display: block;
 
-    width: 17px;
-    height: 11px;
+  width: 17px;
+  height: 11px;
 
-    border: 1.6px solid var(--muted);
-    border-radius: 50% / 60%;
+  border: 1.6px solid var(--muted);
+  border-radius: 50% / 60%;
 }
 
 .eye-icon::after {
-    content: '';
+  content: "";
 
-    position: absolute;
+  position: absolute;
 
-    left: 50%;
-    top: 50%;
+  left: 50%;
+  top: 50%;
 
-    width: 4px;
-    height: 4px;
+  width: 4px;
+  height: 4px;
 
-    transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 
-    border-radius: 50%;
+  border-radius: 50%;
 
-    background: var(--muted);
+  background: var(--muted);
 }
 
 .toggle-password.visible .eye-icon::before {
-    content: '';
+  content: "";
 
-    position: absolute;
+  position: absolute;
 
-    width: 21px;
-    height: 1.5px;
+  width: 21px;
+  height: 1.5px;
 
-    left: -3px;
-    top: 4px;
+  left: -3px;
+  top: 4px;
 
-    transform: rotate(-45deg);
+  transform: rotate(-45deg);
 
-    background: var(--muted);
+  background: var(--muted);
 }
-
 
 /* =========================
    PASSWORD STRENGTH
 ========================= */
 
 .strength {
-    margin-top: 2px;
+  margin-top: 2px;
 }
 
 .strength-header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 
-    margin-bottom: 7px;
+  margin-bottom: 7px;
 
-    color: var(--muted);
+  color: var(--muted);
 
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .strength-bars {
-    display: grid;
+  display: grid;
 
-    grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 
-    gap: 5px;
+  gap: 5px;
 }
 
 .strength-bars span {
-    height: 3px;
+  height: 3px;
 
-    border-radius: 10px;
+  border-radius: 10px;
 
-    background: var(--border);
+  background: var(--border);
 
-    transition: background 0.2s ease;
+  transition: background 0.2s ease;
 }
-
 
 /* =========================
    REQUIREMENTS
 ========================= */
 
 .requirements {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
 
-    gap: 12px;
+  gap: 12px;
 
-    margin-top: 13px;
-    margin-bottom: 14px;
+  margin-top: 13px;
+  margin-bottom: 14px;
 }
 
 .requirement {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 
-    gap: 7px;
-    justify-content: center;
+  gap: 7px;
+  justify-content: center;
 
-    color: var(--muted);
+  color: var(--muted);
 
-    font-size: 12px;
+  font-size: 12px;
 
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 .requirement .check {
-    flex-shrink: 0;
+  flex-shrink: 0;
 
-    width: 16px;
-    height: 16px;
+  width: 16px;
+  height: 16px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    border: 1px solid var(--border);
-    border-radius: 50%;
+  border: 1px solid var(--border);
+  border-radius: 50%;
 
-    color: transparent;
+  color: transparent;
 
-    font-size: 9px;
+  font-size: 9px;
 
-    transition: all 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .requirement.valid {
-    color: var(--text-secondary);
+  color: var(--text-secondary);
 }
 
 .requirement.valid .check {
-    color: white;
+  color: white;
 
-    background: var(--success);
-    border-color: var(--success);
+  background: var(--success);
+  border-color: var(--success);
 }
-
 
 /* =========================
    ERROR MESSAGE
 ========================= */
 
 .form-error {
-    min-height: 0;
-    margin-top: 6px;
+  min-height: 0;
+  margin-top: 6px;
 
-    color: var(--danger);
+  color: var(--danger);
 
-    font-size: 13px;
-    line-height: 1.3;
+  font-size: 13px;
+  line-height: 1.3;
 }
 
 .form-error:empty {
-    display: none;
+  display: none;
 }
-
 
 /* =========================
    PRIMARY BUTTON
 ========================= */
 
 .primary-button {
-    width: 100%;
-    height: 48px;
-    position: relative;
+  width: 100%;
+  height: 48px;
+  position: relative;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9px;
 
-    background: var(--primary);
+  background: var(--primary);
 
-    color: white;
+  color: white;
 
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition:
-        background 0.2s ease,
-        transform 0.1s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
 }
 
 .button-arrow {
-    position: absolute;
-    right: 16px;
+  position: absolute;
+  right: 16px;
 
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 
-    transition: transform 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .button-arrow-left {
-    position: absolute;
-    left: 16px;
+  position: absolute;
+  left: 16px;
 
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 
-    transition: transform 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .primary-button:hover .button-arrow {
-    transform: translateX(2px);
+  transform: translateX(2px);
 }
 
 .primary-button:hover {
-    background: var(--primary-hover);
+  background: var(--primary-hover);
 }
 
 .primary-button:active {
-    transform: scale(0.995);
+  transform: scale(0.995);
 }
 
 .primary-button:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-    pointer-events: none;
-    transform: none;
-    background: var(--primary);
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  background: var(--primary);
 }
-
 
 /* =========================
    SECURITY NOTE
 ========================= */
 
 .security-note {
-    margin-top: 15px;
+  margin-top: 15px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    padding: 0;
+  padding: 0;
 
-    border: none;
-    background: transparent;
+  border: none;
+  background: transparent;
 
-    text-align: center;
+  text-align: center;
 }
 
 .security-note p {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.4;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
 }
-
 
 /* =========================
    SMALL WINDOW HEIGHT
 ========================= */
 
 @media (max-height: 680px) {
+  .auth-page {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
 
-    .auth-page {
-        padding-top: 12px;
-        padding-bottom: 12px;
-    }
+  .logo {
+    width: 58px;
+    height: 58px;
 
-    .logo {
-        width: 58px;
-        height: 58px;
+    margin-bottom: 8px;
+  }
 
-        margin-bottom: 8px;
-    }
+  .logo svg {
+    width: 32px;
+    height: 32px;
+  }
 
-    .logo svg {
-        width: 32px;
-        height: 32px;
-    }
+  .brand h1 {
+    font-size: 24px;
+  }
 
-    .brand h1 {
-        font-size: 24px;
-    }
+  .form-heading {
+    text-align: center;
+    margin-top: 28px;
+    margin-bottom: 22px;
+  }
 
-    .form-heading {
-        text-align: center;
-        margin-top: 28px;
-        margin-bottom: 22px;
-    }
+  .form-group {
+    margin-bottom: 12px;
+  }
 
-    .form-group {
-        margin-bottom: 12px;
-    }
+  .password-field input {
+    height: 40px;
+  }
 
-    .password-field input {
-        height: 40px;
-    }
+  .primary-button {
+    height: 40px;
+  }
 
-    .primary-button {
-        height: 40px;
-    }
+  .requirements {
+    margin-top: 10px;
+  }
 
-    .requirements {
-        margin-top: 10px;
-    }
-
-    .security-note {
-        margin-top: 18px;
-    }
+  .security-note {
+    margin-top: 18px;
+  }
 }
 
 /* =========================
@@ -606,41 +590,41 @@ body {
 ========================= */
 
 .secondary-button {
-    width: 100%;
-    height: 48px;
-    position: relative;
+  width: 100%;
+  height: 48px;
+  position: relative;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 
-    border: 1px solid var(--border);
-    border-radius: 9px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
 
-    background: transparent;
+  background: transparent;
 
-    color: var(--text);
+  color: var(--text);
 
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition:
-        background .2s ease,
-        border-color .2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .secondary-button:hover {
-    background: color-mix(in srgb, var(--hover-overlay) 3%, transparent);
-    border-color: var(--border-hover);
+  background: color-mix(in srgb, var(--hover-overlay) 3%, transparent);
+  border-color: var(--border-hover);
 }
 
 .secondary-button:hover .button-arrow-left {
-    transform: translateX(-2px);
+  transform: translateX(-2px);
 }
 
 /* =========================
@@ -648,25 +632,25 @@ body {
 ========================= */
 
 #forgotPasswordContainer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 2px;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2px;
+  margin-bottom: 10px;
 }
 
 .text-link {
-    border: none;
-    background: none;
-    color: var(--primary);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0;
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
 }
 
 .text-link:hover {
-    color: var(--primary-hover);
+  color: var(--primary-hover);
 }
 
 /* =========================
@@ -674,58 +658,58 @@ body {
 ========================= */
 
 .import-vault-option {
-    margin-top: 14px;
+  margin-top: 14px;
 }
 
 .auth-divider {
-    display: flex;
-    align-items: center;
-    text-align: center;
-    margin: 12px 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 12px 0;
 }
 
 .auth-divider::before,
 .auth-divider::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid var(--border);
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--border);
 }
 
 .auth-divider span {
-    padding: 0 12px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    text-transform: uppercase;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  text-transform: uppercase;
 }
 
 .import-vault-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 0;
 }
 
 .import-vault-button svg {
-    width: 18px;
-    height: 18px;
-    stroke: currentColor;
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
 }
 
 .secondary-button:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-    pointer-events: none;
-    transform: none;
+  opacity: 0.65;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
 }
 
 .password-toggle:disabled,
 button:disabled .eye-icon {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* =========================
@@ -733,111 +717,110 @@ button:disabled .eye-icon {
 ========================= */
 
 .import-progress-card {
-    margin-top: 14px;
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    animation: fadeIn 0.2s ease-out;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.2s ease-out;
 }
 
 .import-progress-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .import-progress-spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid var(--border);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
 }
 
 .import-progress-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--foreground);
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--foreground);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .import-progress-percent {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--primary);
-    font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .import-progress-bar-track {
-    width: 100%;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 99px;
-    overflow: hidden;
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
 }
 
 .import-progress-bar-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--primary);
-    border-radius: 99px;
-    transition: width 0.2s ease;
+  height: 100%;
+  width: 0%;
+  background: var(--primary);
+  border-radius: 99px;
+  transition: width 0.2s ease;
 }
 
 .import-progress-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .import-progress-details {
-    font-size: 11px;
-    color: var(--muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
 }
 
 .import-progress-cancel-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 6px;
-    padding: 3px 8px;
-    font-size: 11px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .import-progress-cancel-btn svg {
-    width: 11px;
-    height: 11px;
+  width: 11px;
+  height: 11px;
 }
 
 .import-progress-cancel-btn:hover {
-    color: var(--danger);
-    border-color: rgba(239, 68, 68, 0.4);
-    background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .import-progress-cancel-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
 }
-

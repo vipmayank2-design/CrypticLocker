@@ -9,13 +9,12 @@ function formatBytes(bytes) {
         units.length - 1
     );
     const value = bytes / Math.pow(1024, index);
-    return `${
-        value >= 100
-            ? value.toFixed(0)
-            : value >= 10
-                ? value.toFixed(1)
-                : value.toFixed(2)
-    } ${units[index]}`;
+    return `${value >= 100
+        ? value.toFixed(0)
+        : value >= 10
+            ? value.toFixed(1)
+            : value.toFixed(2)
+        } ${units[index]}`;
 }
 
 function formatVaultDate(isoDateString) {
@@ -148,7 +147,7 @@ function setChangePasswordError(message) {
 
 }
 
-    const vaultTableHeader =
+const vaultTableHeader =
     document.getElementById(
         'vaultTableHeader'
     );
@@ -157,7 +156,7 @@ const quarantineTableHeader =
     document.getElementById(
         'quarantineTableHeader'
     );
-    
+
 const vaultView =
     document.getElementById(
         'vaultView'
@@ -227,7 +226,7 @@ const exportVaultButton =
     document.getElementById(
         'exportVaultButton'
     );
-    
+
 const recoveryKeyValue =
     document.getElementById(
         'recoveryKeyValue'
@@ -242,7 +241,7 @@ const copyRecoveryKeyButton =
     document.getElementById(
         'copyRecoveryKeyButton'
     );
-    
+
 let recoveryKeyVisible = false;
 let recoveryKey = null;
 
@@ -297,8 +296,8 @@ document
         );
 
     });
-    
-    const quarantineNavButton =
+
+const quarantineNavButton =
     document.getElementById(
         'quarantineNavButton'
     );
@@ -337,8 +336,8 @@ const applicationVersion =
     document.getElementById(
         'applicationVersion'
     );
-    
-    const autoLockSelect =
+
+const autoLockSelect =
     document.getElementById(
         'autoLockSelect'
     );
@@ -347,13 +346,13 @@ const lockOnSleepToggle =
     document.getElementById(
         'lockOnSleepToggle'
     );
-    
-    const launchAtStartupToggle =
+
+const launchAtStartupToggle =
     document.getElementById(
         'launchAtStartupToggle'
     );
 
-    const themeOptionSystem =
+const themeOptionSystem =
     document.getElementById(
         'themeOptionSystem'
     );
@@ -387,13 +386,13 @@ const autoLockSelectedText =
     document.getElementById(
         'autoLockSelectedText'
     );
-    
-    const myVaultNavButton =
+
+const myVaultNavButton =
     document.querySelector(
         '.sidebar-nav .nav-item.active'
     );
-    
-    const quarantineList =
+
+const quarantineList =
     document.getElementById(
         'quarantineList'
     );
@@ -443,7 +442,7 @@ const quarantineEmptyScanButton =
         'quarantineEmptyScanButton'
     );
 
-    function setQuarantineScanState(
+function setQuarantineScanState(
     button,
     scanning
 ) {
@@ -488,7 +487,7 @@ const quarantineEmptyScanButton =
     }
 
 }
-    
+
 /* =========================================
    QUARANTINE — INSPECTION PANEL
 ========================================= */
@@ -511,8 +510,8 @@ const quarantineInspectRecover =
 
 let inspectedQuarantineOrphan =
     null;
-    
-    const quarantineInspectDone =
+
+const quarantineInspectDone =
     document.getElementById(
         'quarantineInspectDone'
     );
@@ -676,12 +675,12 @@ function openQuarantineInspection(
 
 
     inspectedQuarantineOrphan =
-    orphan;
+        orphan;
 
 
     quarantineInspectRecover.hidden =
         !isPossibleValid;
-    
+
     const displayTitle =
         String(orphan.originalName || orphan.name || 'Unknown container');
     const containerFileName =
@@ -765,13 +764,13 @@ function openQuarantineInspection(
 
 
     quarantineInspectRecovery.innerHTML =
-    isPossibleValid
-        ? `
+        isPossibleValid
+            ? `
             <span class="recovery-availability recovery-available">
                 Available
             </span>
         `
-        : `
+            : `
             <span class="recovery-availability recovery-unavailable">
                 Unavailable
             </span>
@@ -1038,8 +1037,8 @@ document.addEventListener(
 );
 
 let quarantinedOrphans = [];
-    
-    async function loadQuarantinedOrphans() {
+
+async function loadQuarantinedOrphans() {
 
     try {
 
@@ -1089,7 +1088,7 @@ function renderQuarantinedOrphans() {
 
     quarantineList.innerHTML = '';
     const hasItems =
-    quarantinedOrphans.length > 0;
+        quarantinedOrphans.length > 0;
 
 
     const total =
@@ -1108,10 +1107,9 @@ function renderQuarantinedOrphans() {
 
 
     quarantineTotalCount.textContent =
-        `${total} quarantined ${
-            total === 1
-                ? 'item'
-                : 'items'
+        `${total} quarantined ${total === 1
+            ? 'item'
+            : 'items'
         }`;
 
 
@@ -1124,10 +1122,9 @@ function renderQuarantinedOrphans() {
 
 
     quarantineStatusCount.textContent =
-        `${total} quarantined ${
-            total === 1
-                ? 'item'
-                : 'items'
+        `${total} quarantined ${total === 1
+            ? 'item'
+            : 'items'
         }`;
 
 
@@ -1267,11 +1264,10 @@ function renderQuarantinedOrphans() {
 
                     <div class="quarantine-name-container">
                         <span class="quarantine-name-title"></span>
-                        ${
-                            hasOriginalName
-                                ? `<span class="quarantine-name-subtitle"></span>`
-                                : ''
-                        }
+                        ${hasOriginalName
+                    ? `<span class="quarantine-name-subtitle"></span>`
+                    : ''
+                }
                     </div>
 
                 </div>
@@ -1326,9 +1322,8 @@ function renderQuarantinedOrphans() {
     </button>
 
 
-    ${
-        orphan.valid === true
-            ? `
+    ${orphan.valid === true
+                    ? `
                 <button
     class="file-menu-action"
     type="button"
@@ -1343,8 +1338,8 @@ function renderQuarantinedOrphans() {
                     <span>Recover</span>
                 </button>
             `
-            : ''
-    }
+                    : ''
+                }
 
 
     <button
@@ -1441,255 +1436,255 @@ function renderQuarantinedOrphans() {
 
 
             const menuButton =
-    row.querySelector(
-        '.quarantine-menu-button'
-    );
+                row.querySelector(
+                    '.quarantine-menu-button'
+                );
 
-const itemMenu =
-    row.querySelector(
-        '.quarantine-item-menu'
-    );
-
-
-const inspectButton =
-    itemMenu.querySelector(
-        '[data-action="inspect"]'
-    );
-
-    const recoverButton =
-    itemMenu.querySelector(
-        '[data-action="recover"]'
-    );
-
-    const deleteButton =
-    itemMenu.querySelector(
-        '[data-action="delete"]'
-    );
-
-inspectButton.addEventListener(
-    'click',
-    event => {
-
-        event.stopPropagation();
+            const itemMenu =
+                row.querySelector(
+                    '.quarantine-item-menu'
+                );
 
 
-        itemMenu.classList.remove(
-            'open'
-        );
+            const inspectButton =
+                itemMenu.querySelector(
+                    '[data-action="inspect"]'
+                );
+
+            const recoverButton =
+                itemMenu.querySelector(
+                    '[data-action="recover"]'
+                );
+
+            const deleteButton =
+                itemMenu.querySelector(
+                    '[data-action="delete"]'
+                );
+
+            inspectButton.addEventListener(
+                'click',
+                event => {
+
+                    event.stopPropagation();
 
 
-        openQuarantineInspection(
-            orphan
-        );
+                    itemMenu.classList.remove(
+                        'open'
+                    );
 
-    }
-);
 
-if (recoverButton) {
-
-    recoverButton.addEventListener(
-        'click',
-        async event => {
-
-            event.stopPropagation();
-
-            setButtonLoading(recoverButton, true);
-
-            try {
-
-                const check =
-                    typeof window.crypticLocker?.checkQuarantineOrphan === 'function'
-                        ? await window.crypticLocker.checkQuarantineOrphan(orphan.name)
-                        : (orphan.valid !== true ? { success: false, recoverable: false, message: `This quarantined file is invalid and cannot be recovered (${orphan.reason || 'Container validation failed'}).` } : { success: true, recoverable: true, originalName: orphan.name });
-
-                setButtonLoading(recoverButton, false, 'Recover');
-                closeAllDropdownsAndMenus();
-
-                if (!check || check.recoverable !== true) {
-
-                    await showCustomAlert({
-                        title: 'Recovery Failed',
-                        message: check?.message || `This quarantined file is invalid and cannot be recovered (${orphan.reason || 'Container validation failed'}).`,
-                        type: 'danger'
-                    });
-
-                    return;
+                    openQuarantineInspection(
+                        orphan
+                    );
 
                 }
+            );
 
-                const choice =
-                    await showRestoreConfirm({
-                        title:
-                            'Recover file?',
-                        name:
-                            check.originalName || orphan.name,
-                        message:
-                            'The file will be decrypted to the location you choose.',
-                        checkboxLabel:
-                            'Also remove the quarantined copy',
-                        confirmText:
-                            'Recover'
-                    });
+            if (recoverButton) {
 
-                if (!choice.confirmed) {
-                    return;
-                }
+                recoverButton.addEventListener(
+                    'click',
+                    async event => {
 
-                closeRestoreConfirm(false);
+                        event.stopPropagation();
 
-                try {
+                        setButtonLoading(recoverButton, true);
 
-                    const result =
-                        await window
-                            .crypticLocker
-                            .recoverOrphan(
-                                orphan.name,
-                                choice.removeFromVault
-                            );
+                        try {
 
-                    // Close restore confirm modal immediately as soon as recovery returns
-                    closeRestoreConfirm(false);
-        
-                    if (result.canceled) {
-                        return;
-                    }
+                            const check =
+                                typeof window.crypticLocker?.checkQuarantineOrphan === 'function'
+                                    ? await window.crypticLocker.checkQuarantineOrphan(orphan.name)
+                                    : (orphan.valid !== true ? { success: false, recoverable: false, message: `This quarantined file is invalid and cannot be recovered (${orphan.reason || 'Container validation failed'}).` } : { success: true, recoverable: true, originalName: orphan.name });
 
-                    if (!result.success) {
+                            setButtonLoading(recoverButton, false, 'Recover');
+                            closeAllDropdownsAndMenus();
 
-                        if (
-                            result.operationFailed ===
-                            true
-                        ) {
-                            return;
+                            if (!check || check.recoverable !== true) {
+
+                                await showCustomAlert({
+                                    title: 'Recovery Failed',
+                                    message: check?.message || `This quarantined file is invalid and cannot be recovered (${orphan.reason || 'Container validation failed'}).`,
+                                    type: 'danger'
+                                });
+
+                                return;
+
+                            }
+
+                            const choice =
+                                await showRestoreConfirm({
+                                    title:
+                                        'Recover file?',
+                                    name:
+                                        check.originalName || orphan.name,
+                                    message:
+                                        'The file will be decrypted to the location you choose.',
+                                    checkboxLabel:
+                                        'Also remove the quarantined copy',
+                                    confirmText:
+                                        'Recover'
+                                });
+
+                            if (!choice.confirmed) {
+                                return;
+                            }
+
+                            closeRestoreConfirm(false);
+
+                            try {
+
+                                const result =
+                                    await window
+                                        .crypticLocker
+                                        .recoverOrphan(
+                                            orphan.name,
+                                            choice.removeFromVault
+                                        );
+
+                                // Close restore confirm modal immediately as soon as recovery returns
+                                closeRestoreConfirm(false);
+
+                                if (result.canceled) {
+                                    return;
+                                }
+
+                                if (!result.success) {
+
+                                    if (
+                                        result.operationFailed ===
+                                        true
+                                    ) {
+                                        return;
+                                    }
+
+                                    // Close confirm modal before showing error alert
+                                    closeRestoreConfirm(false);
+
+                                    await showCustomAlert({
+                                        title: 'Recovery Failed',
+                                        message: result.message || 'Unable to recover quarantined file.',
+                                        type: 'danger'
+                                    });
+
+                                    return;
+
+                                }
+
+                                await loadQuarantinedOrphans();
+
+                                await loadVaultFiles(
+                                    true
+                                );
+
+                                if (result.removeFromQuarantineError) {
+
+                                    await showCustomAlert({
+                                        title: 'Quarantine Notice',
+                                        message: result.removeFromQuarantineError,
+                                        type: 'warning'
+                                    });
+
+                                }
+
+                            } catch (error) {
+
+                                console.error(
+                                    'Quarantine recovery renderer error:',
+                                    error
+                                );
+
+                                // Close confirm modal before showing error alert
+                                closeRestoreConfirm(false);
+
+                                await showCustomAlert({
+                                    title: 'Recovery Failed',
+                                    message: error?.message || 'Unable to recover quarantined file.',
+                                    type: 'danger'
+                                });
+
+                            } finally {
+
+                                closeRestoreConfirm(false);
+
+                            }
+
+                        } catch (checkError) {
+
+                            console.error(checkError);
+                            setButtonLoading(recoverButton, false, 'Recover');
+                            closeAllDropdownsAndMenus();
+
+                            await showCustomAlert({
+                                title: 'Recovery Failed',
+                                message: checkError?.message || 'Unable to inspect quarantined file.',
+                                type: 'danger'
+                            });
+
+                        } finally {
+
+                            setButtonLoading(recoverButton, false, 'Recover');
+
                         }
 
-                        // Close confirm modal before showing error alert
-                        closeRestoreConfirm(false);
+                    }
+                );
 
-                        await showCustomAlert({
-                            title: 'Recovery Failed',
-                            message: result.message || 'Unable to recover quarantined file.',
-                            type: 'danger'
-                        });
+            }
 
-                        return;
+            if (deleteButton) {
+
+                deleteButton.addEventListener(
+                    'click',
+                    event => {
+
+                        event.stopPropagation();
+
+
+                        itemMenu.classList.remove(
+                            'open'
+                        );
+
+
+                        openDeleteConfirmation(
+                            'quarantine',
+                            orphan.name,
+                            orphan.originalName || orphan.name
+                        );
 
                     }
+                );
 
-                    await loadQuarantinedOrphans();
+            }
 
-                    await loadVaultFiles(
-                        true
-                    );
+            menuButton.addEventListener(
+                'click',
+                event => {
 
-                    if (result.removeFromQuarantineError) {
+                    event.stopPropagation();
 
-                        await showCustomAlert({
-                            title: 'Quarantine Notice',
-                            message: result.removeFromQuarantineError,
-                            type: 'warning'
-                        });
+                    const wasOpen =
+                        itemMenu.classList.contains('open');
 
+                    closeAllDropdownsAndMenus();
+
+                    if (!wasOpen) {
+                        const rect = menuButton.getBoundingClientRect();
+                        const spaceBelow = window.innerHeight - rect.bottom;
+                        if (spaceBelow < 170 && rect.top > 170) {
+                            itemMenu.classList.add('dropup');
+                        } else {
+                            itemMenu.classList.remove('dropup');
+                        }
+                        itemMenu.classList.add('open');
+                        row.classList.add('menu-active');
+                        row.style.zIndex = '1000';
                     }
-
-                } catch (error) {
-
-                    console.error(
-                        'Quarantine recovery renderer error:',
-                        error
-                    );
-
-                    // Close confirm modal before showing error alert
-                    closeRestoreConfirm(false);
-
-                    await showCustomAlert({
-                        title: 'Recovery Failed',
-                        message: error?.message || 'Unable to recover quarantined file.',
-                        type: 'danger'
-                    });
-
-                } finally {
-
-                    closeRestoreConfirm(false);
 
                 }
-
-            } catch (checkError) {
-
-                console.error(checkError);
-                setButtonLoading(recoverButton, false, 'Recover');
-                closeAllDropdownsAndMenus();
-
-                await showCustomAlert({
-                    title: 'Recovery Failed',
-                    message: checkError?.message || 'Unable to inspect quarantined file.',
-                    type: 'danger'
-                });
-
-            } finally {
-
-                setButtonLoading(recoverButton, false, 'Recover');
-
-            }
-
-        }
-    );
-
-}
-
-if (deleteButton) {
-
-    deleteButton.addEventListener(
-        'click',
-        event => {
-
-            event.stopPropagation();
-
-
-            itemMenu.classList.remove(
-                'open'
             );
 
-
-            openDeleteConfirmation(
-                'quarantine',
-                orphan.name,
-                orphan.originalName || orphan.name
-            );
-
-        }
-    );
-
-}
-
-menuButton.addEventListener(
-    'click',
-    event => {
-
-        event.stopPropagation();
-
-        const wasOpen =
-            itemMenu.classList.contains('open');
-
-        closeAllDropdownsAndMenus();
-
-        if (!wasOpen) {
-            const rect = menuButton.getBoundingClientRect();
-            const spaceBelow = window.innerHeight - rect.bottom;
-            if (spaceBelow < 170 && rect.top > 170) {
-                itemMenu.classList.add('dropup');
-            } else {
-                itemMenu.classList.remove('dropup');
-            }
-            itemMenu.classList.add('open');
-            row.classList.add('menu-active');
-            row.style.zIndex = '1000';
-        }
-
-    }
-);
-
-quarantineList.appendChild(
+            quarantineList.appendChild(
                 row
             );
 
@@ -1740,12 +1735,12 @@ async function toggleRecoveryKey() {
             false;
 
         toggleRecoveryKeyButton.innerHTML =
-    EYE_OFF_ICON;
+            EYE_OFF_ICON;
 
-toggleRecoveryKeyButton.title =
-    'Hide Recovery Key';
-    
-    recoveryKeyVisible = true;
+        toggleRecoveryKeyButton.title =
+            'Hide Recovery Key';
+
+        recoveryKeyVisible = true;
 
     } else {
 
@@ -1756,12 +1751,12 @@ toggleRecoveryKeyButton.title =
             true;
 
         toggleRecoveryKeyButton.innerHTML =
-    EYE_ICON;
+            EYE_ICON;
 
-toggleRecoveryKeyButton.title =
-    'Show Recovery Key';
-    
-    recoveryKeyVisible = false;
+        toggleRecoveryKeyButton.title =
+            'Show Recovery Key';
+
+        recoveryKeyVisible = false;
 
     }
 
@@ -1788,8 +1783,8 @@ function applyTheme(theme) {
 
     const mode =
         theme === 'light' ||
-        theme === 'dark' ||
-        theme === 'system'
+            theme === 'dark' ||
+            theme === 'system'
             ? theme
             : 'dark';
 
@@ -1948,11 +1943,11 @@ async function loadApplicationSettings() {
 
         if (launchAtStartupToggle) {
 
-    launchAtStartupToggle.checked =
-        applicationSettings
-            .launchAtStartup === true;
+            launchAtStartupToggle.checked =
+                applicationSettings
+                    .launchAtStartup === true;
 
-}
+        }
 
 
         /*
@@ -2037,14 +2032,12 @@ async function loadSettingsInformation() {
 
 
         vaultItemCount.textContent =
-            `${fileCount} ${
-                fileCount === 1
-                    ? 'file'
-                    : 'files'
-            } • ${folderCount} ${
-                folderCount === 1
-                    ? 'folder'
-                    : 'folders'
+            `${fileCount} ${fileCount === 1
+                ? 'file'
+                : 'files'
+            } • ${folderCount} ${folderCount === 1
+                ? 'folder'
+                : 'folders'
             }`;
 
         if (exportVaultStorage) {
@@ -2119,7 +2112,7 @@ function showApplicationView(
         view === 'quarantine';
 
     const showRecoveryKey =
-    view === 'recovery-key';
+        view === 'recovery-key';
 
     const showExport =
         view === 'export';
@@ -2139,35 +2132,35 @@ function showApplicationView(
     when leaving the Recovery page.
 */
 
-if (
-    recoveryKeyVisible &&
-    view !== 'recovery-key'
-) {
+    if (
+        recoveryKeyVisible &&
+        view !== 'recovery-key'
+    ) {
 
-    recoveryKeyVisible = false;
+        recoveryKeyVisible = false;
 
-    recoveryKey = null;
+        recoveryKey = null;
 
-    recoveryKeyValue.textContent =
-        'CKRV-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX';
+        recoveryKeyValue.textContent =
+            'CKRV-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX';
 
-    copyRecoveryKeyButton.disabled =
-        true;
+        copyRecoveryKeyButton.disabled =
+            true;
 
-    toggleRecoveryKeyButton.innerHTML =
-        EYE_ICON;
+        toggleRecoveryKeyButton.innerHTML =
+            EYE_ICON;
 
-    toggleRecoveryKeyButton.title =
-        'Show Recovery Key';
+        toggleRecoveryKeyButton.title =
+            'Show Recovery Key';
 
-}
+    }
 
-/*
-        Application views.
-
-        Exactly one main view should be
-        visible at a time.
-    */
+    /*
+            Application views.
+    
+            Exactly one main view should be
+            visible at a time.
+        */
 
     vaultView.hidden =
         !showVault;
@@ -2222,12 +2215,12 @@ if (
 
     if (recoveryKeyNavButton) {
 
-    recoveryKeyNavButton.classList.toggle(
-        'active',
-        showRecoveryKey
-    );
+        recoveryKeyNavButton.classList.toggle(
+            'active',
+            showRecoveryKey
+        );
 
-}
+    }
 
     if (exportNavButton) {
 
@@ -2367,37 +2360,37 @@ if (toggleRecoveryKeyButton) {
 
     if (copyRecoveryKeyButton) {
 
-    copyRecoveryKeyButton.addEventListener(
-        'click',
-        async () => {
+        copyRecoveryKeyButton.addEventListener(
+            'click',
+            async () => {
 
-            if (!recoveryKeyVisible) {
-                return;
-            }
+                if (!recoveryKeyVisible) {
+                    return;
+                }
 
-            await window.crypticLocker.copyText(
-                recoveryKey
-            );
-
-            const label =
-                copyRecoveryKeyButton.querySelector(
-                    'span'
+                await window.crypticLocker.copyText(
+                    recoveryKey
                 );
 
-            label.textContent =
-                'Copied ✓';
-
-            setTimeout(() => {
+                const label =
+                    copyRecoveryKeyButton.querySelector(
+                        'span'
+                    );
 
                 label.textContent =
-                    'Copy Recovery Key';
+                    'Copied ✓';
 
-            }, 2000);
+                setTimeout(() => {
 
-        }
-    );
+                    label.textContent =
+                        'Copy Recovery Key';
 
-}
+                }, 2000);
+
+            }
+        );
+
+    }
 
     toggleRecoveryKeyButton.addEventListener(
         'click',
@@ -2730,7 +2723,7 @@ if (autoLockSelect) {
     Apply the new timeout immediately.
 */
 
-resetAutoLockTimer();
+                resetAutoLockTimer();
 
 
                 autoLockSelect.value =
@@ -3120,10 +3113,9 @@ if (quarantineDeleteInvalidButton) {
             openDeleteConfirmation(
                 'quarantine-invalid-all',
                 'all-invalid',
-                `${invalidCount} invalid ${
-                    invalidCount === 1
-                        ? 'container'
-                        : 'containers'
+                `${invalidCount} invalid ${invalidCount === 1
+                    ? 'container'
+                    : 'containers'
                 }`
             );
 
@@ -3136,8 +3128,8 @@ const addVaultMenu =
     document.getElementById(
         'addVaultMenu'
     );
-    
-    const addVaultButton =
+
+const addVaultButton =
     document.getElementById(
         'addVaultButton'
     );
@@ -3181,7 +3173,7 @@ const copyFolderButton =
     document.getElementById(
         'copyFolderButton'
     );
-    
+
 const lockVaultButton =
     document.getElementById(
         'lockVaultButton'
@@ -3216,7 +3208,7 @@ const vaultBreadcrumb =
         'vaultBreadcrumb'
     );
 
-    const operationOverlay =
+const operationOverlay =
     document.getElementById(
         'operationOverlay'
     );
@@ -3255,8 +3247,8 @@ const integrityDoneButton =
     document.getElementById(
         'integrityDoneButton'
     );
-    
-    const operationProcessing =
+
+const operationProcessing =
     document.getElementById(
         'operationProcessing'
     );
@@ -3270,8 +3262,8 @@ const operationResultIcon =
     document.getElementById(
         'operationResultIcon'
     );
-    
-    const operationTitle =
+
+const operationTitle =
     document.getElementById(
         'operationTitle'
     );
@@ -3305,7 +3297,7 @@ const operationFinalizingSpinner =
     document.getElementById(
         'operationFinalizingSpinner'
     );
-    
+
 const operationProgressFill =
     document.getElementById(
         'operationProgressFill'
@@ -3356,7 +3348,7 @@ const operationCancelButton =
         'operationCancelButton'
     );
 
-    function showIntegrityOverlay() {
+function showIntegrityOverlay() {
 
     integrityOverlay.hidden = false;
 
@@ -3373,17 +3365,17 @@ function hideIntegrityOverlay() {
 function setIntegrityLoadingState() {
 
     integrityFooter.hidden =
-    true;
+        true;
 
-integrityDetails.hidden =
-    true;
+    integrityDetails.hidden =
+        true;
 
-integrityDetailsList.innerHTML =
-    '';
+    integrityDetailsList.innerHTML =
+        '';
 
-integrityDetailsButton.textContent =
-    'View Details';
-    
+    integrityDetailsButton.textContent =
+        'View Details';
+
     integrityIcon.className =
         'integrity-icon';
 
@@ -3412,36 +3404,36 @@ function setIntegrityResultState(
 ) {
 
     integrityDetailsList.innerHTML =
-    '';
+        '';
 
-for (
-    const file of
-    (result?.report?.containers?.missing || [])
-) {
+    for (
+        const file of
+        (result?.report?.containers?.missing || [])
+    ) {
 
-    const item =
-        document.createElement(
-            'div'
-        );
+        const item =
+            document.createElement(
+                'div'
+            );
 
-    item.className =
-        'integrity-detail-item';
+        item.className =
+            'integrity-detail-item';
 
-    const fileName =
-        typeof file === 'string'
-            ? file
-            : (file?.name || file?.id || 'Missing container');
+        const fileName =
+            typeof file === 'string'
+                ? file
+                : (file?.name || file?.id || 'Missing container');
 
-    item.innerHTML = `
+        item.innerHTML = `
         ${getFileIconSvg(fileName, 'integrity-detail-icon')}
         <span>${fileName}</span>
     `;
 
-    integrityDetailsList.appendChild(
-        item
-    );
+        integrityDetailsList.appendChild(
+            item
+        );
 
-}
+    }
 
     integritySpinner.hidden =
         true;
@@ -3467,10 +3459,10 @@ for (
             'No integrity issues were detected. Your encrypted vault passed all security checks.';
 
         integrityFooter.hidden =
-    false;
+            false;
 
-integrityDetailsButton.hidden =
-    true;
+        integrityDetailsButton.hidden =
+            true;
     }
 
     else {
@@ -3485,10 +3477,10 @@ integrityDetailsButton.hidden =
             result.summary.message;
 
         integrityFooter.hidden =
-    false;
+            false;
 
-integrityDetailsButton.hidden =
-    false;
+        integrityDetailsButton.hidden =
+            false;
 
     }
 
@@ -4024,8 +4016,7 @@ function showRestoreWarning(status) {
         if (verifiedFiles > 0) {
 
             restoreWarningSubmessage.textContent =
-                `Only ${verifiedFiles} verified ${
-                    verifiedFiles === 1 ? 'file' : 'files'
+                `Only ${verifiedFiles} verified ${verifiedFiles === 1 ? 'file' : 'files'
                 } with intact containers will be restored. Missing files will be skipped.`;
 
             restoreWarningContinueButton.hidden =
@@ -4496,12 +4487,12 @@ let autoLockTimer =
 
 let activeVaultOperations =
     0;
-    
-    /*
-    Tracks every active vault operation.
 
-    Using a Set allows multiple protected
-    operations to run safely in the future.
+/*
+Tracks every active vault operation.
+
+Using a Set allows multiple protected
+operations to run safely in the future.
 */
 
 const activeOperationIds =
@@ -4509,31 +4500,31 @@ const activeOperationIds =
 
 let currentOperationId =
     null;
-    
-    /*
-    Currently selected item waiting for
-    permanent deletion confirmation.
 
-    Shape:
+/*
+Currently selected item waiting for
+permanent deletion confirmation.
 
-    {
-        type: 'file' | 'folder' | 'quarantine',
-        id: string,
-        name: string
-    }
+Shape:
+
+{
+    type: 'file' | 'folder' | 'quarantine',
+    id: string,
+    name: string
+}
 */
 
 let pendingDeleteTarget =
     null;
-    
-    /*
-    null = root My Vault
 
-    otherwise:
-    {
-        folderId,
-        relativePath
-    }
+/*
+null = root My Vault
+
+otherwise:
+{
+    folderId,
+    relativePath
+}
 */
 
 let currentLocation = null;
@@ -4546,16 +4537,16 @@ function openDeleteConfirmation(
 ) {
 
     if (
-    type !== 'file' &&
-    type !== 'folder' &&
-    type !== 'quarantine' &&
-    type !== 'quarantine-invalid-all' &&
-    type !== 'bulk'
-) {
+        type !== 'file' &&
+        type !== 'folder' &&
+        type !== 'quarantine' &&
+        type !== 'quarantine-invalid-all' &&
+        type !== 'bulk'
+    ) {
 
-    return;
+        return;
 
-}
+    }
 
 
     if (
@@ -4579,17 +4570,15 @@ function openDeleteConfirmation(
 
 
         deleteConfirmTitle.textContent =
-            `Delete ${items.length} ${
-                items.length === 1
-                    ? 'item'
-                    : 'items'
+            `Delete ${items.length} ${items.length === 1
+                ? 'item'
+                : 'items'
             }?`;
 
         deleteConfirmName.textContent =
-            `${items.length} ${
-                items.length === 1
-                    ? 'item'
-                    : 'items'
+            `${items.length} ${items.length === 1
+                ? 'item'
+                : 'items'
             } selected`;
 
         deleteConfirmMessage.textContent =
@@ -4640,16 +4629,16 @@ function openDeleteConfirmation(
 
 
     const isBulkInvalid =
-    type === 'quarantine-invalid-all';
-    
+        type === 'quarantine-invalid-all';
+
     deleteConfirmTitle.textContent =
-    isBulkInvalid
-        ? 'Delete all invalid containers?'
-        : isFolder
-            ? 'Delete folder?'
-            : isQuarantine
-                ? 'Delete quarantined container?'
-                : 'Delete file?';
+        isBulkInvalid
+            ? 'Delete all invalid containers?'
+            : isFolder
+                ? 'Delete folder?'
+                : isQuarantine
+                    ? 'Delete quarantined container?'
+                    : 'Delete file?';
 
 
     deleteConfirmName.textContent =
@@ -4657,13 +4646,13 @@ function openDeleteConfirmation(
 
 
     deleteConfirmMessage.textContent =
-    isBulkInvalid
-        ? 'All invalid quarantined containers will be permanently deleted. Possible Valid containers will not be affected. This action cannot be undone.'
-        : isFolder
-            ? 'This folder and all encrypted files inside it will be permanently removed from your encrypted vault.'
-            : isQuarantine
-                ? 'This quarantined encrypted container will be permanently deleted. This action cannot be undone.'
-                : 'This file will be permanently removed from your encrypted vault.';
+        isBulkInvalid
+            ? 'All invalid quarantined containers will be permanently deleted. Possible Valid containers will not be affected. This action cannot be undone.'
+            : isFolder
+                ? 'This folder and all encrypted files inside it will be permanently removed from your encrypted vault.'
+                : isQuarantine
+                    ? 'This quarantined encrypted container will be permanently deleted. This action cannot be undone.'
+                    : 'This file will be permanently removed from your encrypted vault.';
 
 
     deleteConfirmOverlay.hidden =
@@ -4759,354 +4748,352 @@ deleteConfirmButton.addEventListener(
     panel owns the operation UI.
 */
 
-deleteConfirmOverlay.hidden =
-    true;
-    
-    try {
+        deleteConfirmOverlay.hidden =
+            true;
+
+        try {
 
             let result;
 
 
             if (
-    target.type ===
-    'folder'
-) {
+                target.type ===
+                'folder'
+            ) {
 
-    result =
-        await window
-            .crypticLocker
-            .deleteFolder(
-                target.id
-            );
+                result =
+                    await window
+                        .crypticLocker
+                        .deleteFolder(
+                            target.id
+                        );
 
-} else if (
-    target.type ===
-    'quarantine'
-) {
+            } else if (
+                target.type ===
+                'quarantine'
+            ) {
 
-    result =
-        await window
-            .crypticLocker
-            .deleteQuarantinedOrphan(
-                target.id
-            );
+                result =
+                    await window
+                        .crypticLocker
+                        .deleteQuarantinedOrphan(
+                            target.id
+                        );
 
 
-    closeDeleteConfirmation();
+                closeDeleteConfirmation();
 
 
-    /*
-        Single quarantine deletion does not
-        use the normal vault delete progress
-        flow, so show its terminal result here.
-    */
+                /*
+                    Single quarantine deletion does not
+                    use the normal vault delete progress
+                    flow, so show its terminal result here.
+                */
 
-    if (
-        result?.success === true
-    ) {
+                if (
+                    result?.success === true
+                ) {
 
-        await loadQuarantinedOrphans();
+                    await loadQuarantinedOrphans();
 
 
-        showOperationResult({
+                    showOperationResult({
 
-            type:
-                'success',
+                        type:
+                            'success',
 
-            title:
-                'Container deleted successfully',
+                        title:
+                            'Container deleted successfully',
 
-            name:
-                target.name,
+                        name:
+                            target.name,
 
-            message:
-                'The quarantined container was permanently deleted.'
+                        message:
+                            'The quarantined container was permanently deleted.'
 
-        });
+                    });
 
 
-        return;
+                    return;
 
-    }
+                }
 
 
-    showOperationResult({
+                showOperationResult({
 
-        type:
-            'failure',
+                    type:
+                        'failure',
 
-        title:
-            'Container deletion failed',
+                    title:
+                        'Container deletion failed',
 
-        name:
-            target.name,
+                    name:
+                        target.name,
 
-        message:
-            result?.message ||
-            'The quarantined container could not be deleted.'
+                    message:
+                        result?.message ||
+                        'The quarantined container could not be deleted.'
 
-    });
+                });
 
 
-    return;
+                return;
 
-} else if (
-    target.type ===
-    'quarantine-invalid-all'
-) {
+            } else if (
+                target.type ===
+                'quarantine-invalid-all'
+            ) {
 
-    result =
-        await window
-            .crypticLocker
-            .deleteAllInvalidQuarantinedOrphans();
+                result =
+                    await window
+                        .crypticLocker
+                        .deleteAllInvalidQuarantinedOrphans();
 
 
-    /*
-        Bulk invalid-container deletion does
-        not use the normal progress-event flow.
+                /*
+                    Bulk invalid-container deletion does
+                    not use the normal progress-event flow.
+            
+                    Handle its structured terminal result
+                    here using the reusable operation panel.
+                */
 
-        Handle its structured terminal result
-        here using the reusable operation panel.
-    */
+                closeDeleteConfirmation();
 
-    closeDeleteConfirmation();
 
+                const deletedCount =
+                    Number(
+                        result?.deletedCount
+                    ) || 0;
 
-    const deletedCount =
-        Number(
-            result?.deletedCount
-        ) || 0;
 
+                const failedCount =
+                    Number(
+                        result?.failedCount
+                    ) || 0;
 
-    const failedCount =
-        Number(
-            result?.failedCount
-        ) || 0;
 
+                /*
+                    Always refresh quarantine from the
+                    backend after a bulk-delete attempt.
+            
+                    This also handles partial deletion.
+                */
 
-    /*
-        Always refresh quarantine from the
-        backend after a bulk-delete attempt.
+                await loadQuarantinedOrphans();
 
-        This also handles partial deletion.
-    */
 
-    await loadQuarantinedOrphans();
+                if (
+                    result?.success === true &&
+                    failedCount === 0
+                ) {
 
+                    showOperationResult({
 
-    if (
-        result?.success === true &&
-        failedCount === 0
-    ) {
+                        type:
+                            'success',
 
-        showOperationResult({
+                        title:
+                            'Invalid containers deleted',
 
-            type:
-                'success',
+                        name:
+                            `${deletedCount} ${deletedCount === 1
+                                ? 'container'
+                                : 'containers'
+                            } deleted`,
 
-            title:
-                'Invalid containers deleted',
+                        message:
+                            deletedCount === 1
+                                ? 'The invalid quarantined container was permanently deleted.'
+                                : 'The invalid quarantined containers were permanently deleted.'
 
-            name:
-                `${deletedCount} ${
-                    deletedCount === 1
-                        ? 'container'
-                        : 'containers'
-                } deleted`,
+                    });
 
-            message:
-                deletedCount === 1
-                    ? 'The invalid quarantined container was permanently deleted.'
-                    : 'The invalid quarantined containers were permanently deleted.'
 
-        });
+                    return;
 
+                }
 
-        return;
 
-    }
+                if (
+                    deletedCount > 0 &&
+                    failedCount > 0
+                ) {
 
+                    showOperationResult({
 
-    if (
-        deletedCount > 0 &&
-        failedCount > 0
-    ) {
+                        type:
+                            'attention',
 
-        showOperationResult({
+                        title:
+                            'Deletion partially completed',
 
-            type:
-                'attention',
+                        name:
+                            `${deletedCount} deleted • ${failedCount} failed`,
 
-            title:
-                'Deletion partially completed',
+                        message:
+                            'Some invalid quarantined containers could not be deleted.'
 
-            name:
-                `${deletedCount} deleted • ${failedCount} failed`,
+                    });
 
-            message:
-                'Some invalid quarantined containers could not be deleted.'
 
-        });
+                    return;
 
+                }
 
-        return;
 
-    }
+                showOperationResult({
 
+                    type:
+                        'failure',
 
-    showOperationResult({
+                    title:
+                        'Invalid containers could not be deleted',
 
-        type:
-            'failure',
+                    name:
+                        failedCount === 1
+                            ? '1 container failed'
+                            : `${failedCount} containers failed`,
 
-        title:
-            'Invalid containers could not be deleted',
+                    message:
+                        result?.message ||
+                        'No invalid quarantined containers were deleted.'
 
-        name:
-            failedCount === 1
-                ? '1 container failed'
-                : `${failedCount} containers failed`,
+                });
 
-        message:
-            result?.message ||
-            'No invalid quarantined containers were deleted.'
 
-    });
+                return;
 
+            } else if (
+                target.type ===
+                'bulk'
+            ) {
 
-    return;
+                result =
+                    await window
+                        .crypticLocker
+                        .bulkDeleteItems(
+                            target.items
+                        );
 
-} else if (
-    target.type ===
-    'bulk'
-) {
 
-    result =
-        await window
-            .crypticLocker
-            .bulkDeleteItems(
-                target.items
-            );
+                closeDeleteConfirmation();
 
 
-    closeDeleteConfirmation();
+                const deletedCount =
+                    Number(
+                        result?.deletedCount
+                    ) || 0;
 
 
-    const deletedCount =
-        Number(
-            result?.deletedCount
-        ) || 0;
+                const failedCount =
+                    Array.isArray(
+                        result?.failures
+                    )
+                        ? result.failures.length
+                        : 0;
 
 
-    const failedCount =
-        Array.isArray(
-            result?.failures
-        )
-            ? result.failures.length
-            : 0;
+                /*
+                    Always refresh the vault view and
+                    exit selection mode after a bulk
+                    delete attempt, success or not.
+                */
 
+                exitSelectionMode();
 
-    /*
-        Always refresh the vault view and
-        exit selection mode after a bulk
-        delete attempt, success or not.
-    */
+                await loadVaultFiles();
 
-    exitSelectionMode();
 
-    await loadVaultFiles();
+                if (
+                    result?.success === true &&
+                    failedCount === 0
+                ) {
 
+                    showOperationResult({
 
-    if (
-        result?.success === true &&
-        failedCount === 0
-    ) {
+                        type:
+                            'success',
 
-        showOperationResult({
+                        title:
+                            'Items deleted successfully',
 
-            type:
-                'success',
+                        name:
+                            `${deletedCount} ${deletedCount === 1
+                                ? 'item'
+                                : 'items'
+                            } deleted`,
 
-            title:
-                'Items deleted successfully',
+                        message:
+                            'The selected items were permanently removed from your encrypted vault.'
 
-            name:
-                `${deletedCount} ${
-                    deletedCount === 1
-                        ? 'item'
-                        : 'items'
-                } deleted`,
+                    });
 
-            message:
-                'The selected items were permanently removed from your encrypted vault.'
 
-        });
+                    return;
 
+                }
 
-        return;
 
-    }
+                if (
+                    deletedCount > 0 &&
+                    failedCount > 0
+                ) {
 
+                    showOperationResult({
 
-    if (
-        deletedCount > 0 &&
-        failedCount > 0
-    ) {
+                        type:
+                            'attention',
 
-        showOperationResult({
+                        title:
+                            'Deletion partially completed',
 
-            type:
-                'attention',
+                        name:
+                            `${deletedCount} deleted • ${failedCount} failed`,
 
-            title:
-                'Deletion partially completed',
+                        message:
+                            'Some selected items could not be deleted.'
 
-            name:
-                `${deletedCount} deleted • ${failedCount} failed`,
+                    });
 
-            message:
-                'Some selected items could not be deleted.'
 
-        });
+                    return;
 
+                }
 
-        return;
 
-    }
+                showOperationResult({
 
+                    type:
+                        'failure',
 
-    showOperationResult({
+                    title:
+                        'Items could not be deleted',
 
-        type:
-            'failure',
+                    name:
+                        failedCount === 1
+                            ? '1 item failed'
+                            : `${failedCount} items failed`,
 
-        title:
-            'Items could not be deleted',
+                    message:
+                        result?.message ||
+                        'No selected items were deleted.'
 
-        name:
-            failedCount === 1
-                ? '1 item failed'
-                : `${failedCount} items failed`,
+                });
 
-        message:
-            result?.message ||
-            'No selected items were deleted.'
 
-    });
+                return;
 
+            } else {
 
-    return;
+                result =
+                    await window
+                        .crypticLocker
+                        .deleteFile(
+                            target.id
+                        );
 
-} else {
-
-    result =
-        await window
-            .crypticLocker
-            .deleteFile(
-                target.id
-            );
-
-}
+            }
 
 
             /*
@@ -5133,13 +5120,13 @@ deleteConfirmOverlay.hidden =
                 */
 
                 if (
-    result.operationFailed ===
-    true
-) {
+                    result.operationFailed ===
+                    true
+                ) {
 
-    return;
+                    return;
 
-}
+                }
 
 
                 await showCustomAlert({
@@ -5441,7 +5428,7 @@ async function initializeDashboard() {
     Start inactivity protection.
 */
 
-resetAutoLockTimer();
+        resetAutoLockTimer();
 
     } catch (error) {
 
@@ -5498,14 +5485,14 @@ async function loadVaultFiles(
     folder currently being viewed.
 */
 
-if (!preserveLocation) {
+    if (!preserveLocation) {
 
-    currentLocation = null;
+        currentLocation = null;
 
-}
+    }
 
 
-renderCurrentLocation();
+    renderCurrentLocation();
 
 }
 
@@ -5548,13 +5535,12 @@ function formatOperationBytes(
         );
 
 
-    return `${
-        value >= 100
-            ? value.toFixed(0)
-            : value >= 10
-                ? value.toFixed(1)
-                : value.toFixed(2)
-    } ${units[index]}`;
+    return `${value >= 100
+        ? value.toFixed(0)
+        : value >= 10
+            ? value.toFixed(1)
+            : value.toFixed(2)
+        } ${units[index]}`;
 
 }
 
@@ -5638,23 +5624,23 @@ function openChangePasswordDialog() {
     currentPasswordInput.focus();
 
     document
-    .querySelectorAll('.cp-eye, #changePasswordView .toggle-password')
-    .forEach(button => {
+        .querySelectorAll('.cp-eye, #changePasswordView .toggle-password')
+        .forEach(button => {
 
-        const input =
-            document.getElementById(
-                button.dataset.target
-            );
+            const input =
+                document.getElementById(
+                    button.dataset.target
+                );
 
-        if (!input) {
-            return;
-        }
+            if (!input) {
+                return;
+            }
 
-        input.type = 'password';
-        button.classList.remove('visible');
-        button.setAttribute('aria-label', 'Show password');
+            input.type = 'password';
+            button.classList.remove('visible');
+            button.setAttribute('aria-label', 'Show password');
 
-    });
+        });
 
 }
 
@@ -5670,23 +5656,23 @@ async function closeChangePasswordDialog() {
     ]);
 
     document
-    .querySelectorAll('.cp-eye, #changePasswordView .toggle-password')
-    .forEach(button => {
+        .querySelectorAll('.cp-eye, #changePasswordView .toggle-password')
+        .forEach(button => {
 
-        const input =
-            document.getElementById(
-                button.dataset.target
-            );
+            const input =
+                document.getElementById(
+                    button.dataset.target
+                );
 
-        if (!input) {
-            return;
-        }
+            if (!input) {
+                return;
+            }
 
-        input.type = 'password';
-        button.classList.remove('visible');
-        button.setAttribute('aria-label', 'Show password');
+            input.type = 'password';
+            button.classList.remove('visible');
+            button.setAttribute('aria-label', 'Show password');
 
-    });
+        });
 
 }
 
@@ -5799,7 +5785,7 @@ async function submitChangePassword() {
         }
 
         window.location.href =
-    'index.html';
+            'index.html';
 
 
     } catch (error) {
@@ -5999,86 +5985,85 @@ function renderCurrentLocation() {
 
     if (count === 0) {
 
-    fileList.hidden = true;
+        fileList.hidden = true;
 
-    emptyState.hidden = false;
+        emptyState.hidden = false;
 
-    if (vaultTableHeader) {
+        if (vaultTableHeader) {
 
-        vaultTableHeader.hidden = true;
+            vaultTableHeader.hidden = true;
 
-    }
-
-    const emptyTitle =
-        emptyState.querySelector('h2');
-
-    const emptyDesc =
-        emptyState.querySelector('p');
-
-    const emptyButtons =
-        emptyState.querySelector('.empty-add-buttons');
-
-
-    if (activeSearchQuery) {
-
-        if (emptyTitle) {
-            emptyTitle.textContent =
-                'No matching items found';
         }
 
-        if (emptyDesc) {
-            const rawQuery =
-                vaultSearchInput?.value?.trim() ||
-                activeSearchQuery;
+        const emptyTitle =
+            emptyState.querySelector('h2');
 
-            emptyDesc.textContent =
-                `No files or folders matched "${rawQuery}".`;
-        }
+        const emptyDesc =
+            emptyState.querySelector('p');
 
-        if (emptyButtons) {
-            emptyButtons.hidden = true;
+        const emptyButtons =
+            emptyState.querySelector('.empty-add-buttons');
+
+
+        if (activeSearchQuery) {
+
+            if (emptyTitle) {
+                emptyTitle.textContent =
+                    'No matching items found';
+            }
+
+            if (emptyDesc) {
+                const rawQuery =
+                    vaultSearchInput?.value?.trim() ||
+                    activeSearchQuery;
+
+                emptyDesc.textContent =
+                    `No files or folders matched "${rawQuery}".`;
+            }
+
+            if (emptyButtons) {
+                emptyButtons.hidden = true;
+            }
+
+        } else {
+
+            if (emptyTitle) {
+                emptyTitle.textContent =
+                    'Your vault is empty';
+            }
+
+            if (emptyDesc) {
+                emptyDesc.textContent =
+                    'Add files or folders to securely store them inside CrypticLocker.';
+            }
+
+            if (emptyButtons) {
+                emptyButtons.hidden = false;
+            }
+
         }
 
     } else {
 
-        if (emptyTitle) {
-            emptyTitle.textContent =
-                'Your vault is empty';
-        }
+        emptyState.hidden = true;
 
-        if (emptyDesc) {
-            emptyDesc.textContent =
-                'Add files or folders to securely store them inside CrypticLocker.';
-        }
+        fileList.hidden = false;
 
-        if (emptyButtons) {
-            emptyButtons.hidden = false;
+        if (vaultTableHeader) {
+
+            vaultTableHeader.hidden = false;
+
         }
 
     }
-
-} else {
-
-    emptyState.hidden = true;
-
-    fileList.hidden = false;
-
-    if (vaultTableHeader) {
-
-        vaultTableHeader.hidden = false;
-
-    }
-
-}
 
 
     document.querySelector(
         '.item-count'
     ).textContent =
-        `${count} ${
-            count === 1
-                ? 'item'
-                : 'items'
+        `${count} ${count === 1
+            ? 'item'
+            : 'items'
         }`;
 
 
@@ -6149,10 +6134,10 @@ enableSmoothScrolling(
 );
 
 openChangePasswordModal
-?.addEventListener(
-    'click',
-    openChangePasswordDialog
-);
+    ?.addEventListener(
+        'click',
+        openChangePasswordDialog
+    );
 
 if (cpBackButton) {
     cpBackButton.addEventListener(
@@ -6162,13 +6147,13 @@ if (cpBackButton) {
 }
 
 confirmChangePassword
-?.addEventListener(
+    ?.addEventListener(
 
-    'click',
+        'click',
 
-    submitChangePassword
+        submitChangePassword
 
-);
+    );
 
 if (changePasswordView) {
     changePasswordView.addEventListener(
@@ -6330,84 +6315,84 @@ async function handleAddToVault(
 
         if (!result.success) {
 
-    /*
-        The actual vault operation had already
-        started and main.js has already sent
-        the terminal failure event.
+            /*
+                The actual vault operation had already
+                started and main.js has already sent
+                the terminal failure event.
+        
+                The centralized operation panel owns
+                the error UI, so do not show a second
+                Windows alert.
+            */
 
-        The centralized operation panel owns
-        the error UI, so do not show a second
-        Windows alert.
-    */
+            if (
+                result.operationFailed ===
+                true
+            ) {
 
-    if (
-        result.operationFailed ===
-        true
-    ) {
+                return;
 
-        return;
-
-    }
-
-
-    /*
-        VAULT_COMMIT_UNCERTAIN is handled by
-        status: 'attention'.
-
-        The attention panel is already visible,
-        so do not show a duplicate alert.
-    */
-
-    if (
-        result.errorCode ===
-        'VAULT_COMMIT_UNCERTAIN'
-    ) {
-
-        await loadVaultFiles();
-
-        return;
-
-    }
+            }
 
 
-    /*
-        Storage failure before the operation
-        actually started.
+            /*
+                VAULT_COMMIT_UNCERTAIN is handled by
+                status: 'attention'.
+        
+                The attention panel is already visible,
+                so do not show a duplicate alert.
+            */
 
-        No progress/failure panel exists yet,
-        so show the dedicated storage message.
-    */
+            if (
+                result.errorCode ===
+                'VAULT_COMMIT_UNCERTAIN'
+            ) {
 
-    if (
-        result.errorCode ===
-        'INSUFFICIENT_STORAGE'
-    ) {
+                await loadVaultFiles();
 
-        await showCustomAlert({
-            title: 'Insufficient Storage',
-            message: `Not enough storage space.\n\nRequired: ${formatOperationBytes(result.requiredBytes)}\nAvailable: ${formatOperationBytes(result.availableBytes)}`,
-            type: 'warning'
-        });
+                return;
 
-        return;
-
-    }
+            }
 
 
-    /*
-        Any other error that happened before
-        an operation started.
-    */
+            /*
+                Storage failure before the operation
+                actually started.
+        
+                No progress/failure panel exists yet,
+                so show the dedicated storage message.
+            */
 
-    await showCustomAlert({
-        title: 'Unable to Add',
-        message: result.message || 'Unable to add item.',
-        type: 'danger'
-    });
+            if (
+                result.errorCode ===
+                'INSUFFICIENT_STORAGE'
+            ) {
 
-    return;
+                await showCustomAlert({
+                    title: 'Insufficient Storage',
+                    message: `Not enough storage space.\n\nRequired: ${formatOperationBytes(result.requiredBytes)}\nAvailable: ${formatOperationBytes(result.availableBytes)}`,
+                    type: 'warning'
+                });
 
-}
+                return;
+
+            }
+
+
+            /*
+                Any other error that happened before
+                an operation started.
+            */
+
+            await showCustomAlert({
+                title: 'Unable to Add',
+                message: result.message || 'Unable to add item.',
+                type: 'danger'
+            });
+
+            return;
+
+        }
 
 
         /*
@@ -6470,13 +6455,11 @@ async function handleAddToVault(
 
             await showCustomAlert({
                 title: 'Partial Completion',
-                message: `${items.length} of ${
-                    items.length + result.failures.length
-                } ${
-                    type === 'folder'
+                message: `${items.length} of ${items.length + result.failures.length
+                    } ${type === 'folder'
                         ? 'folders'
                         : 'files'
-                } were added successfully. Some items could not be added.`,
+                    } were added successfully. Some items could not be added.`,
                 details: result.failures.map(
                     failure => `• ${failure.name}: ${failure.message}`
                 ),
@@ -6499,20 +6482,20 @@ async function handleAddToVault(
 
     } catch (error) {
 
-    console.error(
-        'ADD TO VAULT RENDERER ERROR:',
-        error
-    );
+        console.error(
+            'ADD TO VAULT RENDERER ERROR:',
+            error
+        );
 
 
-    await showCustomAlert({
-        title: 'Operation Failed',
-        message: `Unable to add item to the vault.\n\n${error?.message || String(error)}`,
-        type: 'danger'
-    });
+        await showCustomAlert({
+            title: 'Operation Failed',
+            message: `Unable to add item to the vault.\n\n${error?.message || String(error)}`,
+            type: 'danger'
+        });
 
 
-} finally {
+    } finally {
 
         buttons.forEach(button => {
 
@@ -6605,8 +6588,8 @@ function addFileRow(
     row.className =
         'file-row';
 
-        row.dataset.fileId =
-    file.id;
+    row.dataset.fileId =
+        file.id;
 
     row.dataset.itemType =
         'file';
@@ -7148,9 +7131,9 @@ function addFileRow(
 
     }
 
-if (updateCount) {
-    updateItemCount();
-}
+    if (updateCount) {
+        updateItemCount();
+    }
 
 }
 
@@ -7165,10 +7148,9 @@ function updateItemCount() {
     document.querySelector(
         '.item-count'
     ).textContent =
-        `${count} ${
-            count === 1
-                ? 'item'
-                : 'items'
+        `${count} ${count === 1
+            ? 'item'
+            : 'items'
         }`;
 
 }
@@ -7380,19 +7362,19 @@ const removeSessionLockedListener =
 
             recoveryKeyVisible = false;
 
-recoveryKey = null;
+            recoveryKey = null;
 
-recoveryKeyValue.textContent =
-    'CKRV-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX';
+            recoveryKeyValue.textContent =
+                'CKRV-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX';
 
-copyRecoveryKeyButton.disabled =
-    true;
+            copyRecoveryKeyButton.disabled =
+                true;
 
-toggleRecoveryKeyButton.innerHTML =
-    EYE_ICON;
+            toggleRecoveryKeyButton.innerHTML =
+                EYE_ICON;
 
-toggleRecoveryKeyButton.title =
-    'Show Recovery Key';
+            toggleRecoveryKeyButton.title =
+                'Show Recovery Key';
 
             window.location.replace(
                 'index.html'
@@ -7400,8 +7382,8 @@ toggleRecoveryKeyButton.title =
 
         }
     );
-    
-    lockVaultButton.addEventListener(
+
+lockVaultButton.addEventListener(
     'click',
     async () => {
 
@@ -7427,19 +7409,19 @@ toggleRecoveryKeyButton.title =
 
             recoveryKeyVisible = false;
 
-recoveryKey = null;
+            recoveryKey = null;
 
-recoveryKeyValue.textContent =
-    'CKRV-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX';
+            recoveryKeyValue.textContent =
+                'CKRV-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX';
 
-copyRecoveryKeyButton.disabled =
-    true;
+            copyRecoveryKeyButton.disabled =
+                true;
 
-toggleRecoveryKeyButton.innerHTML =
-    EYE_ICON;
+            toggleRecoveryKeyButton.innerHTML =
+                EYE_ICON;
 
-toggleRecoveryKeyButton.title =
-    'Show Recovery Key';
+            toggleRecoveryKeyButton.title =
+                'Show Recovery Key';
 
             window.location.replace(
                 'index.html'
@@ -7499,9 +7481,9 @@ vaultIntegrityCheckButton.addEventListener(
 
         showIntegrityOverlay();
 
-setIntegrityLoadingState();
+        setIntegrityLoadingState();
 
-const result =
+        const result =
             await window.crypticLocker
                 .checkVaultIntegrity();
 
@@ -7573,7 +7555,7 @@ function renderRootLocation() {
         [...vaultFolders].sort(
             (a, b) =>
                 new Date(b.addedAt || b.createdAt || b.modifiedAt || 0) -
-        new Date(a.addedAt || a.createdAt || a.modifiedAt || 0)
+                new Date(a.addedAt || a.createdAt || a.modifiedAt || 0)
         );
 
     if (activeSearchQuery) {
@@ -7630,7 +7612,7 @@ function renderRootLocation() {
             .sort(
                 (a, b) =>
                     new Date(b.addedAt || b.createdAt || b.modifiedAt || 0) -
-        new Date(a.addedAt || a.createdAt || a.modifiedAt || 0)
+                    new Date(a.addedAt || a.createdAt || a.modifiedAt || 0)
             );
 
     if (activeSearchQuery) {
@@ -7831,7 +7813,7 @@ function addFolderRow(folder) {
         !normalizeVaultPath(
             folder.relativePath
         );
-    
+
     const fileList =
         document.getElementById(
             'fileList'
@@ -8001,374 +7983,374 @@ function addFolderRow(folder) {
     ).textContent =
         modeText;
 
-        const fileActions =
-    row.querySelector(
-        '.file-actions'
-    );
-
-
-if (isRootFolder) {
-
-    const menuButton =
+    const fileActions =
         row.querySelector(
-            '.file-menu-button'
+            '.file-actions'
         );
 
 
-    const menu =
-        row.querySelector(
-            '.file-menu'
-        );
+    if (isRootFolder) {
+
+        const menuButton =
+            row.querySelector(
+                '.file-menu-button'
+            );
 
 
-    const restoreButton =
-        row.querySelector(
-            '.restore-folder-button'
-        );
+        const menu =
+            row.querySelector(
+                '.file-menu'
+            );
 
-    const selectButton =
-        row.querySelector(
-            '.select-row-button'
-        );
 
-    const deleteButton =
-    row.querySelector(
-        '.delete-folder-button'
-    );
+        const restoreButton =
+            row.querySelector(
+                '.restore-folder-button'
+            );
 
-    if (selectButton) {
-        selectButton.addEventListener('click', event => {
-            event.stopPropagation();
-            menu.classList.remove('open');
-            if (!selectionModeActive) {
-                enterSelectionMode(row);
-            } else {
-                toggleRowSelection(row, true);
-            }
-        });
-    }
-    
-    menuButton.addEventListener(
-        'click',
-        event => {
+        const selectButton =
+            row.querySelector(
+                '.select-row-button'
+            );
 
-            event.stopPropagation();
+        const deleteButton =
+            row.querySelector(
+                '.delete-folder-button'
+            );
 
-            const wasOpen =
-                menu.classList.contains('open');
-
-            closeAllDropdownsAndMenus();
-
-            if (!wasOpen) {
-                const rect = menuButton.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - rect.bottom;
-                if (spaceBelow < 170 && rect.top > 170) {
-                    menu.classList.add('dropup');
+        if (selectButton) {
+            selectButton.addEventListener('click', event => {
+                event.stopPropagation();
+                menu.classList.remove('open');
+                if (!selectionModeActive) {
+                    enterSelectionMode(row);
                 } else {
-                    menu.classList.remove('dropup');
+                    toggleRowSelection(row, true);
                 }
-                menu.classList.add('open');
-                row.classList.add('menu-active');
-                row.style.zIndex = '1000';
-            }
-
+            });
         }
-    );
+
+        menuButton.addEventListener(
+            'click',
+            event => {
+
+                event.stopPropagation();
+
+                const wasOpen =
+                    menu.classList.contains('open');
+
+                closeAllDropdownsAndMenus();
+
+                if (!wasOpen) {
+                    const rect = menuButton.getBoundingClientRect();
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    if (spaceBelow < 170 && rect.top > 170) {
+                        menu.classList.add('dropup');
+                    } else {
+                        menu.classList.remove('dropup');
+                    }
+                    menu.classList.add('open');
+                    row.classList.add('menu-active');
+                    row.style.zIndex = '1000';
+                }
+
+            }
+        );
 
 
-    restoreButton.addEventListener(
-        'click',
-        async event => {
+        restoreButton.addEventListener(
+            'click',
+            async event => {
 
-            event.stopPropagation();
+                event.stopPropagation();
 
-            setButtonLoading(restoreButton, true);
+                setButtonLoading(restoreButton, true);
 
-            try {
+                try {
 
-                const folderId =
-                    folder.folderId || folder.id;
+                    const folderId =
+                        folder.folderId || folder.id;
 
-                if (
-                    typeof window.crypticLocker?.checkItemsStatus ===
-                    'function'
-                ) {
+                    if (
+                        typeof window.crypticLocker?.checkItemsStatus ===
+                        'function'
+                    ) {
 
-                    const status =
-                        await window.crypticLocker
-                            .checkItemsStatus([
-                                {
-                                    id: folderId,
-                                    type: 'folder',
-                                    name: folder.name
+                        const status =
+                            await window.crypticLocker
+                                .checkItemsStatus([
+                                    {
+                                        id: folderId,
+                                        type: 'folder',
+                                        name: folder.name
+                                    }
+                                ]);
+
+                        setButtonLoading(restoreButton, false, 'Restore');
+                        closeAllDropdownsAndMenus();
+
+                        if (
+                            status &&
+                            status.success &&
+                            status.hasIssues
+                        ) {
+
+                            let warningActive = true;
+
+                            while (warningActive) {
+
+                                const warningAction =
+                                    await showRestoreWarning(
+                                        status
+                                    );
+
+                                if (warningAction === 'check-quarantine') {
+                                    highlightQuarantinedOrphans(
+                                        extractMissingIdentifiers(status)
+                                    );
+                                    return;
                                 }
-                            ]);
+
+                                if (warningAction !== 'continue') {
+                                    return;
+                                }
+
+                                if ((status.verifiedFilesCount || 0) === 0) {
+                                    return;
+                                }
+
+                                const choice =
+                                    await showRestoreConfirm({
+                                        title:
+                                            'Restore folder?',
+                                        name:
+                                            folder.name,
+                                        message:
+                                            'The folder will be decrypted to the location you choose.',
+                                        checkboxLabel:
+                                            'Also remove the encrypted copy from the vault',
+                                        confirmText:
+                                            'Restore'
+                                    });
+
+                                if (!choice.confirmed) {
+                                    continue;
+                                }
+
+                                closeRestoreConfirm(false);
+                                warningActive = false;
+
+                                try {
+
+                                    const result =
+                                        await window
+                                            .crypticLocker
+                                            .restoreFolder(
+                                                folderId,
+                                                choice.removeFromVault
+                                            );
+
+                                    if (result.canceled) {
+                                        return;
+                                    }
+
+                                    if (!result.success) {
+
+                                        if (result.operationFailed === true) {
+                                            return;
+                                        }
+
+                                        if (result.errorCode === 'INSUFFICIENT_STORAGE') {
+                                            await showCustomAlert({
+                                                title: 'Insufficient Storage',
+                                                message: `Not enough storage space.\n\nRequired: ${formatOperationBytes(result.requiredBytes)}\nAvailable: ${formatOperationBytes(result.availableBytes)}`,
+                                                type: 'warning'
+                                            });
+                                            return;
+                                        }
+
+                                        await showCustomAlert({
+                                            title: 'Restore Failed',
+                                            message: result.message || 'Unable to restore folder.',
+                                            type: 'danger'
+                                        });
+
+                                        return;
+
+                                    }
+
+                                    await loadVaultFiles();
+
+                                    return;
+
+                                } finally {
+
+                                    closeRestoreConfirm(false);
+
+                                }
+
+                            }
+
+                            return;
+
+                        }
+
+                    }
 
                     setButtonLoading(restoreButton, false, 'Restore');
                     closeAllDropdownsAndMenus();
 
-                    if (
-                        status &&
-                        status.success &&
-                        status.hasIssues
-                    ) {
+                    const choice =
+                        await showRestoreConfirm({
+                            title:
+                                'Restore folder?',
+                            name:
+                                folder.name,
+                            message:
+                                'The folder will be decrypted to the location you choose.',
+                            checkboxLabel:
+                                'Also remove the encrypted copy from the vault',
+                            confirmText:
+                                'Restore'
+                        });
 
-                        let warningActive = true;
-
-                        while (warningActive) {
-
-                            const warningAction =
-                                await showRestoreWarning(
-                                    status
-                                );
-
-                            if (warningAction === 'check-quarantine') {
-                                highlightQuarantinedOrphans(
-                                    extractMissingIdentifiers(status)
-                                );
-                                return;
-                            }
-
-                            if (warningAction !== 'continue') {
-                                return;
-                            }
-
-                            if ((status.verifiedFilesCount || 0) === 0) {
-                                return;
-                            }
-
-                            const choice =
-                                await showRestoreConfirm({
-                                    title:
-                                        'Restore folder?',
-                                    name:
-                                        folder.name,
-                                    message:
-                                        'The folder will be decrypted to the location you choose.',
-                                    checkboxLabel:
-                                        'Also remove the encrypted copy from the vault',
-                                    confirmText:
-                                        'Restore'
-                                });
-
-                            if (!choice.confirmed) {
-                                continue;
-                            }
-
-                            closeRestoreConfirm(false);
-                            warningActive = false;
-
-                            try {
-
-                                const result =
-                                    await window
-                                        .crypticLocker
-                                        .restoreFolder(
-                                            folderId,
-                                            choice.removeFromVault
-                                        );
-
-                                if (result.canceled) {
-                                    return;
-                                }
-
-                                if (!result.success) {
-
-                                    if (result.operationFailed === true) {
-                                        return;
-                                    }
-
-                                    if (result.errorCode === 'INSUFFICIENT_STORAGE') {
-                                        await showCustomAlert({
-                                            title: 'Insufficient Storage',
-                                            message: `Not enough storage space.\n\nRequired: ${formatOperationBytes(result.requiredBytes)}\nAvailable: ${formatOperationBytes(result.availableBytes)}`,
-                                            type: 'warning'
-                                        });
-                                        return;
-                                    }
-
-                                    await showCustomAlert({
-                                        title: 'Restore Failed',
-                                        message: result.message || 'Unable to restore folder.',
-                                        type: 'danger'
-                                    });
-
-                                    return;
-
-                                }
-
-                                await loadVaultFiles();
-
-                                return;
-
-                            } finally {
-
-                                closeRestoreConfirm(false);
-
-                            }
-
-                        }
-
-                        return;
-
-                    }
-
-                }
-
-                setButtonLoading(restoreButton, false, 'Restore');
-                closeAllDropdownsAndMenus();
-
-                const choice =
-                    await showRestoreConfirm({
-                        title:
-                            'Restore folder?',
-                        name:
-                            folder.name,
-                        message:
-                            'The folder will be decrypted to the location you choose.',
-                        checkboxLabel:
-                            'Also remove the encrypted copy from the vault',
-                        confirmText:
-                            'Restore'
-                    });
-
-                if (!choice.confirmed) {
-                    return;
-                }
-
-                closeRestoreConfirm(false);
-
-                try {
-
-                    const result =
-                        await window
-                            .crypticLocker
-                            .restoreFolder(
-                                folder.folderId || folder.id,
-                                choice.removeFromVault
-                            );
-
-                    if (result.canceled) {
+                    if (!choice.confirmed) {
                         return;
                     }
 
-                    if (!result.success) {
+                    closeRestoreConfirm(false);
 
-                        if (
-                            result.operationFailed ===
-                            true
-                        ) {
+                    try {
+
+                        const result =
+                            await window
+                                .crypticLocker
+                                .restoreFolder(
+                                    folder.folderId || folder.id,
+                                    choice.removeFromVault
+                                );
+
+                        if (result.canceled) {
                             return;
                         }
 
-                        if (
-                            result.errorCode ===
-                            'INSUFFICIENT_STORAGE'
-                        ) {
+                        if (!result.success) {
+
+                            if (
+                                result.operationFailed ===
+                                true
+                            ) {
+                                return;
+                            }
+
+                            if (
+                                result.errorCode ===
+                                'INSUFFICIENT_STORAGE'
+                            ) {
+
+                                await showCustomAlert({
+                                    title: 'Insufficient Storage',
+                                    message: `Not enough storage space.\n\nRequired: ${formatOperationBytes(result.requiredBytes)}\nAvailable: ${formatOperationBytes(result.availableBytes)}`,
+                                    type: 'warning'
+                                });
+
+                                return;
+
+                            }
 
                             await showCustomAlert({
-                                title: 'Insufficient Storage',
-                                message: `Not enough storage space.\n\nRequired: ${formatOperationBytes(result.requiredBytes)}\nAvailable: ${formatOperationBytes(result.availableBytes)}`,
-                                type: 'warning'
+                                title: 'Restore Failed',
+                                message: result.message || 'Unable to restore folder.',
+                                type: 'danger'
                             });
 
                             return;
 
                         }
 
-                        await showCustomAlert({
-                            title: 'Restore Failed',
-                            message: result.message || 'Unable to restore folder.',
-                            type: 'danger'
-                        });
+                        if (result.removedFromVault === true) {
+                            await loadVaultFiles();
+                        }
 
-                        return;
+                        if (result.removeFromVaultError) {
+                            await showCustomAlert({
+                                title: 'Vault Notice',
+                                message: result.removeFromVaultError,
+                                type: 'warning'
+                            });
+                        }
+
+                    } finally {
+
+                        closeRestoreConfirm(false);
 
                     }
 
-                    if (result.removedFromVault === true) {
-                        await loadVaultFiles();
-                    }
+                } catch (error) {
 
-                    if (result.removeFromVaultError) {
-                        await showCustomAlert({
-                            title: 'Vault Notice',
-                            message: result.removeFromVaultError,
-                            type: 'warning'
-                        });
-                    }
+                    console.error(
+                        error
+                    );
+                    setButtonLoading(restoreButton, false, 'Restore');
+                    closeAllDropdownsAndMenus();
+
+                    await showCustomAlert({
+                        title: 'Restore Error',
+                        message: error?.message || 'Unable to restore folder.',
+                        type: 'danger'
+                    });
 
                 } finally {
 
-                    closeRestoreConfirm(false);
+                    setButtonLoading(restoreButton, false, 'Restore');
 
                 }
 
-            } catch (error) {
+            }
+        );
 
-                console.error(
-                    error
+
+        deleteButton.addEventListener(
+            'click',
+            event => {
+
+                event.stopPropagation();
+
+
+                menu.classList.remove(
+                    'open'
                 );
-                setButtonLoading(restoreButton, false, 'Restore');
-                closeAllDropdownsAndMenus();
 
-                await showCustomAlert({
-                    title: 'Restore Error',
-                    message: error?.message || 'Unable to restore folder.',
-                    type: 'danger'
-                });
 
-            } finally {
-
-                setButtonLoading(restoreButton, false, 'Restore');
+                openDeleteConfirmation(
+                    'folder',
+                    folder.folderId,
+                    folder.name
+                );
 
             }
+        );
 
+    } else {
+
+        /*
+            Nested folders currently do not have
+            their own Restore action.
+    
+            Root-folder restore will restore the
+            complete folder tree.
+        */
+
+        fileActions.style.visibility =
+            'hidden';
+
+        const checkboxWrapper = row.querySelector('.file-row-checkbox');
+        if (checkboxWrapper) {
+            checkboxWrapper.style.visibility = 'hidden';
+            checkboxWrapper.style.pointerEvents = 'none';
         }
-    );
-
-
-deleteButton.addEventListener(
-    'click',
-    event => {
-
-        event.stopPropagation();
-
-
-        menu.classList.remove(
-            'open'
-        );
-
-
-        openDeleteConfirmation(
-            'folder',
-            folder.folderId,
-            folder.name
-        );
 
     }
-);
-
-} else {
-
-    /*
-        Nested folders currently do not have
-        their own Restore action.
-
-        Root-folder restore will restore the
-        complete folder tree.
-    */
-
-    fileActions.style.visibility =
-        'hidden';
-
-    const checkboxWrapper = row.querySelector('.file-row-checkbox');
-    if (checkboxWrapper) {
-        checkboxWrapper.style.visibility = 'hidden';
-        checkboxWrapper.style.pointerEvents = 'none';
-    }
-
-}
 
 
     /*
@@ -8618,67 +8600,67 @@ window.crypticLocker
     operation is active.
 */
 
-if (
-    progress.status === 'started'
-) {
+            if (
+                progress.status === 'started'
+            ) {
 
-    if (
-        progress.operationId &&
-        !activeOperationIds.has(
-            progress.operationId
-        )
-    ) {
+                if (
+                    progress.operationId &&
+                    !activeOperationIds.has(
+                        progress.operationId
+                    )
+                ) {
 
-        activeOperationIds.add(
-            progress.operationId
-        );
+                    activeOperationIds.add(
+                        progress.operationId
+                    );
 
-        activeVaultOperations =
-            activeOperationIds.size;
+                    activeVaultOperations =
+                        activeOperationIds.size;
 
-        stopAutoLockTimer();
+                    stopAutoLockTimer();
 
-    }
+                }
 
-}
-else if (
-    progress.status === 'completed' ||
-    progress.status === 'failed' ||
-    progress.status === 'attention' ||
-    progress.status === 'cancelled'
-) {
+            }
+            else if (
+                progress.status === 'completed' ||
+                progress.status === 'failed' ||
+                progress.status === 'attention' ||
+                progress.status === 'cancelled'
+            ) {
 
-    if (
-        progress.operationId
-    ) {
+                if (
+                    progress.operationId
+                ) {
 
-        activeOperationIds.delete(
-            progress.operationId
-        );
+                    activeOperationIds.delete(
+                        progress.operationId
+                    );
 
-        activeVaultOperations =
-            activeOperationIds.size;
+                    activeVaultOperations =
+                        activeOperationIds.size;
 
-    }
+                }
 
-    /*
-        If every protected operation has
-        finished, restart inactivity timing.
-    */
+                /*
+                    If every protected operation has
+                    finished, restart inactivity timing.
+                */
 
-    if (
-        activeVaultOperations === 0
-    ) {
+                if (
+                    activeVaultOperations === 0
+                ) {
 
-        resetAutoLockTimer();
+                    resetAutoLockTimer();
 
-    }
+                }
 
-}
+            }
 
-/*
-                Start / processing state
-            */
+            /*
+                            Start / processing state
+                        */
 
             if (
                 progress.status === 'started' ||
@@ -8688,30 +8670,30 @@ else if (
             ) {
 
                 if (
-    progress.operationId
-) {
+                    progress.operationId
+                ) {
 
-    currentOperationId =
-        progress.operationId;
+                    currentOperationId =
+                        progress.operationId;
 
-}
+                }
 
-operationCancelButton.disabled =
-    false;
+                operationCancelButton.disabled =
+                    false;
 
-operationCancelButton.hidden =
-    false;
+                operationCancelButton.hidden =
+                    false;
 
-const cancelButtonText =
-    operationCancelButton
-        .querySelector('span');
+                const cancelButtonText =
+                    operationCancelButton
+                        .querySelector('span');
 
-if (cancelButtonText) {
+                if (cancelButtonText) {
 
-    cancelButtonText.textContent =
-        'Cancel';
+                    cancelButtonText.textContent =
+                        'Cancel';
 
-}
+                }
 
                 operationOverlay.hidden =
                     false;
@@ -8742,86 +8724,86 @@ if (cancelButtonText) {
                 operationCancelButton.hidden = false;
                 operationCancelButton.disabled = false;
 
-    /*
-    If recovery was started from the
-    Container Inspection panel, close
-    inspection as soon as the actual
-    recovery operation begins.
+                /*
+                If recovery was started from the
+                Container Inspection panel, close
+                inspection as soon as the actual
+                recovery operation begins.
+            
+                If the user cancels the destination
+                picker, no operation progress event
+                is received, so inspection stays open.
+            */
 
-    If the user cancels the destination
-    picker, no operation progress event
-    is received, so inspection stays open.
-*/
+                if (
+                    isRecover &&
+                    !quarantineInspectOverlay.hidden
+                ) {
 
-if (
-    isRecover &&
-    !quarantineInspectOverlay.hidden
-) {
+                    closeQuarantineInspection();
 
-    closeQuarantineInspection();
+                }
 
-}
+                if (
+                    !restoreConfirmOverlay.hidden
+                ) {
 
-if (
-    !restoreConfirmOverlay.hidden
-) {
+                    closeRestoreConfirm(false);
 
-    closeRestoreConfirm(false);
-
-}
+                }
 
 
-operationTitle.textContent =
-    isExport
-        ? 'Exporting Vault'
-        : isRecover
-            ? 'Recovering file'
-            : isDelete
-                ? (
-                    progress.itemType === 'folder'
-                        ? 'Deleting folder'
-                        : 'Deleting file'
-                )
-                : isRestore
-                    ? (
-                        progress.itemType === 'folder'
-                            ? 'Restoring folder'
-                            : 'Restoring file'
-                    )
-                    : (
-                        progress.itemType === 'folder'
-                            ? 'Securing folder'
-                            : 'Securing file'
-                    );
+                operationTitle.textContent =
+                    isExport
+                        ? 'Exporting Vault'
+                        : isRecover
+                            ? 'Recovering file'
+                            : isDelete
+                                ? (
+                                    progress.itemType === 'folder'
+                                        ? 'Deleting folder'
+                                        : 'Deleting file'
+                                )
+                                : isRestore
+                                    ? (
+                                        progress.itemType === 'folder'
+                                            ? 'Restoring folder'
+                                            : 'Restoring file'
+                                    )
+                                    : (
+                                        progress.itemType === 'folder'
+                                            ? 'Securing folder'
+                                            : 'Securing file'
+                                    );
 
 
                 operationItemName.textContent =
                     progress.name ||
                     'CrypticLocker';
 
-                    operationCurrentFile.textContent =
-    progress.currentFile ||
-    (
-        isExport
-            ? (
-                progress.status === 'started'
-                    ? 'Preparing backup package...'
-                    : 'Streaming encrypted files...'
-            )
-            : isDelete
-                ? (
-                    progress.status ===
-                    'started'
-                        ? 'Preparing deletion...'
-                        : 'Removing from vault...'
-                )
-                : (
-                    progress.status ===
-                    'started'
-                        ? 'Preparing...'
-                        : 'Finalizing...'
-                )
-    );
+                operationCurrentFile.textContent =
+                    progress.currentFile ||
+                    (
+                        isExport
+                            ? (
+                                progress.status === 'started'
+                                    ? 'Preparing backup package...'
+                                    : 'Streaming encrypted files...'
+                            )
+                            : isDelete
+                                ? (
+                                    progress.status ===
+                                        'started'
+                                        ? 'Preparing deletion...'
+                                        : 'Removing from vault...'
+                                )
+                                : (
+                                    progress.status ===
+                                        'started'
+                                        ? 'Preparing...'
+                                        : 'Finalizing...'
+                                )
+                    );
 
                 const totalBytes =
                     Number(
@@ -8854,95 +8836,93 @@ operationTitle.textContent =
 
 
                 const displayPercentage =
-    Math.floor(
-        percentage
-    );
-
-
-if (
-    displayPercentage >= 99
-) {
-
-    operationPercentageValue.textContent =
-        '';
-
-    operationFinalizingSpinner.hidden =
-        false;
-
-    operationCancelButton.hidden =
-        true;
-
-    operationStatusText.textContent =
-        'Finalizing...';
-
-    operationProgressFill.style.width =
-        '100%';
-
-} else {
-
-    operationPercentageValue.textContent =
-        `${displayPercentage}%`;
-
-    operationFinalizingSpinner.hidden =
-        true;
-
-    operationCancelButton.hidden =
-        false;
-
-    operationProgressFill.style.width =
-        `${percentage}%`;
-
-}
+                    Math.floor(
+                        percentage
+                    );
 
 
                 if (
-    progress.status ===
-    'started'
-) {
+                    displayPercentage >= 99
+                ) {
 
-    operationStatusText.textContent =
-        isDelete
-            ? 'Preparing deletion...'
-            : 'Preparing...';
+                    operationPercentageValue.textContent =
+                        '';
 
-} else if (isRecover) {
+                    operationFinalizingSpinner.hidden =
+                        false;
 
-    operationStatusText.textContent =
-        'Recovering and verifying...';
+                    operationCancelButton.hidden =
+                        true;
 
-} else if (isDelete) {
+                    operationStatusText.textContent =
+                        'Finalizing...';
 
-    operationStatusText.textContent =
-        'Deleting securely from vault...';
+                    operationProgressFill.style.width =
+                        '100%';
 
-} else if (isRestore) {
+                } else {
 
-    operationStatusText.textContent =
-        'Decrypting and verifying...';
+                    operationPercentageValue.textContent =
+                        `${displayPercentage}%`;
 
-} else if (isExport) {
+                    operationFinalizingSpinner.hidden =
+                        true;
 
-    operationStatusText.textContent =
-        'Exporting and packaging...';
+                    operationCancelButton.hidden =
+                        false;
 
-} else {
+                    operationProgressFill.style.width =
+                        `${percentage}%`;
 
-    operationStatusText.textContent =
-        'Encrypting and securing...';
+                }
 
-}
+
+                if (
+                    progress.status ===
+                    'started'
+                ) {
+
+                    operationStatusText.textContent =
+                        isDelete
+                            ? 'Preparing deletion...'
+                            : 'Preparing...';
+
+                } else if (isRecover) {
+
+                    operationStatusText.textContent =
+                        'Recovering and verifying...';
+
+                } else if (isDelete) {
+
+                    operationStatusText.textContent =
+                        'Deleting securely from vault...';
+
+                } else if (isRestore) {
+
+                    operationStatusText.textContent =
+                        'Decrypting and verifying...';
+
+                } else if (isExport) {
+
+                    operationStatusText.textContent =
+                        'Exporting and packaging...';
+
+                } else {
+
+                    operationStatusText.textContent =
+                        'Encrypting and securing...';
+
+                }
 
 
                 operationSize.textContent =
                     totalBytes > 0
-                        ? `${
-                            formatOperationBytes(
-                                processedBytes
-                            )
-                        } / ${
-                            formatOperationBytes(
-                                totalBytes
-                            )
+                        ? `${formatOperationBytes(
+                            processedBytes
+                        )
+                        } / ${formatOperationBytes(
+                            totalBytes
+                        )
                         }`
                         : 'Preparing...';
 
@@ -8973,10 +8953,9 @@ if (
 
                 operationSpeed.textContent =
                     speed > 0
-                        ? `${
-                            formatOperationBytes(
-                                speed
-                            )
+                        ? `${formatOperationBytes(
+                            speed
+                        )
                         }/s`
                         : '—';
 
@@ -9006,271 +8985,271 @@ if (
     an operation fails.
 */
 
-/*
-    Cancelled operation.
-*/
-
-if (
-    progress.status ===
-    'cancelled'
-) {
-
-    operationOverlay.hidden =
-        false;
-
-    operationProcessing.hidden =
-        true;
-
-    operationSuccess.hidden =
-        false;
-
-
-    operationFinalizingSpinner.hidden =
-        true;
-
-
-    operationPercentageValue.textContent =
-        '0%';
-
-
-    operationResultIcon.className =
-        'operation-result-icon attention';
-
-
-    const isFolder =
-        progress.itemType ===
-        'folder';
-
-
-    const isRestore =
-        progress.operation ===
-        'restore';
-
-
-    const isRecover =
-        progress.operation ===
-        'recover';
-
-
-    const isDelete =
-        progress.operation ===
-        'delete';
-
-
-    const isExport =
-        progress.operation ===
-        'export';
-
-    operationSuccessTitle.textContent =
-        isExport
-            ? 'Vault export cancelled'
-            : 'Operation cancelled';
-
-
-    operationSuccessName.textContent =
-        progress.name ||
-        'CrypticLocker';
-
-
-    operationSuccessMessage.textContent =
-        isExport
-            ? 'The vault export was cancelled. No files were created.'
-            : isRecover
-                ? 'The recovery operation was cancelled.'
-                : isDelete
-                    ? (
-                        isFolder
-                            ? 'The folder deletion was cancelled.'
-                            : 'The file deletion was cancelled.'
-                    )
-                    : isRestore
-                        ? (
-                            isFolder
-                                ? 'The folder restore was cancelled.'
-                                : 'The file restore was cancelled.'
-                        )
-                        : (
-                            isFolder
-                                ? 'The folder encryption was cancelled.'
-                                : 'The file encryption was cancelled.'
-                        );
-
-
-    operationSpeed.textContent =
-        '—';
-
-    operationEta.textContent =
-        '—';
-
-    return;
-
-}
-
-if (
-    progress.status ===
-    'failed'
-) {
-
-    operationOverlay.hidden =
-        false;
-
-    operationProcessing.hidden =
-        true;
-
-    operationSuccess.hidden =
-        false;
-
-    operationResultIcon.className =
-    'operation-result-icon failed';
-
-
-    const isRestore =
-        progress.operation ===
-        'restore';
-
-    const isRecover =
-        progress.operation ===
-        'recover';
-
-    const isDelete =
-    progress.operation ===
-    'delete';
-    
-    const isFolder =
-        progress.itemType ===
-        'folder';
-
-
-    operationSuccessTitle.textContent =
-    isRecover
-        ? 'File recovery failed'
-        : isDelete
-            ? (
-                isFolder
-                    ? 'Folder deletion failed'
-                    : 'File deletion failed'
-            )
-            : isRestore
-                ? (
-                    isFolder
-                        ? 'Folder restore failed'
-                        : 'File restore failed'
-                )
-                : (
-                    isFolder
-                        ? 'Folder could not be secured'
-                        : 'File could not be secured'
-                );
-
-
-    operationSuccessName.textContent =
-        progress.name ||
-        'CrypticLocker';
-
-
-    operationSuccessMessage.textContent =
-        progress.message ||
-        'The operation could not be completed.';
-
-
-    /*
-        A failed operation is terminal.
-
-        Do not keep stale speed / ETA values
-        from the last progress event.
-    */
-
-    operationSpeed.textContent =
-        '—';
-
-    operationEta.textContent =
-        '—';
-
-
-    return;
-
-}
-
-/*
-    Attention / uncertain operation.
-
-    Encryption completed, but CrypticLocker
-    could not safely confirm the final vault
-    metadata commit.
-
-    This is intentionally NOT treated as
-    success or failure because the encrypted
-    containers may already exist and the
-    original source has been preserved.
-*/
-
-if (
-    progress.status ===
-    'attention'
-) {
-
-    operationOverlay.hidden =
-        false;
-
-    operationProcessing.hidden =
-        true;
-
-    operationSuccess.hidden =
-        false;
-
-    operationResultIcon.className =
-    'operation-result-icon attention';
-
-
-    const isFolder =
-        progress.itemType ===
-        'folder';
-
-
-    operationSuccessTitle.textContent =
-        isFolder
-            ? 'Folder needs attention'
-            : 'File needs attention';
-
-
-    operationSuccessName.textContent =
-        progress.name ||
-        'CrypticLocker';
-
-
-    operationSuccessMessage.textContent =
-        progress.message ||
-        (
-            isFolder
-                ? 'The folder was encrypted, but CrypticLocker could not verify the final vault commit. Your original folder has not been removed.'
-                : 'The file was encrypted, but CrypticLocker could not verify the final vault commit. Your original file has not been removed.'
-        );
-
-
-    /*
-        Attention is a terminal state.
-
-        Clear stale performance information
-        left by the previous progress event.
-    */
-
-    operationSpeed.textContent =
-        '—';
-
-    operationEta.textContent =
-        '—';
-
-
-    return;
-
-}
-
-/*
-                Successful operation.
-
-                Same panel switches into
-                success state and waits for OK.
+            /*
+                Cancelled operation.
             */
+
+            if (
+                progress.status ===
+                'cancelled'
+            ) {
+
+                operationOverlay.hidden =
+                    false;
+
+                operationProcessing.hidden =
+                    true;
+
+                operationSuccess.hidden =
+                    false;
+
+
+                operationFinalizingSpinner.hidden =
+                    true;
+
+
+                operationPercentageValue.textContent =
+                    '0%';
+
+
+                operationResultIcon.className =
+                    'operation-result-icon attention';
+
+
+                const isFolder =
+                    progress.itemType ===
+                    'folder';
+
+
+                const isRestore =
+                    progress.operation ===
+                    'restore';
+
+
+                const isRecover =
+                    progress.operation ===
+                    'recover';
+
+
+                const isDelete =
+                    progress.operation ===
+                    'delete';
+
+
+                const isExport =
+                    progress.operation ===
+                    'export';
+
+                operationSuccessTitle.textContent =
+                    isExport
+                        ? 'Vault export cancelled'
+                        : 'Operation cancelled';
+
+
+                operationSuccessName.textContent =
+                    progress.name ||
+                    'CrypticLocker';
+
+
+                operationSuccessMessage.textContent =
+                    isExport
+                        ? 'The vault export was cancelled. No files were created.'
+                        : isRecover
+                            ? 'The recovery operation was cancelled.'
+                            : isDelete
+                                ? (
+                                    isFolder
+                                        ? 'The folder deletion was cancelled.'
+                                        : 'The file deletion was cancelled.'
+                                )
+                                : isRestore
+                                    ? (
+                                        isFolder
+                                            ? 'The folder restore was cancelled.'
+                                            : 'The file restore was cancelled.'
+                                    )
+                                    : (
+                                        isFolder
+                                            ? 'The folder encryption was cancelled.'
+                                            : 'The file encryption was cancelled.'
+                                    );
+
+
+                operationSpeed.textContent =
+                    '—';
+
+                operationEta.textContent =
+                    '—';
+
+                return;
+
+            }
+
+            if (
+                progress.status ===
+                'failed'
+            ) {
+
+                operationOverlay.hidden =
+                    false;
+
+                operationProcessing.hidden =
+                    true;
+
+                operationSuccess.hidden =
+                    false;
+
+                operationResultIcon.className =
+                    'operation-result-icon failed';
+
+
+                const isRestore =
+                    progress.operation ===
+                    'restore';
+
+                const isRecover =
+                    progress.operation ===
+                    'recover';
+
+                const isDelete =
+                    progress.operation ===
+                    'delete';
+
+                const isFolder =
+                    progress.itemType ===
+                    'folder';
+
+
+                operationSuccessTitle.textContent =
+                    isRecover
+                        ? 'File recovery failed'
+                        : isDelete
+                            ? (
+                                isFolder
+                                    ? 'Folder deletion failed'
+                                    : 'File deletion failed'
+                            )
+                            : isRestore
+                                ? (
+                                    isFolder
+                                        ? 'Folder restore failed'
+                                        : 'File restore failed'
+                                )
+                                : (
+                                    isFolder
+                                        ? 'Folder could not be secured'
+                                        : 'File could not be secured'
+                                );
+
+
+                operationSuccessName.textContent =
+                    progress.name ||
+                    'CrypticLocker';
+
+
+                operationSuccessMessage.textContent =
+                    progress.message ||
+                    'The operation could not be completed.';
+
+
+                /*
+                    A failed operation is terminal.
+            
+                    Do not keep stale speed / ETA values
+                    from the last progress event.
+                */
+
+                operationSpeed.textContent =
+                    '—';
+
+                operationEta.textContent =
+                    '—';
+
+
+                return;
+
+            }
+
+            /*
+                Attention / uncertain operation.
+            
+                Encryption completed, but CrypticLocker
+                could not safely confirm the final vault
+                metadata commit.
+            
+                This is intentionally NOT treated as
+                success or failure because the encrypted
+                containers may already exist and the
+                original source has been preserved.
+            */
+
+            if (
+                progress.status ===
+                'attention'
+            ) {
+
+                operationOverlay.hidden =
+                    false;
+
+                operationProcessing.hidden =
+                    true;
+
+                operationSuccess.hidden =
+                    false;
+
+                operationResultIcon.className =
+                    'operation-result-icon attention';
+
+
+                const isFolder =
+                    progress.itemType ===
+                    'folder';
+
+
+                operationSuccessTitle.textContent =
+                    isFolder
+                        ? 'Folder needs attention'
+                        : 'File needs attention';
+
+
+                operationSuccessName.textContent =
+                    progress.name ||
+                    'CrypticLocker';
+
+
+                operationSuccessMessage.textContent =
+                    progress.message ||
+                    (
+                        isFolder
+                            ? 'The folder was encrypted, but CrypticLocker could not verify the final vault commit. Your original folder has not been removed.'
+                            : 'The file was encrypted, but CrypticLocker could not verify the final vault commit. Your original file has not been removed.'
+                    );
+
+
+                /*
+                    Attention is a terminal state.
+            
+                    Clear stale performance information
+                    left by the previous progress event.
+                */
+
+                operationSpeed.textContent =
+                    '—';
+
+                operationEta.textContent =
+                    '—';
+
+
+                return;
+
+            }
+
+            /*
+                            Successful operation.
+            
+                            Same panel switches into
+                            success state and waits for OK.
+                        */
 
             if (
                 progress.status ===
@@ -9286,17 +9265,17 @@ if (
                 operationSuccess.hidden =
                     false;
 
-                    operationFinalizingSpinner.hidden =
-    true;
+                operationFinalizingSpinner.hidden =
+                    true;
 
-operationCancelButton.hidden =
-    false;
+                operationCancelButton.hidden =
+                    false;
 
-operationPercentageValue.textContent =
-    '100%';
+                operationPercentageValue.textContent =
+                    '100%';
 
                 operationResultIcon.className =
-    'operation-result-icon success';
+                    'operation-result-icon success';
 
 
                 const isExport =
@@ -9308,12 +9287,12 @@ operationPercentageValue.textContent =
                     'restore';
 
                 const isRecover =
-                progress.operation ===
-                'recover';
+                    progress.operation ===
+                    'recover';
 
                 const isDelete =
-    progress.operation ===
-    'delete';
+                    progress.operation ===
+                    'delete';
 
                 const isFolder =
                     progress.itemType ===
@@ -9321,80 +9300,80 @@ operationPercentageValue.textContent =
 
 
                 operationSuccessTitle.textContent =
-    isExport
-        ? 'Vault exported successfully'
-        : isRecover
-            ? 'File recovered successfully'
-            : isDelete
-                ? (
-                    isFolder
-                        ? 'Folder deleted successfully'
-                        : 'File deleted successfully'
-                    )
-                : isRestore
-                    ? (
-                        isFolder
-                            ? 'Folder restored successfully'
-                            : 'File restored successfully'
-                    )
-                    : (
-                        isFolder
-                            ? 'Folder secured successfully'
-                            : (
-                                progress.totalFiles > 1
-                                    ? 'Files secured successfully'
-                                    : 'File secured successfully'
-                            )
-                    );
+                    isExport
+                        ? 'Vault exported successfully'
+                        : isRecover
+                            ? 'File recovered successfully'
+                            : isDelete
+                                ? (
+                                    isFolder
+                                        ? 'Folder deleted successfully'
+                                        : 'File deleted successfully'
+                                )
+                                : isRestore
+                                    ? (
+                                        isFolder
+                                            ? 'Folder restored successfully'
+                                            : 'File restored successfully'
+                                    )
+                                    : (
+                                        isFolder
+                                            ? 'Folder secured successfully'
+                                            : (
+                                                progress.totalFiles > 1
+                                                    ? 'Files secured successfully'
+                                                    : 'File secured successfully'
+                                            )
+                                    );
 
 
                 operationSuccessName.textContent =
                     progress.name || '';
 
-            if (isExport) {
+                if (isExport) {
 
-    operationSuccessMessage.textContent =
-        `Your encrypted vault backup (.clvault) with ${progress.totalFiles || 0} items was saved successfully.`;
+                    operationSuccessMessage.textContent =
+                        `Your encrypted vault backup (.clvault) with ${progress.totalFiles || 0} items was saved successfully.`;
 
-} else if (isRecover) {
+                } else if (isRecover) {
 
-    operationSuccessMessage.textContent =
-        'The orphan file was recovered and verified successfully.';
+                    operationSuccessMessage.textContent =
+                        'The orphan file was recovered and verified successfully.';
 
-} else if (isDelete) {
+                } else if (isDelete) {
 
-    operationSuccessMessage.textContent =
-        isFolder
-            ? `${progress.totalFiles || 0} encrypted files were permanently removed from the vault.`
-            : 'The encrypted file was permanently removed from the vault.';
+                    operationSuccessMessage.textContent =
+                        isFolder
+                            ? `${progress.totalFiles || 0} encrypted files were permanently removed from the vault.`
+                            : 'The encrypted file was permanently removed from the vault.';
 
-} else if (isRestore) {
+                } else if (isRestore) {
 
-    operationSuccessMessage.textContent =
-        isFolder
-            ? `${progress.totalFiles || 0} files were restored and verified successfully.`
-            : 'The file was restored and verified successfully.';
+                    operationSuccessMessage.textContent =
+                        isFolder
+                            ? `${progress.totalFiles || 0} files were restored and verified successfully.`
+                            : 'The file was restored and verified successfully.';
 
-} else {
+                } else {
 
-    operationSuccessMessage.textContent =
-        isFolder
-            ? `${progress.totalFiles || 0} files were encrypted successfully.`
-            : (
-                progress.totalFiles > 1
-                    ? `${progress.totalFiles} files were encrypted successfully.`
-                    : 'The file was encrypted successfully.'
-            );
+                    operationSuccessMessage.textContent =
+                        isFolder
+                            ? `${progress.totalFiles || 0} files were encrypted successfully.`
+                            : (
+                                progress.totalFiles > 1
+                                    ? `${progress.totalFiles} files were encrypted successfully.`
+                                    : 'The file was encrypted successfully.'
+                            );
 
-}
-    
+                }
+
 
             }
 
         }
     );
 
-    operationCancelButton.addEventListener(
+operationCancelButton.addEventListener(
     'click',
     async () => {
 
@@ -9474,18 +9453,18 @@ operationOkButton.addEventListener(
     () => {
 
         operationCancelButton.disabled =
-    false;
+            false;
 
-const cancelButtonText =
-    operationCancelButton
-        .querySelector('span');
+        const cancelButtonText =
+            operationCancelButton
+                .querySelector('span');
 
-if (cancelButtonText) {
+        if (cancelButtonText) {
 
-    cancelButtonText.textContent =
-        'Cancel';
+            cancelButtonText.textContent =
+                'Cancel';
 
-}
+        }
 
         currentOperationId =
             null;
@@ -9500,17 +9479,17 @@ if (cancelButtonText) {
             true;
 
         operationResultIcon.className =
-    'operation-result-icon success';
+            'operation-result-icon success';
 
         operationProgressFill.style.width =
             '0%';
 
 
-       operationPercentageValue.textContent =
-    '0%';
+        operationPercentageValue.textContent =
+            '0%';
 
-operationFinalizingSpinner.hidden =
-    true;
+        operationFinalizingSpinner.hidden =
+            true;
 
     }
 );
@@ -9626,10 +9605,9 @@ function updateSelectionBar() {
 
 
     selectionBarCount.textContent =
-        `${count} ${
-            count === 1
-                ? 'item'
-                : 'items'
+        `${count} ${count === 1
+            ? 'item'
+            : 'items'
         } selected`;
 
 
@@ -10190,16 +10168,14 @@ if (selectionRestoreButton) {
                             const choice =
                                 await showRestoreConfirm({
                                     title:
-                                        `Restore ${verifiedCount} ${
-                                            verifiedCount === 1
-                                                ? 'file'
-                                                : 'files'
+                                        `Restore ${verifiedCount} ${verifiedCount === 1
+                                            ? 'file'
+                                            : 'files'
                                         }?`,
                                     name:
-                                        `${verifiedCount} verified ${
-                                            verifiedCount === 1
-                                                ? 'file'
-                                                : 'files'
+                                        `${verifiedCount} verified ${verifiedCount === 1
+                                            ? 'file'
+                                            : 'files'
                                         } will be restored`,
                                     message:
                                         'You will be asked to choose a folder where these items will be decrypted.',
@@ -10216,7 +10192,7 @@ if (selectionRestoreButton) {
 
                             itemsToRestore =
                                 status.validItems &&
-                                status.validItems.length > 0
+                                    status.validItems.length > 0
                                     ? status.validItems
                                     : items;
 
@@ -10265,16 +10241,14 @@ if (selectionRestoreButton) {
                 const choice =
                     await showRestoreConfirm({
                         title:
-                            `Restore ${items.length} ${
-                                items.length === 1
-                                    ? 'item'
-                                    : 'items'
+                            `Restore ${items.length} ${items.length === 1
+                                ? 'item'
+                                : 'items'
                             }?`,
                         name:
-                            `${items.length} ${
-                                items.length === 1
-                                    ? 'item'
-                                    : 'items'
+                            `${items.length} ${items.length === 1
+                                ? 'item'
+                                : 'items'
                             } selected`,
                         message:
                             'You will be asked to choose a folder where these items will be decrypted.',
@@ -10333,10 +10307,9 @@ if (selectionRestoreButton) {
 
                     await showCustomAlert({
                         title: 'Partial Completion',
-                        message: `${result.restoredItems.length} of ${
-                            result.restoredItems.length +
+                        message: `${result.restoredItems.length} of ${result.restoredItems.length +
                             result.failures.length
-                        } items were restored. Some items could not be restored.`,
+                            } items were restored. Some items could not be restored.`,
                         details: result.failures.map(
                             failure => `• ${failure.name}: ${failure.message}`
                         ),
