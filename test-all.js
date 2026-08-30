@@ -51,14 +51,15 @@ async function runAsyncSuite(name, testFn) {
 }
 
 async function main() {
-    const mainJs = fs.readFileSync(path.join(projectRoot, 'main.js'), 'utf8');
-    const preloadJs = fs.readFileSync(path.join(projectRoot, 'preload.js'), 'utf8');
-    const dashboardJs = fs.readFileSync(path.join(projectRoot, 'src/js/dashboard.js'), 'utf8');
-    const appJs = fs.readFileSync(path.join(projectRoot, 'src/js/app.js'), 'utf8');
-    const indexHtml = fs.readFileSync(path.join(projectRoot, 'src/index.html'), 'utf8');
-    const dashboardHtml = fs.readFileSync(path.join(projectRoot, 'src/dashboard.html'), 'utf8');
-    const dashboardCss = fs.readFileSync(path.join(projectRoot, 'src/css/dashboard.css'), 'utf8');
-    const styleCss = fs.readFileSync(path.join(projectRoot, 'src/css/style.css'), 'utf8');
+    const clean = str => str.replace(/\r\n/g, '\n');
+    const mainJs = clean(fs.readFileSync(path.join(projectRoot, 'main.js'), 'utf8'));
+    const preloadJs = clean(fs.readFileSync(path.join(projectRoot, 'preload.js'), 'utf8'));
+    const dashboardJs = clean(fs.readFileSync(path.join(projectRoot, 'src/js/dashboard.js'), 'utf8'));
+    const appJs = clean(fs.readFileSync(path.join(projectRoot, 'src/js/app.js'), 'utf8'));
+    const indexHtml = clean(fs.readFileSync(path.join(projectRoot, 'src/index.html'), 'utf8'));
+    const dashboardHtml = clean(fs.readFileSync(path.join(projectRoot, 'src/dashboard.html'), 'utf8'));
+    const dashboardCss = clean(fs.readFileSync(path.join(projectRoot, 'src/css/dashboard.css'), 'utf8'));
+    const styleCss = clean(fs.readFileSync(path.join(projectRoot, 'src/css/style.css'), 'utf8'));
     const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
 
     // -------------------------------------------------------------

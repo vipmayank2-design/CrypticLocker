@@ -25,7 +25,8 @@
   "devDependencies": {
     "electron": "^40.8.0",
     "electron-builder": "^26.15.3",
-    "png-to-ico": "^3.0.2"
+    "png-to-ico": "^3.0.2",
+    "png2icons": "^2.0.1"
   },
   "build": {
     "appId": "com.crypticlocker.vault",
@@ -84,14 +85,14 @@
           "target": "dmg",
           "arch": [
             "x64",
-            "arm64",
-            "universal"
+            "arm64"
           ]
         }
       ],
       "category": "public.app-category.security",
-      "icon": "build/icon.png",
-      "hardenedRuntime": true,
+      "icon": "build/icon.icns",
+      "identity": null,
+      "hardenedRuntime": false,
       "gatekeeperAssess": false
     },
     "linux": {
@@ -111,6 +112,7 @@
           ]
         }
       ],
+      "maintainer": "CrypticLocker Technologies <contact@crypticlocker.com>",
       "category": "Utility",
       "icon": "build/icon.png"
     }
