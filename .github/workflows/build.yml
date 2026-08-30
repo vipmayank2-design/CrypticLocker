@@ -1,0 +1,55 @@
+name: Build Multi-Platform Packages
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Master Health Audit
+        run: npm test
+
+      - name: Build Windows Packages (NSIS & Portable)
+        if: matrix.os == 'windows-latest'
+        run: npm run build:win
+
+      - name: Build macOS Packages (.dmg for Apple Silicon & Intel)
+        if: matrix.os == 'macos-latest'
+        run: npm run build:mac
+
+      - name: Build Linux Packages (.AppImage & .deb)
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run build:linux
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrypticLocker-${{ matrix.os }}
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.deb
+          if-no-files-found: error
