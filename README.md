@@ -251,5 +251,4 @@ For technical teams acquiring the CrypticLocker IP, the following architectural 
 
 **CrypticLocker Technologies** holds full intellectual property, commercial, copyright, and distribution rights to this software asset, source code, visual identity, and documentation.
 
-*For acquisition inquiries or technical transfer assistance, contact:*  
-**CrypticLocker Technologies** — `contact@crypticlocker.com`
+*For acquisition inquiries or technical transfer assistance, please contact via the official marketplace listing / platform.*
