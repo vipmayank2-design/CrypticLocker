@@ -7,6 +7,7 @@ const {
     nativeTheme,
     shell
 } = require('electron');
+const os = require('os');
 const path = require('path');
 const fs = require('fs/promises');
 const fsSync = require('fs');
@@ -19,11 +20,40 @@ const sessionManager =
     require('./core/session/sessionManager');
 const vaultPackage =
     require('./core/vault/vaultPackage');
+const capsulePackage =
+    require('./core/capsule/capsulePackage');
 const {
     Transform,
     Writable
 } = require('stream');
 const crypto = require('crypto');
+
+/* =========================================
+   WINDOWS TASKBAR APPLICATION USER MODEL ID
+========================================= */
+
+if (process.platform === 'win32') {
+    app.setAppUserModelId('com.crypticlocker.vault');
+}
+
+/* =========================================
+   SINGLE INSTANCE LOCK
+========================================= */
+
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            if (mainWindow.isMinimized()) {
+                mainWindow.restore();
+            }
+            mainWindow.focus();
+        }
+    });
+}
 
 /* =========================================
    CLV CONTAINER FORMAT
@@ -5584,7 +5614,11 @@ for hashing and then again for encryption.
 
         const readStream =
             fsSync.createReadStream(
-                sourcePath
+                sourcePath,
+                {
+                    highWaterMark:
+                        currentIoAccelerationBufferBytes
+                }
             );
 
 
@@ -5598,7 +5632,9 @@ for hashing and then again for encryption.
                 temporaryPath,
                 {
                     flags: 'r+',
-                    start: 32
+                    start: 32,
+                    highWaterMark:
+                        currentIoAccelerationBufferBytes
                 }
             );
 
@@ -5917,7 +5953,8 @@ async function encryptFileV2(
         relativePath = null,
         operationId = null,
         onProgress = null,
-        mode = 'copy'
+        mode = 'copy',
+        originalName: customOriginalName = null
     } = options;
 
 
@@ -5935,6 +5972,7 @@ async function encryptFileV2(
 
 
     const originalName =
+        customOriginalName ||
         path.basename(
             sourcePath
         );
@@ -7330,7 +7368,9 @@ async function restoreCLV2FileStream(
             encryptedPath,
             {
                 start:
-                    CLV2_HEADER_LENGTH
+                    CLV2_HEADER_LENGTH,
+                highWaterMark:
+                    currentIoAccelerationBufferBytes
             }
         );
 
@@ -7339,7 +7379,9 @@ async function restoreCLV2FileStream(
         fsSync.createWriteStream(
             temporaryPath,
             {
-                flags: 'wx'
+                flags: 'wx',
+                highWaterMark:
+                    currentIoAccelerationBufferBytes
             }
         );
 
@@ -10141,7 +10183,9 @@ async function restoreVaultFileStream(
             fsSync.createReadStream(
                 encryptedPath,
                 {
-                    start: 32
+                    start: 32,
+                    highWaterMark:
+                        currentIoAccelerationBufferBytes
                 }
             );
 
@@ -10150,7 +10194,9 @@ async function restoreVaultFileStream(
             fsSync.createWriteStream(
                 temporaryPath,
                 {
-                    flags: 'wx'
+                    flags: 'wx',
+                    highWaterMark:
+                        currentIoAccelerationBufferBytes
                 }
             );
 
@@ -12731,6 +12777,112 @@ ipcMain.handle(
 );
 
 /* =========================================
+   ADAPTIVE HARDWARE-AWARE I/O ACCELERATION
+========================================= */
+
+let currentIoAccelerationBufferBytes = 512 * 1024;
+let currentIoAccelerationId = 'tier1';
+
+function calculateHardwareBoostTiers(totalRamBytes, cpuCores) {
+    const totalRamGB = Math.max(1, Math.round(totalRamBytes / (1024 ** 3)));
+    
+    let baseSpeed = 25;
+    let maxBadgeName = "Max Safe";
+    let defaultBufferBytes = 512 * 1024;
+
+    if (totalRamGB <= 6) {
+        baseSpeed = 25;
+        maxBadgeName = "Max Safe";
+        defaultBufferBytes = 512 * 1024;
+    } else if (totalRamGB <= 12) {
+        baseSpeed = 50;
+        maxBadgeName = "Turbo Boost";
+        defaultBufferBytes = 1024 * 1024;
+    } else if (totalRamGB <= 24) {
+        baseSpeed = 100;
+        maxBadgeName = "Ultra Engine";
+        defaultBufferBytes = 2 * 1024 * 1024;
+    } else if (totalRamGB <= 48) {
+        baseSpeed = 150;
+        maxBadgeName = "HyperDrive";
+        defaultBufferBytes = 4 * 1024 * 1024;
+    } else if (totalRamGB <= 96) {
+        baseSpeed = 250;
+        maxBadgeName = "Uncapped Ultra";
+        defaultBufferBytes = 8 * 1024 * 1024;
+    } else {
+        baseSpeed = Math.min(1000, Math.max(250, Math.floor((totalRamGB / 64) * 250)));
+        maxBadgeName = "Unrestricted Max";
+        defaultBufferBytes = 16 * 1024 * 1024;
+    }
+
+    const tier1Speed = baseSpeed;
+    const tier2Speed = Math.round(baseSpeed * 1.6);
+    const tier3Speed = Math.round(baseSpeed * 2.3);
+
+    const tierBuffers = {
+        tier1: Math.max(512 * 1024, Math.min(defaultBufferBytes, 1 * 1024 * 1024)),
+        tier2: Math.max(1024 * 1024, Math.min(defaultBufferBytes * 2, 4 * 1024 * 1024)),
+        tier3: Math.max(2 * 1024 * 1024, Math.min(defaultBufferBytes * 3, 8 * 1024 * 1024)),
+        tier4: Math.max(4 * 1024 * 1024, defaultBufferBytes * 4)
+    };
+
+    return {
+        totalRamGB,
+        cpuCores,
+        tiers: [
+            { id: 'tier1', label: `${tier1Speed}+ MB/s`, bufferBytes: tierBuffers.tier1 },
+            { id: 'tier2', label: `${tier2Speed}+ MB/s`, bufferBytes: tierBuffers.tier2 },
+            { id: 'tier3', label: `${tier3Speed}+ MB/s`, bufferBytes: tierBuffers.tier3 },
+            { id: 'tier4', label: maxBadgeName, bufferBytes: tierBuffers.tier4 }
+        ],
+        activeId: currentIoAccelerationId
+    };
+}
+
+ipcMain.handle('vault:get-hardware-profile', async () => {
+    try {
+        const totalRamBytes = os.totalmem();
+        const cpuCores = (os.cpus() && os.cpus().length) || 4;
+        const profile = calculateHardwareBoostTiers(totalRamBytes, cpuCores);
+        return { success: true, profile };
+    } catch (err) {
+        return {
+            success: true,
+            profile: {
+                totalRamGB: 8,
+                cpuCores: 4,
+                tiers: [
+                    { id: 'tier1', label: '50+ MB/s', bufferBytes: 1024 * 1024 },
+                    { id: 'tier2', label: '100+ MB/s', bufferBytes: 2 * 1024 * 1024 },
+                    { id: 'tier3', label: '150+ MB/s', bufferBytes: 3 * 1024 * 1024 },
+                    { id: 'tier4', label: 'Turbo Boost', bufferBytes: 4 * 1024 * 1024 }
+                ],
+                activeId: currentIoAccelerationId
+            }
+        };
+    }
+});
+
+ipcMain.handle('vault:set-io-acceleration', async (event, tierData) => {
+    try {
+        if (!tierData || typeof tierData !== 'object') {
+            return { success: false, message: 'Invalid tier data' };
+        }
+        currentIoAccelerationId = tierData.id || 'tier1';
+        if (typeof tierData.bufferBytes === 'number' && tierData.bufferBytes >= 64 * 1024) {
+            currentIoAccelerationBufferBytes = tierData.bufferBytes;
+            if (typeof vaultPackage.setStreamChunkSize === 'function') {
+                vaultPackage.setStreamChunkSize(currentIoAccelerationBufferBytes);
+            }
+        }
+        return { success: true, activeId: currentIoAccelerationId };
+    } catch (err) {
+        return { success: false, message: err.message };
+    }
+});
+
+/* =========================================
 EXPORT VAULT
 ========================================= */
 
@@ -12765,7 +12917,7 @@ ipcMain.handle(
             const now = new Date();
             const pad = (n) => String(n).padStart(2, '0');
             const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-            const defaultFilename = `CrypticLocker_${timestamp}.clvault`;
+            const defaultFilename = `CrypticLocker-Vault-${timestamp}.clvault`;
 
             const saveResult = await dialog.showSaveDialog(
                 mainWindow,
@@ -12907,6 +13059,21 @@ ipcMain.handle(
             }
 
             packageFilePath = openResult.filePaths[0];
+
+            // Format Isolation: Explicitly reject Secure Capsules (.clpack)
+            try {
+                const headerCheck = Buffer.alloc(8);
+                const checkHandle = await fs.open(packageFilePath, 'r');
+                await checkHandle.read(headerCheck, 0, 8, 0);
+                await checkHandle.close();
+                if (headerCheck.equals(Buffer.from('CLCAP1.0', 'utf8'))) {
+                    return {
+                        success: false,
+                        message: 'This file is a Secure Capsule (.clpack), not a Full Vault backup. Please log in to your vault and import it from the Export/Import Capsule page.'
+                    };
+                }
+            } catch { }
+
             const targetVaultDir = getVaultDirectory();
 
             // Pre-check target drive disk space from package manifest
@@ -12999,8 +13166,415 @@ ipcMain.handle(
 );
 
 /* =========================================
+   SECURE CAPSULE EXPORT & MERGE ENGINE
+========================================= */
+
+ipcMain.handle('vault:select-capsule-file', async () => {
+    try {
+        const openResult = await dialog.showOpenDialog(mainWindow, {
+            title: 'Select CrypticLocker Capsule (.clpack)',
+            buttonLabel: 'Select Capsule',
+            properties: ['openFile'],
+            filters: [
+                {
+                    name: 'CrypticLocker Secure Capsule (*.clpack)',
+                    extensions: ['clpack']
+                },
+                {
+                    name: 'All Files (*.*)',
+                    extensions: ['*']
+                }
+            ]
+        });
+
+        if (openResult.canceled || !openResult.filePaths || openResult.filePaths.length === 0) {
+            return { success: false, canceled: true };
+        }
+
+        return { success: true, filePath: openResult.filePaths[0] };
+    } catch (err) {
+        return { success: false, message: err.message };
+    }
+});
+
+ipcMain.handle('vault:inspect-capsule', async (event, arg1, arg2) => {
+    try {
+        if (!sessionManager.isUnlocked()) {
+            return { success: false, message: 'Vault is locked.' };
+        }
+        const filePath = typeof arg1 === 'string' ? arg1 : arg1?.filePath;
+        const transferPassword = typeof arg1 === 'object' && arg1 !== null ? (arg1.transferPassword || arg2) : arg2;
+        if (!filePath || typeof filePath !== 'string') {
+            return { success: false, message: 'Capsule file path is required.' };
+        }
+        const result = await capsulePackage.inspectCapsulePackage(filePath, transferPassword);
+        return { success: result.valid, ...result };
+    } catch (err) {
+        return { success: false, message: err.message };
+    }
+});
+
+ipcMain.handle('vault:export-capsule', async (event, arg1, arg2) => {
+    if (!sessionManager.isUnlocked()) {
+        return { success: false, message: 'Vault is locked.' };
+    }
+    const items = Array.isArray(arg1) ? arg1 : (arg1 && Array.isArray(arg1.items) ? arg1.items : null);
+    const transferPassword = typeof arg1 === 'object' && arg1 !== null && arg1.transferPassword ? arg1.transferPassword : (typeof arg2 === 'string' ? arg2 : null);
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+        return { success: false, message: 'No items specified to export.' };
+    }
+    if (!transferPassword || typeof transferPassword !== 'string' || transferPassword.length === 0) {
+        return { success: false, message: 'Transfer password is required.' };
+    }
+
+    const exportOpId = 'capsule_export_' + Date.now();
+    let scratchDir = null;
+
+    try {
+        const index = await readVaultIndex();
+        const filesToExport = [];
+        const vaultFilesDir = getVaultFilesDirectory();
+
+        scratchDir = path.join(app.getPath('temp'), `cl_export_scratch_${Date.now()}`);
+        await fs.mkdir(scratchDir, { recursive: true });
+
+        for (const item of items) {
+            if (item.type === 'file') {
+                const fMeta = index.files.find(f => f.id === item.id);
+                if (fMeta) {
+                    const encPath = path.join(vaultFilesDir, fMeta.encryptedFile || `${fMeta.id}.clv`);
+                    const destPath = path.join(scratchDir, `${fMeta.id}_${fMeta.name}`);
+                    await restoreCLV2FileStream(encPath, destPath, fMeta.id);
+                    filesToExport.push({
+                        diskPath: destPath,
+                        name: fMeta.name,
+                        size: fMeta.size,
+                        relativePath: fMeta.relativePath || '',
+                        parentFolderName: ''
+                    });
+                }
+            } else if (item.type === 'folder') {
+                const folderMeta = index.folders.find(f => f.id === item.id);
+                if (folderMeta) {
+                    let folderFiles = index.files.filter(f => f.parentFolderId === folderMeta.id);
+                    if (item.relativePath) {
+                        const targetRel = String(item.relativePath).replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+                        folderFiles = folderFiles.filter(f => {
+                            const fRel = String(f.relativePath || '').replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+                            return fRel === targetRel || fRel.startsWith(targetRel + '/');
+                        });
+                    }
+                    for (const fMeta of folderFiles) {
+                        const encPath = path.join(vaultFilesDir, fMeta.encryptedFile || `${fMeta.id}.clv`);
+                        const destPath = path.join(scratchDir, `${fMeta.id}_${fMeta.name}`);
+                        await restoreCLV2FileStream(encPath, destPath, fMeta.id);
+
+                        let exportRel = fMeta.relativePath || '';
+                        if (item.relativePath) {
+                            const targetRel = String(item.relativePath).replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+                            let normFRel = String(exportRel).replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+                            if (normFRel.startsWith(targetRel)) {
+                                normFRel = normFRel.slice(targetRel.length).replace(/^\/+/, '');
+                            }
+                            exportRel = normFRel;
+                        }
+
+                        filesToExport.push({
+                            diskPath: destPath,
+                            name: fMeta.name,
+                            size: fMeta.size,
+                            relativePath: exportRel,
+                            parentFolderName: item.name || folderMeta.name
+                        });
+                    }
+                }
+            }
+        }
+
+        if (filesToExport.length === 0) {
+            return { success: false, message: 'No valid files found to export in capsule.' };
+        }
+
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const ts = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+        let defaultName;
+        if (items.length === 1) {
+            defaultName = `CrypticLocker-Capsule-${ts}.clpack`;
+        } else {
+            defaultName = `CrypticLocker-Capsule-Package-${ts}.clpack`;
+        }
+
+        const saveResult = await dialog.showSaveDialog(mainWindow, {
+            title: 'Export Secure Capsule',
+            defaultPath: path.join(app.getPath('downloads'), defaultName),
+            buttonLabel: 'Export Capsule',
+            filters: [
+                {
+                    name: 'CrypticLocker Secure Capsule (*.clpack)',
+                    extensions: ['clpack']
+                }
+            ],
+            properties: ['showOverwriteConfirmation']
+        });
+
+        if (saveResult.canceled || !saveResult.filePath) {
+            return { success: false, canceled: true };
+        }
+
+        sendVaultProgress(event, {
+            operationId: exportOpId,
+            operation: 'export_capsule',
+            status: 'started',
+            name: path.basename(saveResult.filePath),
+            currentFile: 'Initializing secure capsule encryption...',
+            totalBytes: filesToExport.reduce((a, b) => a + (b.size || 0), 0),
+            totalFiles: filesToExport.length
+        });
+
+        const res = await capsulePackage.createCapsulePackage({
+            sourceFiles: filesToExport,
+            transferPassword,
+            destinationPath: saveResult.filePath,
+            operationId: exportOpId,
+            checkCancelled: isVaultOperationCancelled,
+            onProgress: (p) => {
+                sendVaultProgress(event, { operationId: exportOpId, ...p });
+            }
+        });
+
+        return {
+            success: true,
+            filePath: saveResult.filePath,
+            fileCount: res.fileCount,
+            totalBytes: res.totalBytes
+        };
+    } catch (err) {
+        if (err.message === 'OPERATION_CANCELLED' || isVaultOperationCancelled(exportOpId)) {
+            sendVaultProgress(event, {
+                operationId: exportOpId,
+                operation: 'export_capsule',
+                status: 'cancelled',
+                name: 'Export cancelled'
+            });
+            return { success: false, canceled: true };
+        }
+        sendVaultProgress(event, {
+            operationId: exportOpId,
+            operation: 'export_capsule',
+            status: 'failed',
+            name: path.basename(saveResult?.filePath || 'Capsule'),
+            message: err.message
+        });
+        return { success: false, message: err.message };
+    } finally {
+        if (scratchDir) {
+            try { await fs.rm(scratchDir, { recursive: true, force: true }); } catch { }
+        }
+    }
+});
+
+ipcMain.handle('vault:merge-capsule', async (event, arg1, arg2) => {
+    if (!sessionManager.isUnlocked()) {
+        return { success: false, message: 'Vault is locked.' };
+    }
+    const filePath = typeof arg1 === 'string' ? arg1 : arg1?.filePath;
+    const transferPassword = typeof arg1 === 'object' && arg1 !== null && arg1.transferPassword ? arg1.transferPassword : (typeof arg2 === 'string' ? arg2 : null);
+
+    if (!filePath || typeof filePath !== 'string') {
+        return { success: false, message: 'Capsule file path is required.' };
+    }
+    if (!transferPassword || typeof transferPassword !== 'string' || transferPassword.length === 0) {
+        return { success: false, message: 'Transfer password is required.' };
+    }
+
+    // 1. FAST PRE-FLIGHT: Verify password and inspect manifest BEFORE starting operation overlay!
+    const preFlight = await capsulePackage.inspectCapsulePackage(filePath, transferPassword);
+    if (!preFlight.valid) {
+        return {
+            success: false,
+            errorCode: preFlight.incorrectPassword ? 'INCORRECT_PASSWORD' : 'INVALID_CAPSULE',
+            message: preFlight.error || 'Incorrect transfer password or tampered capsule package.'
+        };
+    }
+
+    const mergeOpId = 'capsule_merge_' + Date.now();
+    let stagingDir = null;
+    let operationStarted = false;
+
+    try {
+        stagingDir = path.join(app.getPath('temp'), `cl_merge_staging_${Date.now()}`);
+        await fs.mkdir(stagingDir, { recursive: true });
+
+        operationStarted = true;
+        sendVaultProgress(event, {
+            operationId: mergeOpId,
+            operation: 'import_capsule',
+            status: 'started',
+            name: path.basename(filePath),
+            currentFile: 'Decrypting capsule with transfer key...'
+        });
+
+        const unpacked = await capsulePackage.unpackCapsuleToStaging({
+            packagePath: filePath,
+            transferPassword,
+            stagingDirectory: stagingDir,
+            operationId: mergeOpId,
+            checkCancelled: isVaultOperationCancelled,
+            onProgress: (p) => {
+                sendVaultProgress(event, { operationId: mergeOpId, ...p });
+            }
+        });
+
+        const index = await readVaultIndex();
+        const createdFoldersMap = new Map();
+        let importedFilesCount = 0;
+        let importedFoldersCount = 0;
+        const totalFilesToImport = unpacked.extractedFiles.length;
+        let currentFileIndex = 0;
+
+        for (const file of unpacked.extractedFiles) {
+            if (isVaultOperationCancelled(mergeOpId)) {
+                throw new Error('OPERATION_CANCELLED');
+            }
+
+            currentFileIndex++;
+            sendVaultProgress(event, {
+                operationId: mergeOpId,
+                operation: 'import_capsule',
+                status: 'progress',
+                name: path.basename(filePath),
+                currentFile: `Securing ${file.name} (${currentFileIndex} of ${totalFilesToImport})...`,
+                completedFiles: currentFileIndex - 1,
+                totalFiles: totalFilesToImport
+            });
+
+            let targetParentFolderId = null;
+
+            if (file.parentFolderName) {
+                if (!createdFoldersMap.has(file.parentFolderName)) {
+                    let existingFolder = index.folders.find(f => f.name === file.parentFolderName);
+                    if (!existingFolder) {
+                        const newFolderId = crypto.randomUUID();
+                        existingFolder = {
+                            id: newFolderId,
+                            name: file.parentFolderName,
+                            formattedSize: '0 B',
+                            addedAt: new Date().toISOString(),
+                            mode: 'IMPORT',
+                            sourceRemoved: false,
+                            structure: []
+                        };
+                        index.folders.push(existingFolder);
+                        importedFoldersCount++;
+                    }
+                    createdFoldersMap.set(file.parentFolderName, existingFolder.id);
+                }
+                targetParentFolderId = createdFoldersMap.get(file.parentFolderName);
+
+                if (file.relativePath) {
+                    const parentFolder = index.folders.find(f => f.id === targetParentFolderId);
+                    if (parentFolder && Array.isArray(parentFolder.structure)) {
+                        const parts = file.relativePath.split('/');
+                        let currentRel = '';
+                        for (let pIdx = 0; pIdx < parts.length - 1; pIdx++) {
+                            const subName = parts[pIdx];
+                            currentRel = currentRel ? `${currentRel}/${subName}` : subName;
+                            if (!parentFolder.structure.some(s => s.relativePath === currentRel)) {
+                                parentFolder.structure.push({
+                                    name: subName,
+                                    relativePath: currentRel
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            let finalName = file.name;
+            const existingNameCount = index.files.filter(f => f.parentFolderId === targetParentFolderId && f.name === finalName).length;
+            if (existingNameCount > 0) {
+                const parsed = path.parse(file.name);
+                finalName = `${parsed.name} (${existingNameCount})${parsed.ext}`;
+            }
+
+            const encResult = await encryptFileV2(
+                file.diskPath,
+                {
+                    parentFolderId: targetParentFolderId,
+                    relativePath: file.relativePath || null,
+                    operationId: mergeOpId,
+                    mode: 'copy',
+                    originalName: finalName
+                }
+            );
+
+            encResult.mode = 'IMPORT';
+            encResult.sourceRemoved = false;
+            index.files.push(encResult);
+
+            importedFilesCount++;
+        }
+
+        for (const folder of index.folders) {
+            const folderFiles = index.files.filter(f => f.parentFolderId === folder.id);
+            const totalFolderSize = folderFiles.reduce((sum, f) => sum + (f.size || 0), 0);
+            folder.formattedSize = formatFileSize(totalFolderSize);
+        }
+
+        await writeVaultIndex(index);
+
+        sendVaultProgress(event, {
+            operationId: mergeOpId,
+            operation: 'import_capsule',
+            status: 'completed',
+            name: path.basename(filePath),
+            currentFile: `Successfully merged ${importedFilesCount} file(s) into your vault.`,
+            completedFiles: importedFilesCount,
+            totalFiles: importedFilesCount
+        });
+
+        return {
+            success: true,
+            importedFilesCount,
+            importedFoldersCount
+        };
+
+    } catch (err) {
+        if (err.message === 'OPERATION_CANCELLED' || isVaultOperationCancelled(mergeOpId)) {
+            if (operationStarted) {
+                sendVaultProgress(event, {
+                    operationId: mergeOpId,
+                    operation: 'import_capsule',
+                    status: 'cancelled',
+                    name: 'Merge cancelled'
+                });
+            }
+            return { success: false, canceled: true };
+        }
+        if (operationStarted) {
+            sendVaultProgress(event, {
+                operationId: mergeOpId,
+                operation: 'import_capsule',
+                status: 'failed',
+                name: path.basename(filePath),
+                message: err.message
+            });
+        }
+        return { success: false, message: err.message };
+    } finally {
+        if (stagingDir) {
+            try { await fs.rm(stagingDir, { recursive: true, force: true }); } catch { }
+        }
+    }
+});
+
+/* =========================================
 LOCK VAULT
 ========================================= */
+
 
 function lockVault() {
 
@@ -13030,12 +13604,9 @@ function createWindow() {
 
         title: 'CrypticLocker',
 
-        icon: path.join(
-            __dirname,
-            'src',
-            'img',
-            'logo.png'
-        ),
+        icon: process.platform === 'win32'
+            ? path.join(__dirname, 'src', 'img', 'icon.ico')
+            : path.join(__dirname, 'src', 'img', 'logo.png'),
 
         autoHideMenuBar: true,
 

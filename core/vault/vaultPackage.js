@@ -9,7 +9,17 @@ const MAGIC_HEADER = Buffer.from('CLVAULT1', 'utf8'); // 8 bytes: 0x43 0x4C 0x56
 const FORMAT_VERSION = 1;
 const ZERO_HASH_BUF = Buffer.alloc(32, 0);
 const ZERO_HASH_HEX = ZERO_HASH_BUF.toString('hex');
-const STREAM_CHUNK_SIZE = 512 * 1024; // 512 KB for high-throughput streaming
+let STREAM_CHUNK_SIZE = 512 * 1024; // 512 KB default for high-throughput streaming
+
+function getStreamChunkSize() {
+    return STREAM_CHUNK_SIZE;
+}
+
+function setStreamChunkSize(sizeBytes) {
+    if (typeof sizeBytes === 'number' && sizeBytes >= 64 * 1024 && sizeBytes <= 64 * 1024 * 1024) {
+        STREAM_CHUNK_SIZE = sizeBytes;
+    }
+}
 
 /**
  * Scan directory recursively and collect all relative file paths.
@@ -876,10 +886,75 @@ async function validateAndExtractVaultPackage(packagePath, targetVaultDirectory,
     }
 }
 
+/**
+ * Calculate adaptive hardware boost tiers based on system memory and CPU core count.
+ * Scales dynamically from 1 GB lightweight devices up to multi-terabyte enterprise workstations.
+ */
+function calculateHardwareBoostTiers(totalRamBytes, cpuCores, activeId = 'tier1') {
+    const totalRamGB = Math.max(1, Math.round(totalRamBytes / (1024 ** 3)));
+    
+    let baseSpeed = 25;
+    let maxBadgeName = "Max Safe";
+    let defaultBufferBytes = 512 * 1024;
+
+    if (totalRamGB <= 6) {
+        baseSpeed = 25;
+        maxBadgeName = "Max Safe";
+        defaultBufferBytes = 512 * 1024;
+    } else if (totalRamGB <= 12) {
+        baseSpeed = 50;
+        maxBadgeName = "Turbo Boost";
+        defaultBufferBytes = 1024 * 1024;
+    } else if (totalRamGB <= 24) {
+        baseSpeed = 100;
+        maxBadgeName = "Ultra Engine";
+        defaultBufferBytes = 2 * 1024 * 1024;
+    } else if (totalRamGB <= 48) {
+        baseSpeed = 150;
+        maxBadgeName = "HyperDrive";
+        defaultBufferBytes = 4 * 1024 * 1024;
+    } else if (totalRamGB <= 96) {
+        baseSpeed = 250;
+        maxBadgeName = "Uncapped Ultra";
+        defaultBufferBytes = 8 * 1024 * 1024;
+    } else {
+        baseSpeed = Math.min(1000, Math.max(250, Math.floor((totalRamGB / 64) * 250)));
+        maxBadgeName = "Unrestricted Max";
+        defaultBufferBytes = 16 * 1024 * 1024;
+    }
+
+    const tier1Speed = baseSpeed;
+    const tier2Speed = Math.round(baseSpeed * 1.6);
+    const tier3Speed = Math.round(baseSpeed * 2.3);
+
+    const tierBuffers = {
+        tier1: Math.max(512 * 1024, Math.min(defaultBufferBytes, 1 * 1024 * 1024)),
+        tier2: Math.max(1024 * 1024, Math.min(defaultBufferBytes * 2, 4 * 1024 * 1024)),
+        tier3: Math.max(2 * 1024 * 1024, Math.min(defaultBufferBytes * 3, 8 * 1024 * 1024)),
+        tier4: Math.max(4 * 1024 * 1024, defaultBufferBytes * 4)
+    };
+
+    return {
+        totalRamGB,
+        cpuCores: cpuCores || 4,
+        tiers: [
+            { id: 'tier1', label: `${tier1Speed}+ MB/s`, bufferBytes: tierBuffers.tier1 },
+            { id: 'tier2', label: `${tier2Speed}+ MB/s`, bufferBytes: tierBuffers.tier2 },
+            { id: 'tier3', label: `${tier3Speed}+ MB/s`, bufferBytes: tierBuffers.tier3 },
+            { id: 'tier4', label: maxBadgeName, bufferBytes: tierBuffers.tier4 }
+        ],
+        activeId: activeId || 'tier1'
+    };
+}
+
 module.exports = {
     MAGIC_HEADER,
     FORMAT_VERSION,
     collectFilesRecursively,
     exportVaultPackage,
-    validateAndExtractVaultPackage
+    validateAndExtractVaultPackage,
+    getStreamChunkSize,
+    setStreamChunkSize,
+    calculateHardwareBoostTiers
 };
+

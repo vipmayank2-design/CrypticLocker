@@ -15,13 +15,27 @@
     "build:all": "electron-builder -mwl --publish never"
   },
   "keywords": [
-    "security",
-    "vault",
     "encryption",
-    "desktop"
+    "vault",
+    "privacy",
+    "security",
+    "file-encryption",
+    "aes-256",
+    "electron",
+    "desktop",
+    "open-source",
+    "offline-first"
   ],
   "author": "CrypticLocker Technologies",
-  "license": "Commercial",
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/vipmayank2-design/CrypticLocker",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vipmayank2-design/CrypticLocker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vipmayank2-design/CrypticLocker/issues"
+  },
   "devDependencies": {
     "electron": "^40.8.0",
     "electron-builder": "^26.15.3",
@@ -32,7 +46,7 @@
     "publish": null,
     "appId": "com.crypticlocker.vault",
     "productName": "CrypticLocker",
-    "copyright": "Copyright © 2026 CrypticLocker Technologies",
+    "copyright": "Copyright © 2026 CrypticLocker Technologies. Licensed under GPL-3.0.",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -76,6 +90,13 @@
         "ext": "clvault",
         "name": "CrypticLocker Vault Archive",
         "description": "CrypticLocker Encrypted Vault Backup",
+        "icon": "build/icon.ico",
+        "role": "Editor"
+      },
+      {
+        "ext": "clpack",
+        "name": "CrypticLocker Secure Capsule",
+        "description": "CrypticLocker Secure Transfer Capsule",
         "icon": "build/icon.ico",
         "role": "Editor"
       }

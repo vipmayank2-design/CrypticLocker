@@ -157,6 +157,88 @@ contextBridge.exposeInMainWorld(
 
         },
 
+        selectCapsuleFile: () => {
+
+            return ipcRenderer.invoke(
+                'vault:select-capsule-file'
+            );
+
+        },
+
+        inspectCapsule: (filePathOrOptions, maybeTransferPassword) => {
+
+            let filePath;
+            let transferPassword;
+            if (typeof filePathOrOptions === 'string') {
+                filePath = filePathOrOptions;
+                transferPassword = maybeTransferPassword;
+            } else if (filePathOrOptions && typeof filePathOrOptions === 'object') {
+                filePath = filePathOrOptions.filePath;
+                transferPassword = filePathOrOptions.transferPassword || maybeTransferPassword;
+            }
+
+            return ipcRenderer.invoke(
+                'vault:inspect-capsule',
+                { filePath, transferPassword }
+            );
+
+        },
+
+        exportCapsule: (itemsOrOptions, maybeTransferPassword) => {
+
+            let items;
+            let transferPassword;
+            if (Array.isArray(itemsOrOptions)) {
+                items = itemsOrOptions;
+                transferPassword = maybeTransferPassword;
+            } else if (itemsOrOptions && typeof itemsOrOptions === 'object') {
+                items = itemsOrOptions.items;
+                transferPassword = itemsOrOptions.transferPassword || maybeTransferPassword;
+            }
+
+            return ipcRenderer.invoke(
+                'vault:export-capsule',
+                { items, transferPassword }
+            );
+
+        },
+
+        mergeCapsule: (filePathOrOptions, maybeTransferPassword) => {
+
+            let filePath;
+            let transferPassword;
+            if (typeof filePathOrOptions === 'string') {
+                filePath = filePathOrOptions;
+                transferPassword = maybeTransferPassword;
+            } else if (filePathOrOptions && typeof filePathOrOptions === 'object') {
+                filePath = filePathOrOptions.filePath;
+                transferPassword = filePathOrOptions.transferPassword || maybeTransferPassword;
+            }
+
+            return ipcRenderer.invoke(
+                'vault:merge-capsule',
+                { filePath, transferPassword }
+            );
+
+        },
+
+        getHardwareProfile: () => {
+
+            return ipcRenderer.invoke(
+                'vault:get-hardware-profile'
+            );
+
+        },
+
+        setIoAcceleration: (tierData) => {
+
+            return ipcRenderer.invoke(
+                'vault:set-io-acceleration',
+                tierData
+            );
+
+        },
+
 
         addFile: (mode = 'copy') => {
 

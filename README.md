@@ -1,254 +1,277 @@
-# CrypticLocker 🛡️
-> **Enterprise-Grade Offline-First Desktop Vault & Cryptographic Container**  
-> *Commercial Turnkey Software Asset — Full Intellectual Property (IP) & Source Code Distribution*
+<p align="center">
+  <img src="src/img/logo-transparent.png" alt="CrypticLocker" width="140">
+</p>
 
-[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue.svg)](https://github.com/vipmayank2-design/CrypticLocker)
-[![Architecture](https://img.shields.io/badge/Arch-x64%20%7C%20ARM64%20(Apple%20Silicon)-success.svg)](https://github.com/vipmayank2-design/CrypticLocker)
-[![Tests](https://img.shields.io/badge/Audit-13%2F13%20Suites%20Passed%20(100%25)-brightgreen.svg)](https://github.com/vipmayank2-design/CrypticLocker)
-[![Security](https://img.shields.io/badge/Cipher-AES--256--GCM%20%2B%20Scrypt-orange.svg)](https://github.com/vipmayank2-design/CrypticLocker)
-[![License](https://img.shields.io/badge/License-Commercial%20Asset-lightgrey.svg)](LICENSE)
+<h1 align="center">CrypticLocker</h1>
+
+<p align="center">
+  <strong>A secure, offline-first personal vault for protecting your private files and folders.</strong>
+</p>
+
+<p align="center">
+  No cloud. No accounts. No telemetry. Your files stay on YOUR machine.
+</p>
+
+<p align="center">
+  <a href="https://github.com/vipmayank2-design/CrypticLocker/releases"><img src="https://img.shields.io/github/v/release/vipmayank2-design/CrypticLocker?style=flat-square&color=blue" alt="Release"></a>
+  <a href="https://github.com/vipmayank2-design/CrypticLocker/releases"><img src="https://img.shields.io/github/downloads/vipmayank2-design/CrypticLocker/total?style=flat-square&color=green" alt="Downloads"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="License"></a>
+  <a href="https://github.com/vipmayank2-design/CrypticLocker/actions"><img src="https://img.shields.io/github/actions/workflow/status/vipmayank2-design/CrypticLocker/ci.yml?style=flat-square&label=CI" alt="CI"></a>
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#download">Download</a> •
+  <a href="#security">Security</a> •
+  <a href="#build-from-source">Build</a> •
+  <a href="#contributing">Contribute</a> •
+  <a href="#license">License</a>
+</p>
 
 ---
 
-## 1. Executive Summary & Asset Overview
+## What is CrypticLocker?
 
-**CrypticLocker** is a production-ready, zero-knowledge personal desktop vault designed for ultra-secure local storage, streaming encryption, and portable archiving of sensitive files and folders.
+CrypticLocker is a free, open-source desktop application that lets you encrypt and protect your private files and folders inside a secure personal vault. Everything runs **locally on your machine** — no internet connection required, no cloud storage, no accounts, no data ever leaves your computer.
 
-Built with an uncompromising **Offline-First / Zero-Telemetry** design philosophy, CrypticLocker never transmits user data, encryption keys, or biometric telemetry outside the host machine. All cryptographic operations are processed on the local hardware via hardware-accelerated AES-NI pipelines.
-
-### 💼 Technical Acquisition Highlights
-* **100% Turnkey Codebase**: Clean, audited, enterprise JavaScript with zero technical debt or prototype residue.
-* **Commercial Anonymity**: Clean git commit history, verified author metadata (`CrypticLocker Technologies`), and zero hardcoded developer paths or credentials.
-* **Master Health Audit**: Automated test suite (`npm test`) with 13 comprehensive test suites validating cryptography, streaming pipelines, lockout ladders, and UI integrity in under 2 seconds.
-* **Multi-Platform Automated CI/CD**: Pre-configured GitHub Actions matrix pipeline compiling native binaries for **Windows**, **macOS (Apple Silicon & Intel)**, and **Linux** concurrently.
+Built with **AES-256-GCM** encryption and **scrypt** key derivation, the same cryptographic standards used by security professionals worldwide.
 
 ---
 
-## 2. Core Cryptographic Architecture
+## Features
 
-CrypticLocker implements an enterprise **Dual-Key Envelope Architecture** utilizing military-grade symmetric encryption and memory-hardened password derivation.
+### 🔒 Military-Grade Encryption
+- **AES-256-GCM** authenticated encryption with per-file unique IVs
+- **scrypt** password hashing (N=16384, r=8, p=1) — resistant to brute-force and GPU attacks
+- 256-bit recovery key for emergency vault access
+
+### 📁 File & Folder Management
+- Add files and folders with **Copy** (keep original) or **Move** (migrate to vault) modes
+- Restore files back to their original location
+- Bulk operations — select multiple items at once
+- Real-time search and column sorting
+
+### 📦 Capsule Engine — Secure Sharing (.clpack)
+- Export individual files or folders as encrypted **capsule packages**
+- Share `.clpack` files with anyone — they open in CrypticLocker with a password
+- Multi-item capsule bundles for sharing multiple files at once
+- Import capsules and merge into your existing vault
+
+### 💾 Full Vault Backup (.clvault)
+- Export your entire vault as a single encrypted backup archive
+- Restore from `.clvault` backups on any machine with CrypticLocker
+- Pre-check disk space validation before export/import
+
+### ⚡ Adaptive I/O Acceleration
+- Hardware-aware dynamic buffer scaling (512 KB to 16 MB based on your system RAM)
+- Up to **~600% throughput** improvement for large file operations
+- Interactive acceleration tier selection
+
+### 🛡️ Security Hardening
+- Progressive lockout after failed password attempts (exponential cooldown)
+- Auto-lock on idle timeout and OS sleep/screen-lock events
+- Quarantine system for detecting and recovering orphaned encrypted files
+- Vault integrity checking
+
+### 🎨 Clean Interface
+- Dark, Light, and System theme support
+- Custom glassmorphic tooltips — zero native browser tooltips
+- Professional, distraction-free design
+
+### 💻 Cross-Platform
+- **Windows**: NSIS installer + portable edition (USB-ready, zero install)
+- **macOS**: DMG for Apple Silicon (M1/M2/M3/M4) and Intel
+- **Linux**: AppImage (universal) and .deb (Debian/Ubuntu)
+- Native file associations for `.clvault` and `.clpack`
+
+---
+
+## Download
+
+### Latest Release
+Download the latest version from the [**Releases**](https://github.com/vipmayank2-design/CrypticLocker/releases) page.
+
+| Platform | Download | Type |
+| :------- | :------- | :--- |
+| **Windows** | `CrypticLocker Setup X.X.X.exe` | Installer |
+| **Windows** | `CrypticLocker X.X.X.exe` | Portable (no install) |
+| **macOS** | `CrypticLocker-X.X.X.dmg` | DMG |
+| **Linux** | `CrypticLocker-X.X.X.AppImage` | AppImage |
+| **Linux** | `CrypticLocker_X.X.X_amd64.deb` | Debian package |
+
+### Portable Edition
+The portable `.exe` runs directly from a USB drive or any folder — no installation, no registry changes, no traces left behind.
+
+---
+
+## Security
+
+### Encryption Architecture
 
 ```
-                          [ User Master Password ]
-                                     │
-                                     ▼
-                   [ Scrypt KDF (N=16384, r=8, p=1) ]
-                                     │
-                                     ▼
-                       [ Password Unlock Key (PUK) ]
-                                     │
-                                     ▼
-      ┌─────────────────────────────────────────────────────────────┐
-      │  Vault Master Key Package (VMK) Decryption (AES-256-GCM)   │
-      └─────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
-                        [ Vault Master Key (VMK) ]
-                                     │
-                                     ▼
-      ┌─────────────────────────────────────────────────────────────┐
-      │     Streaming Payload Encryption / Decryption Engine        │
-      │   • Per-file unique 96-bit cryptographic IVs                │
-      │   • Authenticated 128-bit GCM authentication tags           │
-      │   • 512 KB dynamic chunked streaming pipeline               │
-      └─────────────────────────────────────────────────────────────┘
+              [ Master Password ]
+                      │
+                      ▼
+        [ scrypt KDF (N=16384, r=8, p=1) ]
+                      │
+                      ▼
+            [ Password Unlock Key ]
+                      │
+                      ▼
+    ┌───────────────────────────────────────┐
+    │  Vault Master Key (VMK) Decryption   │
+    │          AES-256-GCM                 │
+    └───────────────────────────────────────┘
+                      │
+                      ▼
+             [ Vault Master Key ]
+                      │
+                      ▼
+    ┌───────────────────────────────────────┐
+    │   Per-File Streaming Encryption      │
+    │   • Unique 96-bit IV per file        │
+    │   • 128-bit GCM auth tags            │
+    │   • Hardware-aware buffer scaling    │
+    └───────────────────────────────────────┘
 ```
 
-### Cryptographic Parameters
-* **Primary Symmetric Cipher**: `AES-256-GCM` (Authenticated Galois/Counter Mode).
-* **Key Derivation Function (KDF)**: `Scrypt` (`N=16384`, `r=8`, `p=1`, key length = 32 bytes).
-* **Master Recovery Key**: 256-bit entropy derived via high-iteration PBKDF2 (`100,000` iterations, SHA-512) formatted as standard human-readable, hyphenated hexadecimal groups.
-* **Zero-Knowledge Memory Hygiene**: In-memory keys and session secrets are scrubbed upon vault lock, application blur/timeout, or explicit session destruction.
+### Key Facts
+- **Zero-knowledge**: Your master password is never stored anywhere
+- **Zero-telemetry**: No data, analytics, or crash reports are ever sent
+- **Offline-first**: Works completely without internet
+- **Open-source**: Full source code available for audit
+- All crypto uses Node.js built-in `crypto` module — no third-party crypto libraries
+
+For the full security policy and vulnerability reporting, see [SECURITY.md](SECURITY.md).
 
 ---
 
-## 3. Subsystem & Feature Specifications
+## Build from Source
 
-### 🗄️ 1. File & Folder Engine
-* **Add File / Add Folder**: Supports both **COPY** (preserves host source) and **MOVE** (securely migrates source and unlinks original upon atomic verification).
-* **High-Speed Chunked Streaming**: 512 KB chunk buffer enables processing multi-gigabyte files with constant, minimal RAM footprint (< 80 MB).
-* **Instant Cancellation & Atomic Rollback**: Operations can be cancelled in real-time. Incomplete operations trigger immediate atomic stream destruction and unlinking, leaving zero orphaned chunks.
+### Prerequisites
+- [Node.js](https://nodejs.org/) v20.x or v22.x (recommended: v22.x)
+- npm v10.x or higher
+- Git
 
-### 📦 2. Enterprise Vault Backup & Restore (`.clvault`)
-* **Proprietary Archive Format**: `.clvault` is a tamper-evident, self-contained binary archive packaging encrypted vault assets, folder hierarchy trees, and integrity checksums.
-* **Pre-Check Disk Quota Engine**: Validates destination drive capacity prior to export/import to avoid mid-stream out-of-disk failures.
-* **Native OS Association**: Windows Explorer and file managers natively recognize and associate with `.clvault` files.
+### Setup
 
-### 🧪 3. Quarantine & Deep Byte Inspection Subsystem
-* Detects and isolates orphaned or structurally desynchronized encrypted blocks.
-* Inspects payload headers, cryptographic integrity tags, and structure without decrypting payload data.
-* Provides 1-click byte-level repair, orphan recovery, or permanent purging.
+```bash
+# Clone the repository
+git clone https://github.com/vipmayank2-design/CrypticLocker.git
+cd CrypticLocker
 
-### 🛡️ 4. Security Hardening & Lockout System
-* **Progressive Lockout Ladder**: Enforces exponential cooldown periods after repeated invalid unlock attempts to mitigate brute-force dictionary attacks.
-* **Auto-Lock Engine**: Configurable idle timeout (default 1 minute) and automated lock upon OS sleep/screen-lock events.
-* **Danger Zone Reset**: 3-step verification modal with mandatory password challenge for permanent vault destruction.
+# Install dependencies
+npm install
+
+# Run in development mode
+npm start
+
+# Run the test suite (16 test suites)
+npm test
+```
+
+### Build Binaries
+
+```bash
+# Windows (NSIS installer + portable)
+npm run build:win
+
+# macOS (DMG for Apple Silicon & Intel)
+npm run build:mac
+
+# Linux (AppImage + .deb)
+npm run build:linux
+```
+
+Build output is in the `dist/` directory.
 
 ---
 
-## 4. Codebase Directory Structure
+## Project Structure
 
 ```
 CrypticLocker/
 ├── .github/
 │   └── workflows/
-│       └── build.yml               # Automated 3-platform GitHub Actions CI/CD matrix
-├── build/
-│   ├── icon.ico                    # Windows multi-resolution icon (16x16 -> 256x256)
-│   ├── icon.icns                   # macOS Apple Icon Image format
-│   └── icon.png                    # Linux & cross-platform high-res master icon (512x512)
+│       ├── ci.yml                  # Test on every push & PR
+│       ├── build.yml               # Multi-platform build
+│       └── release.yml             # Auto-release on tag push
 ├── core/
+│   ├── capsule/
+│   │   └── capsulePackage.js       # .clpack capsule engine
 │   ├── constants/
-│   │   └── cryptoConstants.js      # Cryptographic parameter definitions
+│   │   └── cryptoConstants.js      # Cryptographic parameters
 │   ├── crypto/
-│   │   └── vaultCrypto.js          # AES-256-GCM cipher engine & key derivation
+│   │   └── vaultCrypto.js          # AES-256-GCM cipher engine
 │   ├── session/
-│   │   └── sessionManager.js       # In-memory session manager & auto-lock state
+│   │   └── sessionManager.js       # Session & auto-lock state
 │   └── vault/
-│       └── vaultPackage.js         # .clvault streaming export/import archive engine
+│       └── vaultPackage.js         # .clvault export/import engine
 ├── src/
-│   ├── css/
-│   │   ├── dashboard.css           # Vault dashboard, data grid & modal styles
-│   │   ├── global.css              # System theme variables (Dark & Light tokens)
-│   │   └── style.css               # Setup screen, auth card & responsive styling
-│   ├── fonts/
-│   │   └── LeagueSpartan-*.ttf     # Bundled local typography (zero CDN dependency)
-│   ├── img/
-│   │   ├── logo.png                # Master high-resolution branded logo (2000x2000)
-│   │   └── logo-transparent.png    # In-app vector transparent brand mark (1101x1101)
-│   ├── js/
-│   │   ├── app.js                  # Setup screen, import flow & unlock controller
-│   │   ├── dashboard.js            # Main dashboard, table rendering & modal logic
-│   │   └── theme-init.js           # Instant flash-free theme loader
+│   ├── css/                        # Stylesheets (dashboard, global, login)
+│   ├── fonts/                      # Bundled typography (zero CDN)
+│   ├── img/                        # Icons and logos
+│   ├── js/                         # Renderer scripts
 │   ├── dashboard.html              # Main vault interface
-│   └── index.html                  # Setup, login, and forgot-password interface
-├── main.js                         # Electron main process & IPC handlers (13,000+ lines)
-├── preload.js                      # ContextBridge security barrier & API exposure
-├── package.json                    # Packaging targets, scripts & metadata
-├── test-all.js                     # Master pre-packaging health audit suite (13 suites)
-└── .gitignore                      # Clean production exclusion rules
+│   └── index.html                  # Login & setup interface
+├── main.js                         # Electron main process & IPC
+├── preload.js                      # Context bridge security layer
+├── test-all.js                     # 16 automated test suites
+├── package.json                    # Build config & metadata
+├── LICENSE                         # GPL-3.0
+├── CONTRIBUTING.md                 # Contribution guide
+├── SECURITY.md                     # Security policy
+├── CHANGELOG.md                    # Version history
+└── CODE_OF_CONDUCT.md             # Community guidelines
 ```
 
 ---
 
-## 5. Developer & Build Guide
+## Tech Stack
 
-### Prerequisites
-* **Node.js**: v20.x or v22.x (Recommended: `v22.x`)
-* **npm**: v10.x or higher
-* **Git**: Installed and configured
-
-### 1. Installation
-Clone the repository and install dependencies:
-```bash
-git clone https://github.com/vipmayank2-design/CrypticLocker.git
-cd CrypticLocker
-npm install
-```
-
-### 2. Running in Development Mode
-Launch the application locally with full DevTools support:
-```bash
-npm start
-```
-
-### 3. Running the Master Health Audit
-Execute the automated regression and integrity suite:
-```bash
-npm test
-```
-*Expected Output: `TOTAL TEST SUITES: 13 | PASSED: 13 ✅ | FAILED: 0 🎉`*
+| Component | Technology |
+| :-------- | :--------- |
+| Framework | [Electron](https://www.electronjs.org/) 40.x |
+| Runtime | [Node.js](https://nodejs.org/) 22.x |
+| Encryption | Node.js `crypto` (AES-256-GCM + scrypt) |
+| Build | [electron-builder](https://www.electron.build/) |
+| CI/CD | [GitHub Actions](https://github.com/features/actions) |
+| Typography | [League Spartan](https://www.theleagueofmoveabletype.com/league-spartan) (bundled) |
 
 ---
 
-## 6. Multi-Platform Production Packaging
+## Contributing
 
-CrypticLocker is configured out-of-the-box with **`electron-builder`** for local and cloud compilations.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) before submitting a pull request.
 
-### 🪟 Windows Compilation (Run directly on Windows)
-Build both NSIS setup installer and portable single-file executable:
-```bash
-npm run build:win
-```
-**Output Binaries (`dist/`)**:
-* `CrypticLocker Setup 1.0.0.exe` (~90 MB) — Full installer with Desktop shortcut, Start Menu entry, `.clvault` association, and clean uninstaller.
-* `CrypticLocker 1.0.0.exe` (~90 MB) — Zero-installation portable edition for USB drives.
+### Quick Start
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make your changes and ensure all 16 tests pass: `npm test`
+4. Submit a pull request
 
-### 🍎 macOS Compilation (Run on macOS or via CI/CD)
-```bash
-npm run build:mac
-```
-**Output Binary (`dist/`)**:
-* `CrypticLocker-1.0.0.dmg` — Native Apple Silicon (M1/M2/M3/M4) and Intel installer image.
-
-### 🐧 Linux Compilation (Run on Linux or via CI/CD)
-```bash
-npm run build:linux
-```
-**Output Binaries (`dist/`)**:
-* `CrypticLocker-1.0.0.AppImage` — Universal portable Linux executable (runs across Ubuntu, Fedora, Debian, Arch).
-* `CrypticLocker_1.0.0_amd64.deb` — Debian/Ubuntu native package.
+### Security Issues
+**Do NOT open public issues for security vulnerabilities.** Please follow our [Security Policy](SECURITY.md) for responsible disclosure.
 
 ---
 
-## 7. Automated Cloud CI/CD (GitHub Actions)
+## License
 
-The repository includes a ready-to-run continuous integration workflow located at `.github/workflows/build.yml`.
+CrypticLocker is free and open-source software licensed under the [GNU General Public License v3.0](LICENSE).
 
-### How to Trigger 1-Click Cloud Builds:
-1. Navigate to the **Actions** tab in your GitHub repository.
-2. Select **`Build Multi-Platform Packages`** from the workflow list.
-3. Click **`Run workflow`** ➔ Select the `main` branch ➔ Click the green button.
-4. GitHub's cloud runners will concurrently:
-   * Boot **`windows-latest`**, **`macos-latest`**, and **`ubuntu-latest`**.
-   * Run the master test suite (`npm test`) on each operating system.
-   * Compile and export Windows `.exe`, macOS `.dmg`, and Linux `.AppImage` / `.deb`.
-   * Bundle all files into the **Artifacts** download section on GitHub.
+You are free to use, modify, and distribute this software. If you distribute modified versions, they must also be open source under the same license.
 
 ---
 
-## 8. Acquirer Handover & Extensibility Notes
+## Acknowledgments
 
-For technical teams acquiring the CrypticLocker IP, the following architectural extension points are documented:
-
-### 1. "Check for Updates" Endpoint Integration
-* **Current Implementation**: The user interface in Settings includes an interactive "Check for updates" trigger.
-* **Acquirer Integration**: Because CrypticLocker is zero-telemetry and strictly offline-first, no external telemetry server is contacted by default.
-* **How to Connect**: To activate automatic updates, configure `electron-updater` in `main.js` pointing to your organization's release endpoint (e.g. AWS S3 bucket, Cloudflare R2, or GitHub Releases):
-  ```javascript
-  const { autoUpdater } = require('electron-updater');
-  autoUpdater.setFeedURL({ provider: 'github', owner: 'YOUR_ORG', repo: 'CrypticLocker' });
-  autoUpdater.checkForUpdatesAndNotify();
-  ```
-
-### 2. Commercial Licensing & Monetization Layer
-* The application is architected with strict boundary separation between authentication (`src/js/app.js`), session state (`core/session/sessionManager.js`), and backend operations (`main.js`).
-* Acquirers wishing to introduce license keys or recurring subscription checks can easily intercept the unlock handshake in `main.js` (`ipcMain.handle('vault:unlock')`).
-
-### 3. Re-Branding / White-Labeling
-* All brand identity assets are centralized in:
-  * Master Logo: `src/img/logo.png`
-  * In-App Mark: `src/img/logo-transparent.png`
-  * OS Icons: `build/icon.ico`, `build/icon.icns`, `build/icon.png`
-  * Brand Strings: `package.json` (`productName`, `appId`, `author`)
+- [Electron](https://www.electronjs.org/) — Cross-platform desktop framework
+- [Node.js](https://nodejs.org/) — Runtime with built-in cryptographic primitives
+- [electron-builder](https://www.electron.build/) — Build and packaging toolchain
+- [League Spartan](https://www.theleagueofmoveabletype.com/league-spartan) — Beautiful open-source typeface
 
 ---
 
-## 9. Technical Due-Diligence Checklist
-
-| Due-Diligence Item | Verification Method | Status |
-| :--- | :--- | :---: |
-| **Zero Hardcoded Secrets** | Codebase-wide regex scan for tokens, keys, passwords | ✅ Clean |
-| **Zero Developer Filepaths** | Audit of file path resolution; all storage uses `app.getPath('userData')` | ✅ Clean |
-| **No Copyleft / GPL Contamination** | Dependency license audit; all dependencies are MIT / Permissive | ✅ Clean |
-| **Automated Test Coverage** | `npm test` runs 13 automated test suites across all core modules | ✅ 100% Passed |
-| **Binary Verification** | `electron-builder` compiles cleanly on Windows, macOS, and Linux | ✅ Verified |
-| **ASAR Bundle Cleanliness** | Production package excludes test code, logs, and developer scratchpads | ✅ 0 Bytes Test Code |
-
----
-
-## 10. Ownership & Commercial Rights
-
-**CrypticLocker Technologies** holds full intellectual property, commercial, copyright, and distribution rights to this software asset, source code, visual identity, and documentation.
-
-*For acquisition inquiries or technical transfer assistance, please contact via the official marketplace listing / platform.*
+<p align="center">
+  Made with 🛡️ for privacy
+</p>

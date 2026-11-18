@@ -4,6 +4,12 @@ node_modules/
 # Production builds & packaged binaries
 dist/
 
+# Vault user data (NEVER commit user data)
+vault/
+*.clvault
+*.clpack
+recovery-key*.txt
+
 # Logs & debugging
 *.log
 npm-debug.log*
@@ -13,6 +19,7 @@ yarn-error.log*
 # Environment and secrets
 .env
 .env.local
+.env.*
 
 # OS generated files
 .DS_Store
@@ -22,9 +29,14 @@ desktop.ini
 # Scratch and temporary testing directories
 scratch/
 .test_*
+temp/
+tmp/
 
 # IDE & Editor files
 .vscode/
 .idea/
 *.sublime-project
 *.sublime-workspace
+
+# Electron builder cache
+builder-debug.yml

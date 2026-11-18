@@ -114,6 +114,26 @@ const importCancelButton =
         'importCancelButton'
     );
 
+const importBoostDropdown =
+    document.getElementById(
+        'importBoostDropdown'
+    );
+
+const importBoostButton =
+    document.getElementById(
+        'importBoostButton'
+    );
+
+const importBoostMenu =
+    document.getElementById(
+        'importBoostMenu'
+    );
+
+const importBoostSelectedText =
+    document.getElementById(
+        'importBoostSelectedText'
+    );
+
 /* =========================================
 FORGOT PASSWORD ELEMENTS
 ========================================= */
@@ -1317,6 +1337,24 @@ function formatImportBytes(bytes) {
 }
 
 function setImportInProgress(inProgress) {
+    const vaultCard = document.querySelector('.vault-card');
+    if (vaultCard) {
+        vaultCard.classList.toggle('importing-active', inProgress);
+    }
+
+    if (inProgress) {
+        if (screenTitle) screenTitle.textContent = 'Importing Vault';
+        if (screenDescription) screenDescription.textContent = 'Restoring encrypted files and vault structure...';
+    } else {
+        if (screenTitle && screenMode === 'create') {
+            screenTitle.textContent = 'Create your vault';
+            screenDescription.textContent = 'Create a master password to protect your private files.';
+        }
+        if (typeof closeImportBoostDropdown === 'function') {
+            closeImportBoostDropdown();
+        }
+    }
+
     if (password) password.disabled = inProgress;
     if (confirmPassword) confirmPassword.disabled = inProgress;
     if (submitButton) submitButton.disabled = inProgress;
@@ -1439,9 +1477,9 @@ if (importVaultButton) {
             const btnSpan = importVaultButton.querySelector('span');
             const originalText = btnSpan ? btnSpan.textContent : 'Import Existing Vault (.clvault)';
 
-            setImportInProgress(true);
+            importVaultButton.disabled = true;
             if (btnSpan) {
-                btnSpan.textContent = 'Importing Vault...';
+                btnSpan.textContent = 'Selecting file...';
             }
 
             try {
@@ -1489,7 +1527,7 @@ if (importVaultButton) {
                     // User canceled file picker or cancelled during import
                     setImportInProgress(false);
                     formError.style.color = 'var(--muted)';
-                    formError.textContent = 'Vault import was cancelled.';
+                    formError.textContent = '';
 
                 } else {
 
@@ -1508,6 +1546,7 @@ if (importVaultButton) {
 
             } finally {
 
+                importVaultButton.disabled = false;
                 if (btnSpan) {
                     btnSpan.textContent = originalText;
                 }
@@ -1518,3 +1557,193 @@ if (importVaultButton) {
     );
 
 }
+
+/* =========================================
+   CUSTOM GLASSMORPHIC FLOATING TOOLTIP ENGINE
+========================================= */
+
+function initCustomTooltipEngine() {
+    let tooltipEl = document.getElementById('customTooltipPortal');
+    if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.id = 'customTooltipPortal';
+        tooltipEl.className = 'custom-tooltip-portal';
+        document.body.appendChild(tooltipEl);
+    }
+
+    let activeTarget = null;
+    let showTimeout = null;
+
+    function hideTooltip() {
+        if (showTimeout) {
+            clearTimeout(showTimeout);
+            showTimeout = null;
+        }
+        activeTarget = null;
+        if (tooltipEl) {
+            tooltipEl.classList.remove('visible');
+        }
+    }
+
+    function positionTooltip(target) {
+        const text = target.getAttribute('data-tooltip');
+        if (!text || !tooltipEl) return;
+
+        tooltipEl.textContent = text;
+        const targetRect = target.getBoundingClientRect();
+
+        tooltipEl.style.left = '0px';
+        tooltipEl.style.top = '0px';
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+
+        let top = targetRect.top - tooltipRect.height - 8;
+        if (top < 10) {
+            top = targetRect.bottom + 8;
+        }
+
+        let left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+        const padding = 10;
+        left = Math.max(padding, Math.min(left, window.innerWidth - tooltipRect.width - padding));
+
+        tooltipEl.style.left = `${Math.round(left)}px`;
+        tooltipEl.style.top = `${Math.round(top)}px`;
+        tooltipEl.classList.add('visible');
+    }
+
+    document.addEventListener('mouseover', (e) => {
+        const target = e.target.closest('[data-tooltip]');
+        if (!target) return;
+        if (activeTarget === target) return;
+
+        activeTarget = target;
+        if (showTimeout) clearTimeout(showTimeout);
+        showTimeout = setTimeout(() => {
+            if (activeTarget === target) {
+                positionTooltip(target);
+            }
+        }, 80);
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        const target = e.target.closest('[data-tooltip]');
+        if (target && activeTarget === target) {
+            hideTooltip();
+        }
+    });
+
+    document.addEventListener('mousedown', hideTooltip);
+    window.addEventListener('scroll', hideTooltip, true);
+    window.addEventListener('blur', hideTooltip);
+}
+
+initCustomTooltipEngine();
+
+/* =========================================
+   IMPORT I/O ACCELERATION DROPDOWN CONTROLLER
+========================================= */
+
+let cachedImportHardwareProfile = null;
+let activeImportBoostTierId = 'tier1';
+
+function updateImportBoostDropdownUI(tierId) {
+    activeImportBoostTierId = tierId;
+    if (!cachedImportHardwareProfile || !cachedImportHardwareProfile.tiers) return;
+
+    const currentTier = cachedImportHardwareProfile.tiers.find(t => t.id === tierId) || cachedImportHardwareProfile.tiers[0];
+    if (importBoostSelectedText && currentTier) {
+        importBoostSelectedText.textContent = currentTier.label;
+    }
+    if (importBoostMenu) {
+        importBoostMenu.querySelectorAll('.custom-dropdown-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.id === tierId);
+        });
+    }
+}
+
+function closeImportBoostDropdown() {
+    if (importBoostDropdown && importBoostMenu) {
+        importBoostDropdown.classList.remove('open');
+        importBoostMenu.hidden = true;
+        if (importBoostButton) {
+            importBoostButton.setAttribute('aria-expanded', 'false');
+        }
+    }
+}
+
+async function initImportBoostEngine() {
+    try {
+        closeImportBoostDropdown();
+        if (window.crypticLocker && typeof window.crypticLocker.getHardwareProfile === 'function') {
+            const res = await window.crypticLocker.getHardwareProfile();
+            if (res && res.success && res.profile) {
+                cachedImportHardwareProfile = res.profile;
+                activeImportBoostTierId = res.profile.activeId || 'tier1';
+                renderImportBoostMenu();
+                updateImportBoostDropdownUI(activeImportBoostTierId);
+                closeImportBoostDropdown();
+            }
+        }
+    } catch (err) {
+        console.error('Failed to initialize import hardware boost profile:', err);
+    }
+}
+
+function renderImportBoostMenu() {
+    if (!importBoostMenu || !cachedImportHardwareProfile || !cachedImportHardwareProfile.tiers) return;
+    importBoostMenu.innerHTML = '';
+    cachedImportHardwareProfile.tiers.forEach((tier) => {
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'custom-dropdown-item';
+        itemBtn.dataset.id = tier.id;
+        itemBtn.setAttribute('role', 'option');
+        if (tier.id === activeImportBoostTierId) {
+            itemBtn.classList.add('active');
+        }
+        itemBtn.textContent = tier.label;
+        itemBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            updateImportBoostDropdownUI(tier.id);
+            closeImportBoostDropdown();
+            if (window.crypticLocker && typeof window.crypticLocker.setIoAcceleration === 'function') {
+                try {
+                    await window.crypticLocker.setIoAcceleration(tier);
+                } catch (setErr) {
+                    console.error('Failed to set I/O acceleration tier:', setErr);
+                }
+            }
+        });
+        importBoostMenu.appendChild(itemBtn);
+    });
+}
+
+if (importBoostButton && importBoostMenu) {
+    importBoostButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = importBoostDropdown && importBoostDropdown.classList.contains('open');
+        if (!isOpen) {
+            if (!importBoostMenu.children.length && cachedImportHardwareProfile) {
+                renderImportBoostMenu();
+            }
+            if (importBoostDropdown) importBoostDropdown.classList.add('open');
+            importBoostMenu.hidden = false;
+            importBoostButton.setAttribute('aria-expanded', 'true');
+        } else {
+            closeImportBoostDropdown();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (importBoostDropdown && !importBoostDropdown.contains(e.target)) {
+            closeImportBoostDropdown();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeImportBoostDropdown();
+        }
+    });
+}
+
+initImportBoostEngine();

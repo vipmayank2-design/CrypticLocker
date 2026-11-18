@@ -60,10 +60,98 @@ function closeAllDropdownsAndMenus(exceptElement = null) {
                 closeAutoLockDropdown();
             }
         }
+
+        if (typeof closeOperationBoostDropdown === 'function') {
+            const operationBoostDropdown = document.getElementById('operationBoostDropdown');
+            if (!exceptElement || (operationBoostDropdown && !operationBoostDropdown.contains(exceptElement))) {
+                closeOperationBoostDropdown();
+            }
+        }
     } catch (e) {
         console.error('Error closing dropdowns:', e);
     }
 }
+
+/* =========================================
+   CUSTOM GLASSMORPHIC FLOATING TOOLTIP ENGINE
+========================================= */
+
+function initCustomTooltipEngine() {
+    let tooltipEl = document.getElementById('customTooltipPortal');
+    if (!tooltipEl) {
+        tooltipEl = document.createElement('div');
+        tooltipEl.id = 'customTooltipPortal';
+        tooltipEl.className = 'custom-tooltip-portal';
+        document.body.appendChild(tooltipEl);
+    }
+
+    let activeTarget = null;
+    let showTimeout = null;
+
+    function hideTooltip() {
+        if (showTimeout) {
+            clearTimeout(showTimeout);
+            showTimeout = null;
+        }
+        activeTarget = null;
+        if (tooltipEl) {
+            tooltipEl.classList.remove('visible');
+        }
+    }
+
+    function positionTooltip(target) {
+        const text = target.getAttribute('data-tooltip');
+        if (!text || !tooltipEl) return;
+
+        tooltipEl.textContent = text;
+        const targetRect = target.getBoundingClientRect();
+
+        tooltipEl.style.left = '0px';
+        tooltipEl.style.top = '0px';
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+
+        let top = targetRect.top - tooltipRect.height - 8;
+        if (top < 10) {
+            top = targetRect.bottom + 8;
+        }
+
+        let left = targetRect.left + (targetRect.width / 2) - (tooltipRect.width / 2);
+        const padding = 10;
+        left = Math.max(padding, Math.min(left, window.innerWidth - tooltipRect.width - padding));
+
+        tooltipEl.style.left = `${Math.round(left)}px`;
+        tooltipEl.style.top = `${Math.round(top)}px`;
+        tooltipEl.classList.add('visible');
+    }
+
+    document.addEventListener('mouseover', (e) => {
+        const target = e.target.closest('[data-tooltip]');
+        if (!target) return;
+        if (activeTarget === target) return;
+
+        activeTarget = target;
+        if (showTimeout) clearTimeout(showTimeout);
+        showTimeout = setTimeout(() => {
+            if (activeTarget === target) {
+                positionTooltip(target);
+            }
+        }, 80);
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        const target = e.target.closest('[data-tooltip]');
+        if (target && activeTarget === target) {
+            hideTooltip();
+        }
+    });
+
+    document.addEventListener('mousedown', hideTooltip);
+    window.addEventListener('scroll', hideTooltip, true);
+    window.addEventListener('blur', hideTooltip);
+}
+
+initCustomTooltipEngine();
+
 /* =========================================
    APPLICATION VIEW NAVIGATION
 ========================================= */
@@ -385,6 +473,26 @@ const autoLockDropdownMenu =
 const autoLockSelectedText =
     document.getElementById(
         'autoLockSelectedText'
+    );
+
+const operationBoostDropdown =
+    document.getElementById(
+        'operationBoostDropdown'
+    );
+
+const operationBoostButton =
+    document.getElementById(
+        'operationBoostButton'
+    );
+
+const operationBoostMenu =
+    document.getElementById(
+        'operationBoostMenu'
+    );
+
+const operationBoostSelectedText =
+    document.getElementById(
+        'operationBoostSelectedText'
     );
 
 const myVaultNavButton =
@@ -1295,7 +1403,7 @@ function renderQuarantinedOrphans() {
                     <button
                         class="file-menu-button quarantine-menu-button"
                         type="button"
-                        title="More options"
+                        data-tooltip="More options"
                     >
                         <span></span>
                         <span></span>
@@ -1737,8 +1845,11 @@ async function toggleRecoveryKey() {
         toggleRecoveryKeyButton.innerHTML =
             EYE_OFF_ICON;
 
-        toggleRecoveryKeyButton.title =
-            'Hide Recovery Key';
+        toggleRecoveryKeyButton.setAttribute(
+            'data-tooltip',
+            'Hide Recovery Key'
+        );
+        toggleRecoveryKeyButton.removeAttribute('title');
 
         recoveryKeyVisible = true;
 
@@ -1753,8 +1864,11 @@ async function toggleRecoveryKey() {
         toggleRecoveryKeyButton.innerHTML =
             EYE_ICON;
 
-        toggleRecoveryKeyButton.title =
-            'Show Recovery Key';
+        toggleRecoveryKeyButton.setAttribute(
+            'data-tooltip',
+            'Show Recovery Key'
+        );
+        toggleRecoveryKeyButton.removeAttribute('title');
 
         recoveryKeyVisible = false;
 
@@ -2000,8 +2114,12 @@ async function loadSettingsInformation() {
         vaultStorageLocation.textContent =
             result.storageLocation || '—';
 
-        vaultStorageLocation.title =
-            result.storageLocation || '';
+        if (result.storageLocation) {
+            vaultStorageLocation.setAttribute('data-tooltip', result.storageLocation);
+        } else {
+            vaultStorageLocation.removeAttribute('data-tooltip');
+        }
+        vaultStorageLocation.removeAttribute('title');
 
 
         /*
@@ -2080,8 +2198,8 @@ async function loadSettingsInformation() {
         vaultStorageLocation.textContent =
             'Unavailable';
 
-        vaultStorageLocation.title =
-            '';
+        vaultStorageLocation.removeAttribute('data-tooltip');
+        vaultStorageLocation.removeAttribute('title');
 
         vaultStorageUsed.textContent =
             '—';
@@ -2150,8 +2268,11 @@ function showApplicationView(
         toggleRecoveryKeyButton.innerHTML =
             EYE_ICON;
 
-        toggleRecoveryKeyButton.title =
-            'Show Recovery Key';
+        toggleRecoveryKeyButton.setAttribute(
+            'data-tooltip',
+            'Show Recovery Key'
+        );
+        toggleRecoveryKeyButton.removeAttribute('title');
 
     }
 
@@ -2479,8 +2600,11 @@ if (openVaultStorageButton) {
                 ? 'Open in Finder'
                 : 'Open in File Manager';
 
-    openVaultStorageButton.title =
-        explorerLabel;
+    openVaultStorageButton.setAttribute(
+        'data-tooltip',
+        explorerLabel
+    );
+    openVaultStorageButton.removeAttribute('title');
 
     openVaultStorageButton.setAttribute(
         'aria-label',
@@ -2654,6 +2778,106 @@ if (autoLockDropdownButton && autoLockDropdownMenu) {
         });
 
 }
+
+/* =========================================
+   ADAPTIVE I/O ACCELERATION DROPDOWN CONTROLLER
+========================================= */
+
+let cachedHardwareProfile = null;
+let activeBoostTierId = 'tier1';
+
+function updateOperationBoostDropdownUI(tierId) {
+    activeBoostTierId = tierId;
+    if (!cachedHardwareProfile || !cachedHardwareProfile.tiers) {
+        return;
+    }
+    const currentTier = cachedHardwareProfile.tiers.find(t => t.id === tierId) || cachedHardwareProfile.tiers[0];
+    if (operationBoostSelectedText && currentTier) {
+        operationBoostSelectedText.textContent = currentTier.label;
+    }
+    if (operationBoostMenu) {
+        operationBoostMenu.querySelectorAll('.custom-dropdown-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.id === tierId);
+        });
+    }
+}
+
+function closeOperationBoostDropdown() {
+    if (operationBoostDropdown && operationBoostMenu) {
+        operationBoostDropdown.classList.remove('open');
+        operationBoostMenu.hidden = true;
+        if (operationBoostButton) {
+            operationBoostButton.setAttribute('aria-expanded', 'false');
+        }
+    }
+}
+
+async function initOperationBoostEngine() {
+    try {
+        if (window.crypticLocker && typeof window.crypticLocker.getHardwareProfile === 'function') {
+            const res = await window.crypticLocker.getHardwareProfile();
+            if (res && res.success && res.profile) {
+                cachedHardwareProfile = res.profile;
+                activeBoostTierId = res.profile.activeId || 'tier1';
+                renderOperationBoostMenu();
+                updateOperationBoostDropdownUI(activeBoostTierId);
+            }
+        }
+    } catch (err) {
+        console.error('Failed to initialize hardware boost profile:', err);
+    }
+}
+
+function renderOperationBoostMenu() {
+    if (!operationBoostMenu || !cachedHardwareProfile || !cachedHardwareProfile.tiers) {
+        return;
+    }
+    operationBoostMenu.innerHTML = '';
+    cachedHardwareProfile.tiers.forEach((tier) => {
+        const itemBtn = document.createElement('button');
+        itemBtn.type = 'button';
+        itemBtn.className = 'custom-dropdown-item';
+        itemBtn.dataset.id = tier.id;
+        itemBtn.setAttribute('role', 'option');
+        if (tier.id === activeBoostTierId) {
+            itemBtn.classList.add('active');
+        }
+        itemBtn.textContent = tier.label;
+        itemBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            updateOperationBoostDropdownUI(tier.id);
+            closeOperationBoostDropdown();
+            if (window.crypticLocker && typeof window.crypticLocker.setIoAcceleration === 'function') {
+                try {
+                    await window.crypticLocker.setIoAcceleration(tier);
+                } catch (setErr) {
+                    console.error('Failed to set I/O acceleration tier:', setErr);
+                }
+            }
+        });
+        operationBoostMenu.appendChild(itemBtn);
+    });
+}
+
+if (operationBoostButton && operationBoostMenu) {
+    operationBoostButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = operationBoostMenu.hidden;
+        closeAllDropdownsAndMenus();
+        if (isHidden) {
+            if (!operationBoostMenu.children.length && cachedHardwareProfile) {
+                renderOperationBoostMenu();
+            }
+            operationBoostDropdown.classList.add('open');
+            operationBoostMenu.hidden = false;
+            operationBoostButton.setAttribute('aria-expanded', 'true');
+        } else {
+            closeOperationBoostDropdown();
+        }
+    });
+}
+
+initOperationBoostEngine();
 
 /*
     AUTO-LOCK
@@ -3152,6 +3376,21 @@ const fileActionMenu =
 const folderActionMenu =
     document.getElementById(
         'folderActionMenu'
+    );
+
+const emptyFolderButtons =
+    document.getElementById(
+        'emptyFolderButtons'
+    );
+
+const emptyFolderBackButton =
+    document.getElementById(
+        'emptyFolderBackButton'
+    );
+
+const emptyFolderBackButtonText =
+    document.getElementById(
+        'emptyFolderBackButtonText'
     );
 
 const moveFileButton =
@@ -5939,6 +6178,123 @@ async function triggerAutoLock() {
 
 }
 
+const EMPTY_VAULT_ICON_SVG = `
+    <svg viewBox="0 0 24 24">
+        <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H10L12 7H17.5A2.5 2.5 0 0 1 20 9.5V17A2 2 0 0 1 18 19H6A2 2 0 0 1 4 17Z" />
+        <path d="M12 10V16" />
+        <path d="M9 13H15" />
+    </svg>
+`;
+
+const EMPTY_FOLDER_ICON_SVG = `
+    <svg viewBox="0 0 24 24">
+        <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H10L12 7H17.5A2.5 2.5 0 0 1 20 9.5V17A2 2 0 0 1 18 19H6A2 2 0 0 1 4 17Z" />
+    </svg>
+`;
+
+const EMPTY_SEARCH_ICON_SVG = `
+    <svg viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="6" />
+        <path d="M16 16L20 20" />
+    </svg>
+`;
+
+function getCurrentFolderName() {
+
+    if (!currentLocation) {
+        return '';
+    }
+
+    const folder = vaultFolders.find(
+        item => item.id === currentLocation.folderId
+    );
+
+    if (!folder) {
+        return '';
+    }
+
+    const relative = normalizeVaultPath(
+        currentLocation.relativePath
+    );
+
+    if (!relative) {
+        return folder.name;
+    }
+
+    const parts = relative.split('/');
+
+    return parts[parts.length - 1];
+
+}
+
+function getCurrentParentName() {
+
+    if (!currentLocation) {
+        return '';
+    }
+
+    const folder = vaultFolders.find(
+        item => item.id === currentLocation.folderId
+    );
+
+    if (!folder) {
+        return '';
+    }
+
+    const relative = normalizeVaultPath(
+        currentLocation.relativePath
+    );
+
+    if (!relative) {
+        return 'My Vault';
+    }
+
+    const parentPath = pathParent(relative);
+
+    if (!parentPath) {
+        return folder.name;
+    }
+
+    const parts = parentPath.split('/');
+
+    return parts[parts.length - 1];
+
+}
+
+function handleEmptyFolderGoBack() {
+
+    if (!currentLocation) {
+        return;
+    }
+
+    activeSearchQuery = '';
+
+    if (vaultSearchInput) {
+        vaultSearchInput.value = '';
+    }
+
+    if (vaultSearchClearButton) {
+        vaultSearchClearButton.hidden = true;
+    }
+
+    const relative = normalizeVaultPath(
+        currentLocation.relativePath
+    );
+
+    if (!relative) {
+        currentLocation = null;
+    } else {
+        const parentPath = pathParent(relative);
+        currentLocation = {
+            folderId: currentLocation.folderId,
+            relativePath: parentPath
+        };
+    }
+
+    renderCurrentLocation();
+
+}
+
 function renderCurrentLocation() {
 
     if (
@@ -5995,6 +6351,10 @@ function renderCurrentLocation() {
 
         }
 
+        const emptyIconEl =
+            document.getElementById('emptyStateIcon') ||
+            emptyState.querySelector('.empty-icon');
+
         const emptyTitle =
             emptyState.querySelector('h2');
 
@@ -6004,8 +6364,18 @@ function renderCurrentLocation() {
         const emptyButtons =
             emptyState.querySelector('.empty-add-buttons');
 
+        const folderButtons =
+            document.getElementById('emptyFolderButtons');
+
+        const folderBackButtonText =
+            document.getElementById('emptyFolderBackButtonText');
+
 
         if (activeSearchQuery) {
+
+            if (emptyIconEl) {
+                emptyIconEl.innerHTML = EMPTY_SEARCH_ICON_SVG;
+            }
 
             if (emptyTitle) {
                 emptyTitle.textContent =
@@ -6025,7 +6395,55 @@ function renderCurrentLocation() {
                 emptyButtons.hidden = true;
             }
 
+            if (folderButtons) {
+                folderButtons.hidden = true;
+            }
+
+        } else if (currentLocation) {
+
+            const currentFolderName =
+                getCurrentFolderName() || 'Folder';
+
+            const currentParentName =
+                getCurrentParentName() || 'Previous Folder';
+
+            if (emptyIconEl) {
+                emptyIconEl.innerHTML = EMPTY_FOLDER_ICON_SVG;
+            }
+
+            if (emptyTitle) {
+                emptyTitle.textContent =
+                    'This folder is empty';
+            }
+
+            if (emptyDesc) {
+                emptyDesc.textContent =
+                    `No files or subfolders found inside "${currentFolderName}".`;
+            }
+
+            if (emptyButtons) {
+                emptyButtons.hidden = true;
+            }
+
+            if (folderButtons) {
+                folderButtons.hidden = false;
+            }
+
+            if (folderBackButtonText) {
+                const displayParent =
+                    currentParentName.length > 20
+                        ? `${currentParentName.slice(0, 18)}...`
+                        : currentParentName;
+
+                folderBackButtonText.textContent =
+                    `Go Back to ${displayParent}`;
+            }
+
         } else {
+
+            if (emptyIconEl) {
+                emptyIconEl.innerHTML = EMPTY_VAULT_ICON_SVG;
+            }
 
             if (emptyTitle) {
                 emptyTitle.textContent =
@@ -6041,11 +6459,22 @@ function renderCurrentLocation() {
                 emptyButtons.hidden = false;
             }
 
+            if (folderButtons) {
+                folderButtons.hidden = true;
+            }
+
         }
 
     } else {
 
         emptyState.hidden = true;
+
+        const folderButtons =
+            document.getElementById('emptyFolderButtons');
+
+        if (folderButtons) {
+            folderButtons.hidden = true;
+        }
 
         fileList.hidden = false;
 
@@ -6600,10 +7029,15 @@ function addFileRow(
             file.addedAt || file.createdAt || file.modifiedAt
         );
 
+    const fileModeUpper =
+        String(file.mode || '').toUpperCase();
+
     const modeText =
-        (file.mode === 'move' || file.sourceRemoved)
-            ? 'MOVE'
-            : 'COPY';
+        fileModeUpper === 'IMPORT'
+            ? 'IMPORT'
+            : (file.mode === 'move' || file.sourceRemoved)
+                ? 'MOVE'
+                : 'COPY';
 
 
     row.innerHTML = `
@@ -6638,7 +7072,7 @@ function addFileRow(
     <button
         class="file-menu-button"
         type="button"
-        title="More options"
+        data-tooltip="More options"
     >
         <span></span>
         <span></span>
@@ -6680,6 +7114,29 @@ function addFileRow(
         </svg>
 
         <span>Select</span>
+
+    </button>
+
+    <button
+        class="export-capsule-button file-menu-action"
+        type="button"
+    >
+
+        <svg
+            class="file-menu-action-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+
+        <span>Export Capsule</span>
 
     </button>
 
@@ -6762,52 +7219,54 @@ function addFileRow(
             '.file-actions'
         );
 
-    if (isRootFile) {
+    const menuButton =
+        row.querySelector(
+            '.file-menu-button'
+        );
 
-        const menuButton =
-            row.querySelector(
-                '.file-menu-button'
-            );
+    const menu =
+        row.querySelector(
+            '.file-menu'
+        );
 
-        const menu =
-            row.querySelector(
-                '.file-menu'
-            );
+    const restoreButton =
+        row.querySelector(
+            '.restore-file-button'
+        );
 
-        const restoreButton =
-            row.querySelector(
-                '.restore-file-button'
-            );
+    const selectButton =
+        row.querySelector(
+            '.select-row-button'
+        );
 
-        const selectButton =
-            row.querySelector(
-                '.select-row-button'
-            );
+    const exportCapsuleButton =
+        row.querySelector(
+            '.export-capsule-button'
+        );
 
-        const deleteButton =
-            row.querySelector(
-                '.delete-file-button'
-            );
+    const deleteButton =
+        row.querySelector(
+            '.delete-file-button'
+        );
 
-        if (selectButton) {
-            selectButton.addEventListener('click', event => {
-                event.stopPropagation();
-                menu.classList.remove('open');
-                if (!selectionModeActive) {
-                    enterSelectionMode(row);
-                } else {
-                    toggleRowSelection(row, true);
-                }
-            });
-        }
+    if (exportCapsuleButton) {
+        exportCapsuleButton.addEventListener('click', event => {
+            event.stopPropagation();
+            menu.classList.remove('open');
+            openCapsuleExportModal([{
+                type: 'file',
+                id: file.id,
+                name: file.name,
+                size: file.size
+            }]);
+        });
+    }
 
-
+    if (menuButton && menu) {
         menuButton.addEventListener(
             'click',
             event => {
-
                 event.stopPropagation();
-
                 const wasOpen =
                     menu.classList.contains('open');
 
@@ -6825,10 +7284,23 @@ function addFileRow(
                     row.classList.add('menu-active');
                     row.style.zIndex = '1000';
                 }
-
             }
         );
+    }
 
+    if (isRootFile) {
+
+        if (selectButton) {
+            selectButton.addEventListener('click', event => {
+                event.stopPropagation();
+                menu.classList.remove('open');
+                if (!selectionModeActive) {
+                    enterSelectionMode(row);
+                } else {
+                    toggleRowSelection(row, true);
+                }
+            });
+        }
 
         restoreButton.addEventListener(
             'click',
@@ -7118,9 +7590,16 @@ function addFileRow(
 
     } else {
 
-        if (fileActions) {
-            fileActions.style.visibility =
-                'hidden';
+        if (restoreButton) {
+            restoreButton.remove();
+        }
+
+        if (selectButton) {
+            selectButton.remove();
+        }
+
+        if (deleteButton) {
+            deleteButton.remove();
         }
 
         const checkboxWrapper = row.querySelector('.file-row-checkbox');
@@ -7330,6 +7809,16 @@ copyFolderButton.addEventListener(
     }
 );
 
+if (emptyFolderBackButton) {
+    emptyFolderBackButton.addEventListener(
+        'click',
+        () => {
+            handleEmptyFolderGoBack();
+        }
+    );
+}
+
+
 /* =========================================
    LOCK VAULT
 ========================================= */
@@ -7373,8 +7862,11 @@ const removeSessionLockedListener =
             toggleRecoveryKeyButton.innerHTML =
                 EYE_ICON;
 
-            toggleRecoveryKeyButton.title =
-                'Show Recovery Key';
+            toggleRecoveryKeyButton.setAttribute(
+                'data-tooltip',
+                'Show Recovery Key'
+            );
+            toggleRecoveryKeyButton.removeAttribute('title');
 
             window.location.replace(
                 'index.html'
@@ -7420,8 +7912,11 @@ lockVaultButton.addEventListener(
             toggleRecoveryKeyButton.innerHTML =
                 EYE_ICON;
 
-            toggleRecoveryKeyButton.title =
-                'Show Recovery Key';
+            toggleRecoveryKeyButton.setAttribute(
+                'data-tooltip',
+                'Show Recovery Key'
+            );
+            toggleRecoveryKeyButton.removeAttribute('title');
 
             window.location.replace(
                 'index.html'
@@ -7841,10 +8336,15 @@ function addFolderRow(folder) {
             folder.addedAt || folder.createdAt || folder.modifiedAt
         );
 
+    const folderModeUpper =
+        String(folder.mode || '').toUpperCase();
+
     const modeText =
-        (String(folder.mode).toLowerCase() === 'move' || folder.sourceRemoved === true)
-            ? 'MOVE'
-            : 'COPY';
+        folderModeUpper === 'IMPORT'
+            ? 'IMPORT'
+            : (String(folder.mode).toLowerCase() === 'move' || folder.sourceRemoved === true)
+                ? 'MOVE'
+                : 'COPY';
 
 
     row.innerHTML = `
@@ -7893,7 +8393,7 @@ function addFolderRow(folder) {
     <button
         class="file-menu-button"
         type="button"
-        title="More options"
+        data-tooltip="More options"
     >
         <span></span>
         <span></span>
@@ -7936,6 +8436,29 @@ function addFolderRow(folder) {
         </svg>
 
         <span>Select</span>
+
+    </button>
+
+    <button
+        class="export-capsule-button file-menu-action"
+        type="button"
+    >
+
+        <svg
+            class="file-menu-action-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+
+        <span>Export Capsule</span>
 
     </button>
 
@@ -7989,53 +8512,54 @@ function addFolderRow(folder) {
         );
 
 
-    if (isRootFolder) {
+    const menuButton =
+        row.querySelector(
+            '.file-menu-button'
+        );
 
-        const menuButton =
-            row.querySelector(
-                '.file-menu-button'
-            );
+    const menu =
+        row.querySelector(
+            '.file-menu'
+        );
 
+    const restoreButton =
+        row.querySelector(
+            '.restore-folder-button'
+        );
 
-        const menu =
-            row.querySelector(
-                '.file-menu'
-            );
+    const selectButton =
+        row.querySelector(
+            '.select-row-button'
+        );
 
+    const exportCapsuleButton =
+        row.querySelector(
+            '.export-capsule-button'
+        );
 
-        const restoreButton =
-            row.querySelector(
-                '.restore-folder-button'
-            );
+    const deleteButton =
+        row.querySelector(
+            '.delete-folder-button'
+        );
 
-        const selectButton =
-            row.querySelector(
-                '.select-row-button'
-            );
+    if (exportCapsuleButton) {
+        exportCapsuleButton.addEventListener('click', event => {
+            event.stopPropagation();
+            menu.classList.remove('open');
+            openCapsuleExportModal([{
+                type: 'folder',
+                id: folder.folderId,
+                name: folder.name,
+                relativePath: folder.relativePath || ''
+            }]);
+        });
+    }
 
-        const deleteButton =
-            row.querySelector(
-                '.delete-folder-button'
-            );
-
-        if (selectButton) {
-            selectButton.addEventListener('click', event => {
-                event.stopPropagation();
-                menu.classList.remove('open');
-                if (!selectionModeActive) {
-                    enterSelectionMode(row);
-                } else {
-                    toggleRowSelection(row, true);
-                }
-            });
-        }
-
+    if (menuButton && menu) {
         menuButton.addEventListener(
             'click',
             event => {
-
                 event.stopPropagation();
-
                 const wasOpen =
                     menu.classList.contains('open');
 
@@ -8053,10 +8577,23 @@ function addFolderRow(folder) {
                     row.classList.add('menu-active');
                     row.style.zIndex = '1000';
                 }
-
             }
         );
+    }
 
+    if (isRootFolder) {
+
+        if (selectButton) {
+            selectButton.addEventListener('click', event => {
+                event.stopPropagation();
+                menu.classList.remove('open');
+                if (!selectionModeActive) {
+                    enterSelectionMode(row);
+                } else {
+                    toggleRowSelection(row, true);
+                }
+            });
+        }
 
         restoreButton.addEventListener(
             'click',
@@ -8333,16 +8870,17 @@ function addFolderRow(folder) {
 
     } else {
 
-        /*
-            Nested folders currently do not have
-            their own Restore action.
-    
-            Root-folder restore will restore the
-            complete folder tree.
-        */
+        if (restoreButton) {
+            restoreButton.remove();
+        }
 
-        fileActions.style.visibility =
-            'hidden';
+        if (selectButton) {
+            selectButton.remove();
+        }
+
+        if (deleteButton) {
+            deleteButton.remove();
+        }
 
         const checkboxWrapper = row.querySelector('.file-row-checkbox');
         if (checkboxWrapper) {
@@ -8709,6 +9247,14 @@ window.crypticLocker
                     progress.operation ===
                     'export';
 
+                const isExportCapsule =
+                    progress.operation ===
+                    'export_capsule';
+
+                const isImportCapsule =
+                    progress.operation ===
+                    'import_capsule';
+
                 const isRestore =
                     progress.operation ===
                     'restore';
@@ -8752,29 +9298,55 @@ window.crypticLocker
 
                 }
 
+                if (
+                    (isImportCapsule || isExportCapsule) &&
+                    typeof closeCapsuleImportModal === 'function' &&
+                    capsuleImportOverlay &&
+                    !capsuleImportOverlay.hidden
+                ) {
+
+                    closeCapsuleImportModal();
+
+                }
+
+                if (
+                    (isImportCapsule || isExportCapsule) &&
+                    typeof closeCapsuleExportModal === 'function' &&
+                    capsuleExportOverlay &&
+                    !capsuleExportOverlay.hidden
+                ) {
+
+                    closeCapsuleExportModal();
+
+                }
+
 
                 operationTitle.textContent =
                     isExport
                         ? 'Exporting Vault'
-                        : isRecover
-                            ? 'Recovering file'
-                            : isDelete
-                                ? (
-                                    progress.itemType === 'folder'
-                                        ? 'Deleting folder'
-                                        : 'Deleting file'
-                                )
-                                : isRestore
-                                    ? (
-                                        progress.itemType === 'folder'
-                                            ? 'Restoring folder'
-                                            : 'Restoring file'
-                                    )
-                                    : (
-                                        progress.itemType === 'folder'
-                                            ? 'Securing folder'
-                                            : 'Securing file'
-                                    );
+                        : isExportCapsule
+                            ? 'Exporting Capsule'
+                            : isImportCapsule
+                                ? 'Importing Capsule'
+                                : isRecover
+                                    ? 'Recovering file'
+                                    : isDelete
+                                        ? (
+                                            progress.itemType === 'folder'
+                                                ? 'Deleting folder'
+                                                : 'Deleting file'
+                                        )
+                                        : isRestore
+                                            ? (
+                                                progress.itemType === 'folder'
+                                                    ? 'Restoring folder'
+                                                    : 'Restoring file'
+                                            )
+                                            : (
+                                                progress.itemType === 'folder'
+                                                    ? 'Securing folder'
+                                                    : 'Securing file'
+                                            );
 
 
                 operationItemName.textContent =
@@ -8790,19 +9362,31 @@ window.crypticLocker
                                     ? 'Preparing backup package...'
                                     : 'Streaming encrypted files...'
                             )
-                            : isDelete
+                            : isExportCapsule
                                 ? (
-                                    progress.status ===
-                                        'started'
-                                        ? 'Preparing deletion...'
-                                        : 'Removing from vault...'
+                                    progress.status === 'started'
+                                        ? 'Preparing capsule package...'
+                                        : 'Streaming encrypted files...'
                                 )
-                                : (
-                                    progress.status ===
-                                        'started'
-                                        ? 'Preparing...'
-                                        : 'Finalizing...'
-                                )
+                                : isImportCapsule
+                                    ? (
+                                        progress.status === 'started'
+                                            ? 'Preparing capsule import...'
+                                            : 'Decrypting capsule package...'
+                                    )
+                                    : isDelete
+                                        ? (
+                                            progress.status ===
+                                                'started'
+                                                ? 'Preparing deletion...'
+                                                : 'Removing from vault...'
+                                        )
+                                        : (
+                                            progress.status ===
+                                                'started'
+                                                ? 'Preparing...'
+                                                : 'Finalizing...'
+                                        )
                     );
 
                 const totalBytes =
@@ -8902,10 +9486,15 @@ window.crypticLocker
                     operationStatusText.textContent =
                         'Decrypting and verifying...';
 
-                } else if (isExport) {
+                } else if (isExport || isExportCapsule) {
 
                     operationStatusText.textContent =
                         'Exporting and packaging...';
+
+                } else if (isImportCapsule) {
+
+                    operationStatusText.textContent =
+                        'Decrypting and importing...';
 
                 } else {
 
@@ -9040,10 +9629,22 @@ window.crypticLocker
                     progress.operation ===
                     'export';
 
+                const isExportCapsule =
+                    progress.operation ===
+                    'export_capsule';
+
+                const isImportCapsule =
+                    progress.operation ===
+                    'import_capsule';
+
                 operationSuccessTitle.textContent =
                     isExport
                         ? 'Vault export cancelled'
-                        : 'Operation cancelled';
+                        : isExportCapsule
+                            ? 'Capsule export cancelled'
+                            : isImportCapsule
+                                ? 'Capsule import cancelled'
+                                : 'Operation cancelled';
 
 
                 operationSuccessName.textContent =
@@ -9054,25 +9655,29 @@ window.crypticLocker
                 operationSuccessMessage.textContent =
                     isExport
                         ? 'The vault export was cancelled. No files were created.'
-                        : isRecover
-                            ? 'The recovery operation was cancelled.'
-                            : isDelete
-                                ? (
-                                    isFolder
-                                        ? 'The folder deletion was cancelled.'
-                                        : 'The file deletion was cancelled.'
-                                )
-                                : isRestore
-                                    ? (
-                                        isFolder
-                                            ? 'The folder restore was cancelled.'
-                                            : 'The file restore was cancelled.'
-                                    )
-                                    : (
-                                        isFolder
-                                            ? 'The folder encryption was cancelled.'
-                                            : 'The file encryption was cancelled.'
-                                    );
+                        : isExportCapsule
+                            ? 'The capsule export was cancelled. No package was created.'
+                            : isImportCapsule
+                                ? 'The capsule import was cancelled.'
+                                : isRecover
+                                    ? 'The recovery operation was cancelled.'
+                                    : isDelete
+                                        ? (
+                                            isFolder
+                                                ? 'The folder deletion was cancelled.'
+                                                : 'The file deletion was cancelled.'
+                                        )
+                                        : isRestore
+                                            ? (
+                                                isFolder
+                                                    ? 'The folder restore was cancelled.'
+                                                    : 'The file restore was cancelled.'
+                                            )
+                                            : (
+                                                isFolder
+                                                    ? 'The folder encryption was cancelled.'
+                                                    : 'The file encryption was cancelled.'
+                                            );
 
 
                 operationSpeed.textContent =
@@ -9103,6 +9708,18 @@ window.crypticLocker
                     'operation-result-icon failed';
 
 
+                const isExport =
+                    progress.operation ===
+                    'export';
+
+                const isExportCapsule =
+                    progress.operation ===
+                    'export_capsule';
+
+                const isImportCapsule =
+                    progress.operation ===
+                    'import_capsule';
+
                 const isRestore =
                     progress.operation ===
                     'restore';
@@ -9121,25 +9738,31 @@ window.crypticLocker
 
 
                 operationSuccessTitle.textContent =
-                    isRecover
-                        ? 'File recovery failed'
-                        : isDelete
-                            ? (
-                                isFolder
-                                    ? 'Folder deletion failed'
-                                    : 'File deletion failed'
-                            )
-                            : isRestore
-                                ? (
-                                    isFolder
-                                        ? 'Folder restore failed'
-                                        : 'File restore failed'
-                                )
-                                : (
-                                    isFolder
-                                        ? 'Folder could not be secured'
-                                        : 'File could not be secured'
-                                );
+                    isExport
+                        ? 'Vault export failed'
+                        : isExportCapsule
+                            ? 'Capsule export failed'
+                            : isImportCapsule
+                                ? 'Capsule merge failed'
+                                : isRecover
+                                    ? 'File recovery failed'
+                                    : isDelete
+                                        ? (
+                                            isFolder
+                                                ? 'Folder deletion failed'
+                                                : 'File deletion failed'
+                                        )
+                                        : isRestore
+                                            ? (
+                                                isFolder
+                                                    ? 'Folder restore failed'
+                                                    : 'File restore failed'
+                                            )
+                                            : (
+                                                isFolder
+                                                    ? 'Folder could not be secured'
+                                                    : 'File could not be secured'
+                                            );
 
 
                 operationSuccessName.textContent =
@@ -9282,6 +9905,14 @@ window.crypticLocker
                     progress.operation ===
                     'export';
 
+                const isExportCapsule =
+                    progress.operation ===
+                    'export_capsule';
+
+                const isImportCapsule =
+                    progress.operation ===
+                    'import_capsule';
+
                 const isRestore =
                     progress.operation ===
                     'restore';
@@ -9302,29 +9933,33 @@ window.crypticLocker
                 operationSuccessTitle.textContent =
                     isExport
                         ? 'Vault exported successfully'
-                        : isRecover
-                            ? 'File recovered successfully'
-                            : isDelete
-                                ? (
-                                    isFolder
-                                        ? 'Folder deleted successfully'
-                                        : 'File deleted successfully'
-                                )
-                                : isRestore
-                                    ? (
-                                        isFolder
-                                            ? 'Folder restored successfully'
-                                            : 'File restored successfully'
-                                    )
-                                    : (
-                                        isFolder
-                                            ? 'Folder secured successfully'
-                                            : (
-                                                progress.totalFiles > 1
-                                                    ? 'Files secured successfully'
-                                                    : 'File secured successfully'
+                        : isExportCapsule
+                            ? 'Capsule exported successfully'
+                            : isImportCapsule
+                                ? 'Capsule merged successfully'
+                                : isRecover
+                                    ? 'File recovered successfully'
+                                    : isDelete
+                                        ? (
+                                            isFolder
+                                                ? 'Folder deleted successfully'
+                                                : 'File deleted successfully'
+                                        )
+                                        : isRestore
+                                            ? (
+                                                isFolder
+                                                    ? 'Folder restored successfully'
+                                                    : 'File restored successfully'
                                             )
-                                    );
+                                            : (
+                                                isFolder
+                                                    ? 'Folder secured successfully'
+                                                    : (
+                                                        progress.totalFiles > 1
+                                                            ? 'Files secured successfully'
+                                                            : 'File secured successfully'
+                                                    )
+                                            );
 
 
                 operationSuccessName.textContent =
@@ -9334,6 +9969,16 @@ window.crypticLocker
 
                     operationSuccessMessage.textContent =
                         `Your encrypted vault backup (.clvault) with ${progress.totalFiles || 0} items was saved successfully.`;
+
+                } else if (isExportCapsule) {
+
+                    operationSuccessMessage.textContent =
+                        progress.currentFile || 'Your secure capsule (.clpack) was created successfully.';
+
+                } else if (isImportCapsule) {
+
+                    operationSuccessMessage.textContent =
+                        progress.currentFile || 'The capsule files were successfully merged into your vault.';
 
                 } else if (isRecover) {
 
@@ -11346,3 +11991,535 @@ if (exportVaultButton) {
     );
 
 }
+
+/* =========================================
+   SECURE CAPSULE (.clpack) EXPORT & IMPORT
+========================================= */
+
+const selectionExportCapsuleButton =
+    document.getElementById('selectionExportCapsuleButton');
+
+const importCapsuleButton =
+    document.getElementById('importCapsuleButton');
+
+const capsuleExportOverlay =
+    document.getElementById('capsuleExportOverlay');
+
+const capsuleExportTargetName =
+    document.getElementById('capsuleExportTargetName');
+
+const capsuleExportTargetDetails =
+    document.getElementById('capsuleExportTargetDetails');
+
+const capsuleExportPasswordInput =
+    document.getElementById('capsuleExportPasswordInput');
+
+const capsuleExportConfirmPasswordInput =
+    document.getElementById('capsuleExportConfirmPasswordInput');
+
+const capsuleExportPasswordError =
+    document.getElementById('capsuleExportPasswordError');
+
+const capsuleExportCancelButton =
+    document.getElementById('capsuleExportCancelButton');
+
+const capsuleExportConfirmButton =
+    document.getElementById('capsuleExportConfirmButton');
+
+const capsuleImportOverlay =
+    document.getElementById('capsuleImportOverlay');
+
+const capsuleImportFileName =
+    document.getElementById('capsuleImportFileName');
+
+const capsuleImportTargetDetails =
+    document.getElementById('capsuleImportTargetDetails');
+
+const capsuleImportPasswordInput =
+    document.getElementById('capsuleImportPasswordInput');
+
+const capsuleImportPasswordError =
+    document.getElementById('capsuleImportPasswordError');
+
+const capsuleImportCancelButton =
+    document.getElementById('capsuleImportCancelButton');
+
+const capsuleImportConfirmButton =
+    document.getElementById('capsuleImportConfirmButton');
+
+let currentCapsuleExportItems = null;
+let currentCapsuleImportPath = null;
+
+function openCapsuleExportModal(items) {
+    if (!capsuleExportOverlay || !items || items.length === 0) {
+        return;
+    }
+
+    currentCapsuleExportItems = items;
+
+    let totalFiles = 0;
+    let totalBytes = 0;
+
+    for (const item of items) {
+        if (item.type === 'file') {
+            const f = Array.isArray(vaultFiles) ? vaultFiles.find(vf => vf.id === item.id) : null;
+            totalFiles += 1;
+            totalBytes += (f?.size || item.size || 0);
+        } else if (item.type === 'folder') {
+            let folderFiles = Array.isArray(vaultFiles) ? vaultFiles.filter(vf => vf.parentFolderId === item.id) : [];
+            if (item.relativePath) {
+                const normTarget = normalizeVaultPath(item.relativePath);
+                folderFiles = folderFiles.filter(vf => {
+                    const vfRel = normalizeVaultPath(vf.relativePath || '');
+                    return vfRel === normTarget || vfRel.startsWith(normTarget + '/');
+                });
+            }
+            totalFiles += folderFiles.length;
+            totalBytes += folderFiles.reduce((acc, curr) => acc + (curr.size || 0), 0);
+        }
+    }
+
+    if (items.length === 1) {
+        const item = items[0];
+        if (capsuleExportTargetName) {
+            capsuleExportTargetName.textContent = item.name;
+        }
+        if (capsuleExportTargetDetails) {
+            if (item.type === 'file') {
+                capsuleExportTargetDetails.textContent = formatBytes(totalBytes);
+            } else {
+                capsuleExportTargetDetails.textContent = `${totalFiles} ${totalFiles === 1 ? 'file' : 'files'} · ${formatBytes(totalBytes)}`;
+            }
+        }
+    } else {
+        if (capsuleExportTargetName) {
+            capsuleExportTargetName.textContent = `${items.length} Selected Items`;
+        }
+        if (capsuleExportTargetDetails) {
+            capsuleExportTargetDetails.textContent = `${totalFiles} ${totalFiles === 1 ? 'file' : 'files'} · ${formatBytes(totalBytes)}`;
+        }
+    }
+
+    if (capsuleExportPasswordInput) {
+        capsuleExportPasswordInput.value = '';
+        capsuleExportPasswordInput.type = 'password';
+    }
+    if (capsuleExportConfirmPasswordInput) {
+        capsuleExportConfirmPasswordInput.value = '';
+        capsuleExportConfirmPasswordInput.type = 'password';
+    }
+    if (capsuleExportPasswordError) {
+        capsuleExportPasswordError.hidden = true;
+        capsuleExportPasswordError.textContent = '';
+    }
+
+    if (capsuleExportConfirmButton) {
+        capsuleExportConfirmButton.disabled = false;
+        const btnSpan = capsuleExportConfirmButton.querySelector('span');
+        if (btnSpan) {
+            btnSpan.textContent = 'Export Capsule (.clpack)';
+        }
+    }
+
+    // Reset eye toggle icons
+    capsuleExportOverlay.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.classList.remove('visible');
+        btn.setAttribute('aria-label', 'Show password');
+    });
+
+    capsuleExportOverlay.hidden = false;
+    setTimeout(() => {
+        if (capsuleExportPasswordInput) {
+            capsuleExportPasswordInput.focus();
+        }
+    }, 50);
+}
+
+function closeCapsuleExportModal() {
+    if (!capsuleExportOverlay) return;
+    capsuleExportOverlay.hidden = true;
+    if (capsuleExportPasswordInput) capsuleExportPasswordInput.value = '';
+    if (capsuleExportConfirmPasswordInput) capsuleExportConfirmPasswordInput.value = '';
+    if (capsuleExportPasswordError) {
+        capsuleExportPasswordError.hidden = true;
+        capsuleExportPasswordError.textContent = '';
+    }
+    currentCapsuleExportItems = null;
+}
+
+async function handleCapsuleExportConfirm() {
+    if (!currentCapsuleExportItems || currentCapsuleExportItems.length === 0) {
+        return;
+    }
+
+    const password = capsuleExportPasswordInput ? capsuleExportPasswordInput.value : '';
+    const confirmPassword = capsuleExportConfirmPasswordInput ? capsuleExportConfirmPasswordInput.value : '';
+
+    if (!password) {
+        if (capsuleExportPasswordError) {
+            capsuleExportPasswordError.textContent = 'Please enter a transfer password.';
+            capsuleExportPasswordError.hidden = false;
+        }
+        capsuleExportPasswordInput?.focus();
+        return;
+    }
+
+    if (password.length < 4) {
+        if (capsuleExportPasswordError) {
+            capsuleExportPasswordError.textContent = 'Transfer password must be at least 4 characters.';
+            capsuleExportPasswordError.hidden = false;
+        }
+        capsuleExportPasswordInput?.focus();
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        if (capsuleExportPasswordError) {
+            capsuleExportPasswordError.textContent = 'Passwords do not match.';
+            capsuleExportPasswordError.hidden = false;
+        }
+        capsuleExportConfirmPasswordInput?.focus();
+        return;
+    }
+
+    if (capsuleExportPasswordError) {
+        capsuleExportPasswordError.hidden = true;
+        capsuleExportPasswordError.textContent = '';
+    }
+
+    if (capsuleExportConfirmButton) {
+        capsuleExportConfirmButton.disabled = true;
+        const btnSpan = capsuleExportConfirmButton.querySelector('span');
+        if (btnSpan) btnSpan.textContent = 'Preparing Capsule...';
+    }
+
+    try {
+        const itemsToExport = currentCapsuleExportItems.map(item => ({
+            type: item.type,
+            id: item.id,
+            name: item.name,
+            relativePath: item.relativePath || ''
+        }));
+
+        closeCapsuleExportModal();
+
+        const result = await window.crypticLocker.exportCapsule(
+            itemsToExport,
+            password
+        );
+
+        if (result && result.success) {
+            if (selectionModeActive) {
+                exitSelectionMode();
+            }
+        } else if (result && result.canceled) {
+            if (operationOverlay) {
+                operationOverlay.hidden = true;
+            }
+        } else {
+            if (operationOverlay) {
+                operationOverlay.hidden = true;
+            }
+            const errorMsg = result?.message || 'Failed to export capsule.';
+            if (typeof showCustomAlert === 'function') {
+                showCustomAlert({
+                    title: 'Capsule Export Failed',
+                    message: errorMsg,
+                    type: 'danger'
+                });
+            }
+        }
+    } catch (err) {
+        console.error('Capsule export error:', err);
+        if (operationOverlay) {
+            operationOverlay.hidden = true;
+        }
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert({
+                title: 'Capsule Export Error',
+                message: err.message || 'An unexpected error occurred during capsule export.',
+                type: 'danger'
+            });
+        }
+    } finally {
+        if (capsuleExportConfirmButton) {
+            capsuleExportConfirmButton.disabled = false;
+            const btnSpan = capsuleExportConfirmButton.querySelector('span');
+            if (btnSpan) btnSpan.textContent = 'Export Capsule (.clpack)';
+        }
+    }
+}
+
+if (capsuleExportCancelButton) {
+    capsuleExportCancelButton.addEventListener('click', closeCapsuleExportModal);
+}
+
+if (capsuleExportConfirmButton) {
+    capsuleExportConfirmButton.addEventListener('click', handleCapsuleExportConfirm);
+}
+
+if (capsuleExportPasswordInput) {
+    capsuleExportPasswordInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            if (capsuleExportConfirmPasswordInput) {
+                capsuleExportConfirmPasswordInput.focus();
+            } else {
+                handleCapsuleExportConfirm();
+            }
+        }
+    });
+}
+
+if (capsuleExportConfirmPasswordInput) {
+    capsuleExportConfirmPasswordInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            handleCapsuleExportConfirm();
+        }
+    });
+}
+
+if (selectionExportCapsuleButton) {
+    selectionExportCapsuleButton.addEventListener('click', () => {
+        if (activeVaultOperations > 0) {
+            if (typeof showCustomAlert === 'function') {
+                showCustomAlert({
+                    title: 'Operation in Progress',
+                    message: 'Please wait for current operation to finish.',
+                    type: 'warning'
+                });
+            }
+            return;
+        }
+
+        const items = Array.from(selectedVaultItems.values());
+        if (items.length === 0) {
+            return;
+        }
+        openCapsuleExportModal(items);
+    });
+}
+
+/* =========================================
+   CAPSULE MERGE IMPORT
+========================================= */
+
+function openCapsuleImportModal(filePath, inspection) {
+    if (!capsuleImportOverlay) return;
+
+    currentCapsuleImportPath = filePath;
+    const fileName = filePath.replace(/\\/g, '/').split('/').pop();
+
+    if (capsuleImportFileName) {
+        capsuleImportFileName.textContent = fileName;
+    }
+
+    if (capsuleImportTargetDetails) {
+        if (typeof inspection.fileCount === 'number') {
+            capsuleImportTargetDetails.textContent = `${inspection.fileCount} ${inspection.fileCount === 1 ? 'item' : 'items'} (${formatBytes(inspection.totalBytes || 0)}) · Ready to decrypt`;
+        } else {
+            capsuleImportTargetDetails.textContent = `Encrypted CrypticLocker Capsule · Ready to decrypt`;
+        }
+    }
+
+    if (capsuleImportPasswordInput) {
+        capsuleImportPasswordInput.value = '';
+        capsuleImportPasswordInput.type = 'password';
+    }
+
+    if (capsuleImportPasswordError) {
+        capsuleImportPasswordError.hidden = true;
+        capsuleImportPasswordError.textContent = '';
+    }
+
+    if (capsuleImportConfirmButton) {
+        capsuleImportConfirmButton.disabled = false;
+        const btnSpan = capsuleImportConfirmButton.querySelector('span');
+        if (btnSpan) btnSpan.textContent = 'Merge into Vault';
+    }
+
+    // Reset eye toggle icons
+    capsuleImportOverlay.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.classList.remove('visible');
+        btn.setAttribute('aria-label', 'Show password');
+    });
+
+    capsuleImportOverlay.hidden = false;
+    setTimeout(() => {
+        if (capsuleImportPasswordInput) {
+            capsuleImportPasswordInput.focus();
+        }
+    }, 50);
+}
+
+function closeCapsuleImportModal() {
+    if (!capsuleImportOverlay) return;
+    capsuleImportOverlay.hidden = true;
+    if (capsuleImportPasswordInput) capsuleImportPasswordInput.value = '';
+    if (capsuleImportPasswordError) {
+        capsuleImportPasswordError.hidden = true;
+        capsuleImportPasswordError.textContent = '';
+    }
+    currentCapsuleImportPath = null;
+}
+
+if (capsuleImportCancelButton) {
+    capsuleImportCancelButton.addEventListener('click', closeCapsuleImportModal);
+}
+
+async function handleCapsuleImportConfirm() {
+    if (!currentCapsuleImportPath) return;
+
+    const password = capsuleImportPasswordInput ? capsuleImportPasswordInput.value : '';
+    if (!password) {
+        if (capsuleImportPasswordError) {
+            capsuleImportPasswordError.textContent = 'Please enter the transfer password.';
+            capsuleImportPasswordError.hidden = false;
+        }
+        capsuleImportPasswordInput?.focus();
+        return;
+    }
+
+    if (capsuleImportPasswordError) {
+        capsuleImportPasswordError.hidden = true;
+        capsuleImportPasswordError.textContent = '';
+    }
+
+    if (capsuleImportConfirmButton) {
+        capsuleImportConfirmButton.disabled = true;
+        const btnSpan = capsuleImportConfirmButton.querySelector('span');
+        if (btnSpan) btnSpan.textContent = 'Merging Capsule...';
+    }
+
+    const filePath = currentCapsuleImportPath;
+
+    try {
+        closeCapsuleImportModal();
+
+        const result = await window.crypticLocker.mergeCapsule(
+            filePath,
+            password
+        );
+
+        if (result && result.success) {
+            await loadVaultFiles();
+            await updateExportViewStats();
+        } else if (result && result.canceled) {
+            if (operationOverlay) {
+                operationOverlay.hidden = true;
+            }
+        } else {
+            if (operationOverlay) {
+                operationOverlay.hidden = true;
+            }
+            const errorMsg = result?.message || 'Failed to merge capsule into vault.';
+            if (typeof showCustomAlert === 'function') {
+                showCustomAlert({
+                    title: 'Capsule Merge Failed',
+                    message: errorMsg,
+                    type: 'danger'
+                });
+            }
+        }
+    } catch (err) {
+        console.error('Merge capsule error:', err);
+        if (operationOverlay) {
+            operationOverlay.hidden = true;
+        }
+        if (typeof showCustomAlert === 'function') {
+            showCustomAlert({
+                title: 'Capsule Merge Error',
+                message: err.message || 'An unexpected error occurred during merge.',
+                type: 'danger'
+            });
+        }
+    } finally {
+        if (capsuleImportConfirmButton) {
+            capsuleImportConfirmButton.disabled = false;
+            const btnSpan = capsuleImportConfirmButton.querySelector('span');
+            if (btnSpan) btnSpan.textContent = 'Merge into Vault';
+        }
+        currentCapsuleImportPath = null;
+    }
+}
+
+if (capsuleImportConfirmButton) {
+    capsuleImportConfirmButton.addEventListener('click', handleCapsuleImportConfirm);
+}
+
+if (capsuleImportPasswordInput) {
+    capsuleImportPasswordInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            handleCapsuleImportConfirm();
+        }
+    });
+}
+
+if (importCapsuleButton) {
+    importCapsuleButton.addEventListener('click', async () => {
+        if (activeVaultOperations > 0) {
+            if (typeof showCustomAlert === 'function') {
+                showCustomAlert({
+                    title: 'Operation in Progress',
+                    message: 'Please wait for the current vault operation to finish before importing a capsule.',
+                    type: 'warning'
+                });
+            }
+            return;
+        }
+
+        try {
+            const selectRes = await window.crypticLocker.selectCapsuleFile();
+            if (selectRes.canceled || !selectRes.filePath) {
+                return;
+            }
+
+            const inspection = await window.crypticLocker.inspectCapsule(selectRes.filePath, null);
+            if (inspection.isFullVault) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert({
+                        title: 'Incompatible File Type',
+                        message: 'This file is a Full Vault Backup (.clvault), not a Secure Capsule (.clpack).\n\nFull vault backups must be imported from the initial setup screen.',
+                        type: 'warning'
+                    });
+                }
+                return;
+            }
+
+            if (!inspection.valid) {
+                if (typeof showCustomAlert === 'function') {
+                    showCustomAlert({
+                        title: 'Invalid Capsule',
+                        message: inspection.error || 'The selected file is not a valid CrypticLocker Capsule.',
+                        type: 'danger'
+                    });
+                }
+                return;
+            }
+
+            openCapsuleImportModal(selectRes.filePath, inspection);
+
+        } catch (err) {
+            console.error('Import capsule error:', err);
+            if (typeof showCustomAlert === 'function') {
+                showCustomAlert({
+                    title: 'Import Error',
+                    message: err.message || 'Failed to inspect capsule file.',
+                    type: 'danger'
+                });
+            }
+        }
+    });
+}
+
+// Global escape listener for capsule overlays
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        if (capsuleExportOverlay && !capsuleExportOverlay.hidden) {
+            closeCapsuleExportModal();
+        }
+        if (capsuleImportOverlay && !capsuleImportOverlay.hidden) {
+            closeCapsuleImportModal();
+        }
+    }
+});
+

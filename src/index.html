@@ -190,8 +190,25 @@
                                 <div class="import-progress-spinner"></div>
                                 <span class="import-progress-title" id="importProgressTitle">Importing Vault...</span>
                                 <span class="import-progress-percent" id="importProgressPercent">0%</span>
+                                <div class="custom-dropdown import-boost-dropdown" id="importBoostDropdown">
+                                    <button class="custom-dropdown-button import-boost-button" type="button"
+                                        id="importBoostButton" aria-haspopup="listbox" aria-expanded="false"
+                                        data-tooltip="Adaptive I/O Acceleration Engine">
+                                        <svg viewBox="0 0 24 24" class="boost-lightning-icon" aria-hidden="true">
+                                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" />
+                                        </svg>
+                                        <span id="importBoostSelectedText">Speed: Auto</span>
+                                        <svg viewBox="0 0 24 24" class="dropdown-chevron" aria-hidden="true">
+                                            <path d="M6 9L12 15L18 9" />
+                                        </svg>
+                                    </button>
+                                    <div class="custom-dropdown-menu import-boost-menu" id="importBoostMenu" hidden role="listbox">
+                                        <!-- Dynamically populated -->
+                                    </div>
+                                </div>
+
                                 <button type="button" class="import-progress-cancel-btn" id="importCancelButton"
-                                    title="Cancel Import">
+                                    data-tooltip="Cancel Import">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round">
                                         <line x1="18" y1="6" x2="6" y2="18"></line>

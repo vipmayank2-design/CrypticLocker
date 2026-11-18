@@ -824,3 +824,131 @@ button:disabled .eye-icon {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+/* =========================================
+   IMPORT ACCELERATION DROPDOWN
+========================================= */
+
+.import-boost-dropdown {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 125px;
+}
+
+.import-boost-button {
+  width: 100%;
+  height: 25px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.import-boost-button:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--control-border);
+}
+
+.import-boost-dropdown .boost-lightning-icon {
+  width: 12px;
+  height: 12px;
+  fill: var(--primary);
+  stroke: var(--primary);
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+
+.import-boost-dropdown .dropdown-chevron {
+  width: 11px;
+  height: 11px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 2;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.import-boost-dropdown.open .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.import-boost-menu {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  right: 0;
+  min-width: 145px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.import-boost-dropdown.open .import-boost-menu {
+  display: flex;
+}
+
+.import-boost-menu[hidden] {
+  display: none !important;
+}
+
+/* =========================
+   CLEAN VIEW DURING IMPORT
+========================= */
+
+.vault-card.importing-active #authScreen > .form-group,
+.vault-card.importing-active #strengthSection,
+.vault-card.importing-active #requirementsSection,
+.vault-card.importing-active #submitButton,
+.vault-card.importing-active .auth-divider,
+.vault-card.importing-active .import-vault-button {
+  display: none !important;
+}
+
+.vault-card.importing-active .import-progress-card {
+  margin-top: 6px;
+}
+
+.import-boost-menu .custom-dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.import-boost-menu .custom-dropdown-item:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+.import-boost-menu .custom-dropdown-item.active {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--primary);
+  font-weight: 600;
+}
