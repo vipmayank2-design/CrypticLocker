@@ -15,6 +15,7 @@
 <p align="center">
   <a href="https://github.com/vipmayank2-design/CrypticLocker/releases"><img src="https://img.shields.io/github/v/release/vipmayank2-design/CrypticLocker?style=flat-square&color=blue" alt="Release"></a>
   <a href="https://github.com/vipmayank2-design/CrypticLocker/releases"><img src="https://img.shields.io/github/downloads/vipmayank2-design/CrypticLocker/total?style=flat-square&color=green" alt="Downloads"></a>
+  <a href="https://alternativeto.net/software/crypticlocker/"><img src="https://img.shields.io/badge/AlternativeTo-Listed-0c9ef0?style=flat-square" alt="AlternativeTo"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="License"></a>
   <a href="https://github.com/vipmayank2-design/CrypticLocker/actions"><img src="https://img.shields.io/github/actions/workflow/status/vipmayank2-design/CrypticLocker/ci.yml?style=flat-square&label=CI" alt="CI"></a>
 </p>
